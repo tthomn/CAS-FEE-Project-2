@@ -1,0 +1,61 @@
+.homepage {
+    text-align: center;
+    background-color: #f8e5a1;
+    padding: 20px;
+}
+
+.homepage-title {
+    font-size: 36px;
+    font-weight: bold;
+}
+
+.homepage-description {
+    font-size: 18px;
+    margin: 20px 0;
+}
+
+.homepage-image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.homepage-image {
+    max-width: 300px;
+}
+
+.bee-image {
+    width: 60px;
+}
+
+.bee-left {
+    position: absolute;
+    left: -60px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.bee-right {
+    position: absolute;
+    right: -60px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.shop-now-button {
+    background-color: red;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    margin-top: 20px;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+.shop-now-button:hover {
+    background-color: darkred;
+}

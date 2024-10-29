@@ -1,13 +1,30 @@
-# Node modules
-**/node_modules
+# General dependencies
+node_modules/
+.pnp
+.pnp.js
 
-# IDE files
+# Testing output
+coverage/
+
+# Production builds
+frontend/build/
+backend/build/
+
+# Environment variables and sensitive files
+.DS_Store
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Firebase credentials (backend specific)
+backend/src/config/firebase-adminsdk.json
+
+# IDE settings
 .idea/
 
 # Logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
-# Environment variables
-.env
