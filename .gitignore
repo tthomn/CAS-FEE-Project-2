@@ -12,14 +12,17 @@ backend/build/
 
 # Environment variables and sensitive files
 .DS_Store
-.env
+backend/.env
+frontend/.env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
 # Firebase credentials (backend specific)
-backend/src/config/firebase-adminsdk.json
+backend/config/firebase-adminsdk.json
+backend/config/*.json # Ensures any sensitive JSON files are ignored
+frontend/src/firebaseConfig.ts # Optionally ignore sensitive config in frontend
 
 # IDE settings
 .idea/

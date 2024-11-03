@@ -1,5 +1,3 @@
-// src/components/pages/RecipeList.tsx
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import './RecipeList.css';

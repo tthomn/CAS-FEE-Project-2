@@ -1,4 +1,3 @@
-// src/controllers/productController.ts
 import { Request, Response } from 'express';
 import admin from '../config/firebase';
 
