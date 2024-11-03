@@ -10,14 +10,15 @@ export const addToCart = async (req: Request, res: Response) => {
 
         console.log("Received request to add to cart:", { userId, productId, productName, price, quantity, imageUrl });
 
-        const cartItemRef = db.collection('carts').doc(userId).collection('items').doc(productId);
+        const cartItemRef = db.collection('carts').doc(userId).collection('items').doc();
 
         await cartItemRef.set({
+            productId,
             productName,
             price,
             quantity,
             imageUrl,
-        }, { merge: true });
+        });
 
         console.log(`Product ${productName} added to cart for user ${userId}`);
         res.status(201).json({ message: 'Product added to cart' });

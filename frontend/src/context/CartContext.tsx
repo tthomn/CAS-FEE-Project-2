@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import axios from 'axios';
 import { CartItem } from '../types/types';
+import { v4 as uuidv4 } from 'uuid';
 
 interface CartContextType {
     cartItems: CartItem[];
@@ -17,7 +18,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const userId = "testUser";
     const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || '';
 
-    // Define fetchCartItems before useEffect and wrap it in useCallback
     const fetchCartItems = useCallback(async () => {
         try {
             const response = await axios.get(`${API_BASE_URL}/api/cart/${userId}`);
@@ -33,9 +33,14 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }, [fetchCartItems]);
 
     const addToCart = async (item: CartItem) => {
+        const newItem = {
+            ...item,
+            cartItemId: uuidv4(),
+        };
+
         try {
-            await axios.post(`${API_BASE_URL}/api/cart/${userId}`, item);
-            fetchCartItems(); // Refresh cart items after adding
+            await axios.post(`${API_BASE_URL}/api/cart/${userId}`, newItem);
+            fetchCartItems();
         } catch (error) {
             console.error("Error adding item to cart:", error);
         }
@@ -44,7 +49,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const removeFromCart = async (id: string) => {
         try {
             await axios.delete(`${API_BASE_URL}/api/cart/${userId}/${id}`);
-            fetchCartItems(); // Refresh cart items after removing
+            fetchCartItems();
         } catch (error) {
             console.error("Error removing item from cart:", error);
         }
@@ -53,7 +58,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const clearCart = async () => {
         try {
             await axios.delete(`${API_BASE_URL}/api/cart/${userId}`);
-            setCartItems([]); // Clear the cart in state
+            setCartItems([]);
         } catch (error) {
             console.error("Error clearing cart:", error);
         }

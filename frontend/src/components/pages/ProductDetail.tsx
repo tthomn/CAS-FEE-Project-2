@@ -32,6 +32,7 @@ const ProductDetail: React.FC = () => {
     }, [productId]);
 
     const handleAddToCart = () => {
+        console.log("Add to Cart button clicked");
         if (!product) return;
 
         addToCart({
