@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { db } from '../../firebaseConfig';
 import { collection, getDocs } from 'firebase/firestore';
 import { Link } from 'react-router-dom';
-import './CategorySidebar.css';
 
 interface Category {
     id: string;
@@ -36,23 +35,27 @@ const CategorySidebar: React.FC<CategorySidebarProps> = ({ onSelectCategory }) =
     };
 
     return (
-        <div className="category-sidebar">
-            <h3>Kategorien</h3>
-            <ul>
-                <li>
+        <div className="p-4">
+            <h3 className="mb-4 text-lg font-bold">Kategorien</h3>
+            <ul className="list-none p-0">
+                <li className="mb-2">
                     <Link
                         to="/shop"
-                        className={activeCategory === null ? "active" : ""}
+                        className={`font-bold text-lg cursor-pointer ${
+                            activeCategory === null ? 'text-red-700' : 'text-red-500'
+                        }`}
                         onClick={() => handleCategoryClick(null)}
                     >
                         Alle
                     </Link>
                 </li>
                 {categories.map(category => (
-                    <li key={category.id}>
+                    <li key={category.id} className="mb-2">
                         <Link
                             to={`/shop?category=${category.id}`}
-                            className={activeCategory === category.id ? "active" : ""}
+                            className={`font-bold text-lg cursor-pointer ${
+                                activeCategory === category.id ? 'text-red-700' : 'text-red-500'
+                            }`}
                             onClick={() => handleCategoryClick(category.id)}
                         >
                             {category.name}

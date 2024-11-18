@@ -39,14 +39,22 @@ const ProductGrid: React.FC<ProductGridProps> = ({ categoryId }) => {
     }, [categoryId]);
 
     return (
-        <div className="product-grid">
+        <div className="grid grid-cols-3 gap-6 p-4">
             {products.map(product => (
-                <Link to={`/shop/${product.id}`} key={product.id} className="product-card-link">
-                    <div className="product-card">
-                        <img src={product.imageUrl} alt={product.name} />
-                        <h4>{product.name}</h4>
-                        <p>{product.weight} g</p>
-                        <p>CHF {Number(product.price).toFixed(2)}</p>
+                <Link
+                    to={`/shop/${product.id}`}
+                    key={product.id}
+                    className="no-underline text-inherit"
+                >
+                    <div className="border border-gray-300 rounded-lg shadow hover:shadow-lg transition-shadow p-4 flex flex-col items-center text-center">
+                        <img
+                            src={product.imageUrl}
+                            alt={product.name}
+                            className="w-full h-auto max-h-[150px] object-cover mb-4"
+                        />
+                        <h4 className="text-lg font-semibold mb-2">{product.name}</h4>
+                        <p className="text-sm text-gray-600">{product.weight} g</p>
+                        <p className="text-base font-medium text-gray-800">CHF {Number(product.price).toFixed(2)}</p>
                     </div>
                 </Link>
             ))}
