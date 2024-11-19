@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
-import axios from 'axios';
 import { CartItem } from '../types/types';
 import { v4 as uuidv4 } from 'uuid';
+import { db } from '../firebaseConfig';
+import { collection, getDocs, addDoc, deleteDoc, doc } from 'firebase/firestore';
 
 interface CartContextType {
     cartItems: CartItem[];
@@ -16,17 +17,18 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
     const userId = "testUser";
-    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || '';
 
     const fetchCartItems = useCallback(async () => {
         try {
-            const response = await axios.get(`${API_BASE_URL}/api/cart/${userId}`);
-            console.log("Fetched cart items in CartContext:", response.data);
-            setCartItems(response.data);
+            const querySnapshot = await getDocs(collection(db, "cart"));
+            const items = querySnapshot.docs
+                .filter(doc => doc.data().userId === userId) // Filter by userId
+                .map(doc => ({ id: doc.id, ...doc.data() } as CartItem));
+            setCartItems(items);
         } catch (error) {
             console.error("Error fetching cart items:", error);
         }
-    }, [API_BASE_URL, userId]);
+    }, [userId]);
 
     useEffect(() => {
         fetchCartItems();
@@ -36,10 +38,11 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         const newItem = {
             ...item,
             cartItemId: uuidv4(),
+            userId,
         };
 
         try {
-            await axios.post(`${API_BASE_URL}/api/cart/${userId}`, newItem);
+            await addDoc(collection(db, "cart"), newItem);
             fetchCartItems();
         } catch (error) {
             console.error("Error adding item to cart:", error);
@@ -48,7 +51,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     const removeFromCart = async (id: string) => {
         try {
-            await axios.delete(`${API_BASE_URL}/api/cart/${userId}/${id}`);
+            await deleteDoc(doc(db, "cart", id));
             fetchCartItems();
         } catch (error) {
             console.error("Error removing item from cart:", error);
@@ -57,7 +60,13 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     const clearCart = async () => {
         try {
-            await axios.delete(`${API_BASE_URL}/api/cart/${userId}`);
+            // Clear items for this user
+            const querySnapshot = await getDocs(collection(db, "cart"));
+            const batchDelete = querySnapshot.docs
+                .filter(doc => doc.data().userId === userId)
+                .map(doc => deleteDoc(doc.ref));
+
+            await Promise.all(batchDelete);
             setCartItems([]);
         } catch (error) {
             console.error("Error clearing cart:", error);
