@@ -1,10 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../context/AuthContext';
 
 const Header: React.FC = () => {
-    const { cartItems } = useCart();
-    const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+    const { totalItems } = useCart();
+    const { user, loading } = useAuth();
 
     return (
         <header className="flex justify-between items-center py-2 px-5 bg-yellow-300 shadow-md">
@@ -15,7 +16,9 @@ const Header: React.FC = () => {
                 <Link to="/" className="text-gray-800 text-lg font-medium hover:text-gray-600">Home</Link>
                 <Link to="/shop" className="text-gray-800 text-lg font-medium hover:text-gray-600">Shop</Link>
                 <Link to="/recipe" className="text-gray-800 text-lg font-medium hover:text-gray-600">Rezept</Link>
-                <Link to="/account" className="text-gray-800 text-lg font-medium hover:text-gray-600">Account</Link>
+                <Link to="/account" className="text-gray-800 text-lg font-medium hover:text-gray-600">
+                    {user ? 'Account' : 'Login'}
+                </Link>
             </nav>
             <div className="flex items-center gap-4">
                 <Link to="/cart" className="relative text-2xl text-gray-800 hover:text-gray-600">
@@ -26,9 +29,16 @@ const Header: React.FC = () => {
                         </span>
                     )}
                 </Link>
-                <button className="bg-red-500 text-white px-3 py-1 text-base rounded hover:bg-red-700">
-                    Anmelden
-                </button>
+                {!loading && !user && (
+                    <Link to="/login" className="bg-green-500 text-white px-3 py-1 text-base rounded hover:bg-green-700">
+                        Anmelden
+                    </Link>
+                )}
+                {user && (
+                    <button className="bg-red-500 text-white px-3 py-1 text-base rounded hover:bg-red-700">
+                        Abmelden
+                    </button>
+                )}
             </div>
         </header>
     );

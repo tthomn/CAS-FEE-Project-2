@@ -3,6 +3,7 @@ import { CartItem } from '../types/types';
 import { v4 as uuidv4 } from 'uuid';
 import { db } from '../firebaseConfig';
 import { collection, getDocs, addDoc, deleteDoc, doc } from 'firebase/firestore';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
 interface CartContextType {
     cartItems: CartItem[];
@@ -16,17 +17,26 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
-    const userId = "testUser";
+    const [userId, setUserId] = useState<string | null>(null);
+
+    useEffect(() => {
+        const auth = getAuth();
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            setUserId(user ? user.uid : null);
+        });
+        return unsubscribe;
+    }, []);
 
     const fetchCartItems = useCallback(async () => {
-        try {
-            const querySnapshot = await getDocs(collection(db, "cart"));
+        if (userId) {
+            const querySnapshot = await getDocs(collection(db, 'cart'));
             const items = querySnapshot.docs
-                .filter(doc => doc.data().userId === userId) // Filter by userId
-                .map(doc => ({ id: doc.id, ...doc.data() } as CartItem));
+                .filter((doc) => doc.data().userId === userId)
+                .map((doc) => ({ id: doc.id, ...doc.data() } as CartItem));
             setCartItems(items);
-        } catch (error) {
-            console.error("Error fetching cart items:", error);
+        } else {
+            const localCart = localStorage.getItem('guestCart');
+            setCartItems(localCart ? JSON.parse(localCart) : []);
         }
     }, [userId]);
 
@@ -34,42 +44,44 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         fetchCartItems();
     }, [fetchCartItems]);
 
-    const addToCart = async (item: CartItem) => {
-        const newItem = {
-            ...item,
-            cartItemId: uuidv4(),
-            userId,
-        };
+    const addToCart = (item: CartItem) => {
+        const newItem = { ...item, cartItemId: uuidv4() };
 
-        try {
-            await addDoc(collection(db, "cart"), newItem);
-            fetchCartItems();
-        } catch (error) {
-            console.error("Error adding item to cart:", error);
+        if (userId) {
+            addDoc(collection(db, 'cart'), { ...newItem, userId });
+        } else {
+            const updatedCart = [...cartItems, newItem];
+            localStorage.setItem('guestCart', JSON.stringify(updatedCart));
+            setCartItems(updatedCart);
         }
     };
 
-    const removeFromCart = async (id: string) => {
-        try {
-            await deleteDoc(doc(db, "cart", id));
-            fetchCartItems();
-        } catch (error) {
-            console.error("Error removing item from cart:", error);
+    const removeFromCart = (id: string) => {
+        if (userId) {
+            deleteDoc(doc(db, 'cart', id));
+        } else {
+            const updatedCart = cartItems.filter((item) => item.cartItemId !== id);
+            localStorage.setItem('guestCart', JSON.stringify(updatedCart));
+            setCartItems(updatedCart);
         }
     };
 
     const clearCart = async () => {
-        try {
-            // Clear items for this user
-            const querySnapshot = await getDocs(collection(db, "cart"));
-            const batchDelete = querySnapshot.docs
-                .filter(doc => doc.data().userId === userId)
-                .map(doc => deleteDoc(doc.ref));
-
-            await Promise.all(batchDelete);
+        if (userId) {
+            try {
+                const deletePromises = cartItems
+                    .filter((item) => item.cartItemId)
+                    .map((item) =>
+                        deleteDoc(doc(db, 'cart', item.cartItemId!))
+                    );
+                await Promise.all(deletePromises);
+                setCartItems([]);
+            } catch (error) {
+                console.error('Error clearing Firestore cart:', error);
+            }
+        } else {
+            localStorage.removeItem('guestCart');
             setCartItems([]);
-        } catch (error) {
-            console.error("Error clearing cart:", error);
         }
     };
 
@@ -85,7 +97,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 export const useCart = () => {
     const context = useContext(CartContext);
     if (!context) {
-        throw new Error("useCart must be used within a CartProvider");
+        throw new Error('useCart must be used within a CartProvider');
     }
     return context;
 };
