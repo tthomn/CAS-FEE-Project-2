@@ -1,6 +1,4 @@
-import React, { useEffect, useState } from "react";
-import { db } from "../../firebaseConfig";
-import { collection, getDocs } from "firebase/firestore";
+import React from "react";
 import { Link } from "react-router-dom";
 
 interface Category {
@@ -9,51 +7,16 @@ interface Category {
 }
 
 interface CategorySidebarProps {
-    onSelectCategory: (categoryId: string | null) => void;
+    categories: Category[];
+    onSelectCategory: (categoryId: string | null, categoryName: string | null) => void;
+    activeCategory: string | null;
 }
 
-const CategorySidebar: React.FC<CategorySidebarProps> = ({ onSelectCategory }) => {
-    const [categories, setCategories] = useState<Category[]>([]);
-    const [activeCategory, setActiveCategory] = useState<string | null>(null);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
-
-    useEffect(() => {
-        const fetchCategories = async () => {
-            setLoading(true);
-            setError(null);
-
-            try {
-                const querySnapshot = await getDocs(collection(db, "categories"));
-                const categoriesData = querySnapshot.docs.map((doc) => ({
-                    id: doc.id,
-                    ...(doc.data() as Omit<Category, "id">),
-                }));
-                setCategories(categoriesData);
-            } catch (err: any) {
-                setError("Failed to load categories. Please try again.");
-                console.error("Error fetching categories:", err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchCategories();
-    }, []);
-
-    const handleCategoryClick = (categoryId: string | null) => {
-        if (activeCategory === categoryId) return;
-        setActiveCategory(categoryId);
-        onSelectCategory(categoryId);
-    };
-
-    if (loading) {
-        return <p>Loading categories...</p>;
-    }
-
-    if (error) {
-        return <p className="text-red-500">{error}</p>;
-    }
-
+const CategorySidebar: React.FC<CategorySidebarProps> = ({
+                                                             categories,
+                                                             onSelectCategory,
+                                                             activeCategory,
+                                                         }) => {
     return (
         <div className="p-4">
             <h3 className="mb-4 text-lg font-bold">Kategorien</h3>
@@ -64,9 +27,9 @@ const CategorySidebar: React.FC<CategorySidebarProps> = ({ onSelectCategory }) =
                         className={`font-bold text-lg cursor-pointer ${
                             activeCategory === null ? "text-red-700" : "text-red-500"
                         }`}
-                        onClick={() => handleCategoryClick(null)}
+                        onClick={() => onSelectCategory(null, "Shop")}
                     >
-                        Alle
+                        Alle Kategorien
                     </Link>
                 </li>
                 {categories.map((category) => (
@@ -76,7 +39,7 @@ const CategorySidebar: React.FC<CategorySidebarProps> = ({ onSelectCategory }) =
                             className={`font-bold text-lg cursor-pointer ${
                                 activeCategory === category.id ? "text-red-700" : "text-red-500"
                             }`}
-                            onClick={() => handleCategoryClick(category.id)}
+                            onClick={() => onSelectCategory(category.id, category.name)}
                         >
                             {category.name}
                         </Link>
