@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode, useCa
 import { CartItem } from '../types/types';
 import { v4 as uuidv4 } from 'uuid';
 import { db } from '../firebaseConfig';
-import { collection, getDocs, addDoc, deleteDoc, doc, query, where } from 'firebase/firestore';
+import { collection, getDocs, addDoc, deleteDoc, doc, query, where, setDoc } from 'firebase/firestore';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
 interface CartContextType {
@@ -20,50 +20,79 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const [userId, setUserId] = useState<string | null>(null);
 
     const getGuestId = (): string => {
-        let guestId = localStorage.getItem('guestId');
+        let guestId = localStorage.getItem("guestId");
         if (!guestId) {
             guestId = uuidv4();
-            localStorage.setItem('guestId', guestId);
+            localStorage.setItem("guestId", guestId);
         }
         return guestId;
     };
+
+    const syncLocalToFirestore = async (guestId: string) => {
+        const localCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
+        try {
+            for (const item of localCart) {
+                const docRef = doc(collection(db, "cart"), item.cartItemId);
+                await setDoc(docRef, { ...item, guestId });
+            }
+            console.log("Local cart synced to Firestore.");
+        } catch (error) {
+            console.error("Error syncing local cart:", error);
+        }
+    };
+
+    const fetchCartItems = useCallback(async () => {
+        try {
+            let firestoreItems: CartItem[] = [];
+            const guestId = getGuestId();
+
+            if (userId) {
+                console.log("Fetching cart for authenticated user:", userId);
+                const q = query(collection(db, "cart"), where("userId", "==", userId));
+                const querySnapshot = await getDocs(q);
+                firestoreItems = querySnapshot.docs.map((doc) => ({
+                    id: doc.id,
+                    ...(doc.data() as Omit<CartItem, "id">),
+                }));
+            } else {
+                console.log("Fetching cart for guest user:", guestId);
+                const q = query(collection(db, "cart"), where("guestId", "==", guestId));
+                const querySnapshot = await getDocs(q);
+                firestoreItems = querySnapshot.docs.map((doc) => ({
+                    id: doc.id,
+                    ...(doc.data() as Omit<CartItem, "id">),
+                }));
+            }
+
+            if (!userId) {
+                const localCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
+                firestoreItems = [...firestoreItems, ...localCart];
+
+                const uniqueItems = Array.from(
+                    new Map(firestoreItems.map((item) => [item.productId || item.cartItemId, item])).values()
+                );
+
+                firestoreItems = uniqueItems;
+
+                localStorage.setItem("guestCart", JSON.stringify(firestoreItems));
+            }
+
+            setCartItems(firestoreItems);
+        } catch (error) {
+            console.error("Error fetching cart items:", error);
+        }
+    }, [userId]);
+
+
 
     useEffect(() => {
         const auth = getAuth();
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             setUserId(user ? user.uid : null);
+            if (!user) syncLocalToFirestore(getGuestId());
         });
         return unsubscribe;
     }, []);
-
-    const fetchCartItems = useCallback(async () => {
-        try {
-            if (userId) {
-                const q = query(collection(db, 'cart'), where('userId', '==', userId));
-                const querySnapshot = await getDocs(q);
-                const items = querySnapshot.docs.map((doc) => ({
-                    id: doc.id,
-                    ...doc.data(),
-                } as CartItem));
-                setCartItems(items);
-            } else {
-                const guestId = getGuestId();
-                const q = query(collection(db, 'cart'), where('guestId', '==', guestId));
-                const querySnapshot = await getDocs(q);
-                const items = querySnapshot.docs.map((doc) => ({
-                    id: doc.id,
-                    ...doc.data(),
-                } as CartItem));
-                setCartItems(items);
-            }
-        } catch (error) {
-            if (error instanceof Error) {
-                console.error('Error fetching cart items:', error.message);
-            } else {
-                console.error('Unexpected error fetching cart items:', error);
-            }
-        }
-    }, [userId]);
 
     useEffect(() => {
         fetchCartItems();
@@ -73,30 +102,38 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         const newItem = { ...item, cartItemId: uuidv4() };
 
         try {
+            let payload;
             if (userId) {
-                await addDoc(collection(db, 'cart'), { ...newItem, userId });
+                payload = { ...newItem, userId };
             } else {
                 const guestId = getGuestId();
-                await addDoc(collection(db, 'cart'), { ...newItem, guestId });
+                payload = { ...newItem, guestId };
+
+                const existingCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
+                localStorage.setItem(
+                    "guestCart",
+                    JSON.stringify([...existingCart, payload])
+                );
             }
+
+            await addDoc(collection(db, "cart"), payload);
+            console.log("Item added to Firestore successfully.");
+            fetchCartItems();
         } catch (error) {
-            if (error instanceof Error) {
-                console.error('Error adding item to cart:', error.message);
-            } else {
-                console.error('Unexpected error adding item to cart:', error);
-            }
+            console.error("Error adding item to cart:", error);
         }
     };
 
+
     const removeFromCart = async (id: string) => {
         try {
-            await deleteDoc(doc(db, 'cart', id));
+            await deleteDoc(doc(db, "cart", id));
+            setCartItems((prev) => prev.filter((item) => item.id !== id));
+
+            const localCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
+            localStorage.setItem("guestCart", JSON.stringify(localCart.filter((item: CartItem) => item.cartItemId !== id)));
         } catch (error) {
-            if (error instanceof Error) {
-                console.error('Error removing item from cart:', error.message);
-            } else {
-                console.error('Unexpected error removing item from cart:', error);
-            }
+            console.error("Error removing item from cart:", error);
         }
     };
 
@@ -104,26 +141,23 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         try {
             if (userId) {
                 const deletePromises = cartItems.map((item) =>
-                    deleteDoc(doc(db, 'cart', item.id))
+                    deleteDoc(doc(db, "cart", item.id))
                 );
                 await Promise.all(deletePromises);
             } else {
-                localStorage.removeItem('guestCart');
                 const guestId = getGuestId();
-                const q = query(collection(db, 'cart'), where('guestId', '==', guestId));
+                const q = query(collection(db, "cart"), where("guestId", "==", guestId));
                 const querySnapshot = await getDocs(q);
                 const deletePromises = querySnapshot.docs.map((doc) =>
                     deleteDoc(doc.ref)
                 );
                 await Promise.all(deletePromises);
+                localStorage.removeItem("guestCart");
             }
+
             setCartItems([]);
         } catch (error) {
-            if (error instanceof Error) {
-                console.error('Error clearing cart:', error.message);
-            } else {
-                console.error('Unexpected error clearing cart:', error);
-            }
+            console.error("Error clearing cart:", error);
         }
     };
 
@@ -139,7 +173,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 export const useCart = () => {
     const context = useContext(CartContext);
     if (!context) {
-        throw new Error('useCart must be used within a CartProvider');
+        throw new Error("useCart must be used within a CartProvider");
     }
     return context;
 };

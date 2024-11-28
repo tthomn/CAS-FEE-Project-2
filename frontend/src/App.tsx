@@ -12,36 +12,27 @@ import CartPage from "./components/pages/CartPage";
 import NotFoundPage from "./components/pages/NotFoundPage";
 import { CartProvider } from "./context/CartContext";
 import { AuthProvider } from "./context/AuthContext";
+import FlyingBees from "./components/layouts/FlyingBees";
 
 const App: React.FC = () => {
     return (
         <AuthProvider>
             <CartProvider>
                 <Router>
-                    <Header />
-                    <Routes>
-                        <Route path="/" element={<HomePage />} />
-                        <Route path="/shop" element={<ShopPage />} />
-                        <Route path="/shop/:productId" element={<ProductDetail />} />
-                        <Route path="/recipe" element={<Recipe />} />
-                        <Route path="/recipe/:id" element={<RecipeDetail />} />
-
-                        {}
-                        <Route
-                            path="/account"
-                            element={
-
-                                    <Account />
-
-                            }
-                        />
-
-                        {}
-                        <Route path="/cart" element={<CartPage />} />
-
-                        {}
-                        <Route path="*" element={<NotFoundPage />} />
-                    </Routes>
+                    <div className="relative min-h-screen">
+                        <Header />
+                        <Routes>
+                            {}
+                            <Route path="/" element={<><FlyingBees /><HomePage /></>} />
+                            <Route path="/shop" element={<ShopPage />} />
+                            <Route path="/shop/:productId" element={<ProductDetail />} />
+                            <Route path="/recipe" element={<Recipe />} />
+                            <Route path="/recipe/:id" element={<RecipeDetail />} />
+                            <Route path="/account" element={<Account />} />
+                            <Route path="/cart" element={<CartPage />} />
+                            <Route path="*" element={<NotFoundPage />} />
+                        </Routes>
+                    </div>
                 </Router>
             </CartProvider>
         </AuthProvider>

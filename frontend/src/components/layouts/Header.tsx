@@ -8,64 +8,31 @@ const Header: React.FC = () => {
     const { user, logout } = useAuth();
 
     return (
-        <header
-            className="flex justify-between items-center py-2 px-5 shadow-md"
-            style={{ backgroundColor: "#fff8e1" }}
-        >
-            {/* Logo */}
-            <div className="text-2xl font-bold">
-            </div>
+        <header className="flex justify-between items-center py-2 px-5 shadow-md" style={{ backgroundColor: "#fff8e1" }}>
+            <div className="text-2xl font-bold">Honey Shop</div>
             <nav className="flex gap-16">
-                <NavLink
-                    to="/"
-                    className={({ isActive }) =>
-                        `text-lg font-medium hover:text-gray-600 ${
-                            isActive ? "text-black font-bold" : "text-gray-800"
-                        }`
-                    }
-                >
-                    Home
-                </NavLink>
-                <NavLink
-                    to="/shop"
-                    className={({ isActive }) =>
-                        `text-lg font-medium hover:text-gray-600 ${
-                            isActive ? "text-black font-bold" : "text-gray-800"
-                        }`
-                    }
-                >
-                    Shop
-                </NavLink>
-                <NavLink
-                    to="/recipe"
-                    className={({ isActive }) =>
-                        `text-lg font-medium hover:text-gray-600 ${
-                            isActive ? "text-black font-bold" : "text-gray-800"
-                        }`
-                    }
-                >
-                    Rezept
-                </NavLink>
-                <NavLink
-                    to="/account"
-                    className={({ isActive }) =>
-                        `text-lg font-medium hover:text-gray-600 ${
-                            isActive ? "text-black font-bold" : "text-gray-800"
-                        }`
-                    }
-                >
-                    Account
-                </NavLink>
+                {[
+                    { to: "/", label: "Home" },
+                    { to: "/shop", label: "Shop" },
+                    { to: "/recipe", label: "Rezept" },
+                    { to: "/account", label: "Account" },
+                ].map(({ to, label }) => (
+                    <NavLink
+                        key={to}
+                        to={to}
+                        className={({ isActive }) =>
+                            `relative text-lg font-medium ${
+                                isActive ? "text-orange-600 font-bold" : "text-gray-800"
+                            } hover:text-orange-600 hover:after:w-full after:content-[''] after:absolute after:left-0 after:bottom-[0px] after:h-[1px] after:bg-orange-600 after:w-0 after:transition-all after:duration-300`
+                        }
+                    >
+                        {label}
+                    </NavLink>
+                ))}
             </nav>
-
             <div className="flex items-center gap-4">
-                <NavLink
-                    to="/cart"
-                    className="relative text-2xl text-gray-800 hover:text-gray-600"
-                >
-                    <span role="img" aria-label="shopping cart">
-                        🛒
-                    </span>
+                <NavLink to="/cart" className="relative text-2xl text-gray-800 hover:text-gray-600">
+                    🛒
                     {totalItems > 0 && (
                         <span className="absolute top-0 right-0 bg-red-600 text-white rounded-full px-1 text-xs font-bold transform translate-x-2 -translate-y-2">
                             {totalItems}

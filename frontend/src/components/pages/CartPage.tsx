@@ -31,7 +31,7 @@ const CartPage: React.FC = () => {
             q,
             (snapshot) => {
                 const items: CartItem[] = snapshot.docs.map((doc) => ({
-                    id: doc.id,
+                    id: doc.id, // Firestore document ID
                     ...(doc.data() as Omit<CartItem, "id">),
                 }));
                 setCartItems(items);
@@ -72,7 +72,7 @@ const CartPage: React.FC = () => {
                 <>
                     <ul className="list-none space-y-4">
                         {cartItems.map((item) => (
-                            <li key={item.id} className="flex items-center p-4 border-b border-gray-200">
+                            <li key={item.cartItemId || item.id} className="flex items-center p-4 border-b border-gray-200">
                                 <img
                                     src={item.imageUrl}
                                     alt={item.productName}
