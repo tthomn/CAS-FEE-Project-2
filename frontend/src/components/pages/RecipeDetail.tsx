@@ -5,12 +5,12 @@ const RecipeDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
 
     const recipeData: { [key: string]: { title: string; description: string; image: string } } = {
-        '1': { title: 'Honig Kuchen', description: 'A delicious honey cake with rich flavor.', image: '/images/honey_cake.jpg' },
-        '2': { title: 'Honig Sesam Sauce', description: 'Sweet honey sesame sauce, perfect for dipping.', image: '/images/honey_sesame_sauce.jpg' },
-        '3': { title: 'Honig Kuchen', description: 'A delicious honey cake with rich flavor.', image: '/images/honey_cake.jpg' },
-        '4': { title: 'Honig Sesam Sauce', description: 'Sweet honey sesame sauce, perfect for dipping.', image: '/images/honey_sesame_sauce.jpg' },
-        '5': { title: 'Honig Kuchen', description: 'A delicious honey cake with rich flavor.', image: '/images/honey_cake.jpg' },
-        '6': { title: 'Honig Sesam Sauce', description: 'Sweet honey sesame sauce, perfect for dipping.', image: '/images/honey_sesame_sauce.jpg' },
+        '1': { title: 'Honig Kuchen', description: 'Ein saftiger, aromatischer Kuchen mit der natürlichen Süsse von Honig. Perfekt für gemütliche Nachmittage oder besondere Anlässe, begeistert dieser Klassiker mit seiner weichen Textur und einem Hauch von Wohlfühlgeschmack in jedem Bissen. 🍯🍰', image: '/images/honig_kuchen.png' },
+        '2': { title: 'Honig Sesam Sauce', description: ' Eine köstliche Kombination aus der natürlichen Süsse von Honig und dem nussigen Aroma von Sesam. Perfekt als Dressing für Salate, Dip für Gemüse oder Glasur für Fleisch und Fisch. Diese vielseitige Sauce bringt einen Hauch von Raffinesse in jede Mahlzeit! 🍯🌱', image: '/images/honey_sesame_sauce.jpg' },
+        '3': { title: 'Honig Torte', description: ' Eine meisterhafte Kreation aus zarten Schichten, verfeinert mit der natürlichen Süße von Honig. Diese Torte verbindet saftige Teigschichten mit einer leichten, cremigen Füllung und einem Hauch von Luxus in jedem Bissen. Perfekt für besondere Anlässe oder um sich selbst zu verwöhnen! 🍯🎂', image: '/images/honey_cake.jpg' },
+        '4': { title: 'Honig Mousse', description: ' Eine luftig-cremige Verführung mit der feinen Süsse von Honig. Dieses zarte Dessert zergeht auf der Zunge und verwöhnt den Gaumen mit einem Hauch von Eleganz und natürlichem Geschmack. Perfekt für besondere Momente oder als Highlight eines Menüs! 🍯🍮', image: '/images/honig_mousse.png' },
+        '5': { title: 'Honig Tee', description: 'Eine wohltuende Kombination aus aromatischem Tee und der natürlichen Süsse von Honig. Ideal für entspannte Momente, verwöhnt dieser Tee die Sinne und sorgt für eine warme, beruhigende Auszeit. Perfekt für kalte Tage oder einfach zum Geniessen! 🍯☕', image: '/images/honey_tea.png' },
+        '6': { title: 'Honig Kekse', description: 'Köstliche, goldbraune Kekse mit der natürlichen Süsse von Honig. Perfekt für den Genuss zu einer Tasse Tee oder Kaffee, mit einem zarten Aroma, das jeden Bissen zu einem besonderen Moment macht. 🍯🍪', image: '/images/honig_kekse.png' },
     };
 
     const recipe = recipeData[id!];

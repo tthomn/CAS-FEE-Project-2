@@ -56,85 +56,104 @@ const Account: React.FC = () => {
         return <p className="text-center text-gray-500">Loading...</p>;
     }
 
-    if (user) {
-        return (
-            <div className="max-w-md mx-auto p-6 text-center">
-                <h1 className="text-2xl font-bold mb-4">My Account</h1>
-                <p className="text-gray-700">
-                    <strong>Email:</strong> {user.email}
-                </p>
-                <p className="text-gray-700">
-                    <strong>Registration Date:</strong> {user.metadata.creationTime}
-                </p>
-                <h2 className="text-xl font-bold mt-6 mb-2">Purchase History</h2>
-                <ul className="list-disc list-inside text-left mx-auto max-w-xs">
-                    <li>Order #123 - $50.00 - Delivered</li>
-                    <li>Order #124 - $30.00 - In Progress</li>
-                </ul>
-                {message && <p className="text-green-500 mt-4">{message}</p>}
-            </div>
-        );
-    }
-
     return (
-        <div className="max-w-md mx-auto p-6 text-center">
-            <h1 className="text-2xl font-bold mb-4">
-                {isRegistering ? "Register" : "Login"}
-            </h1>
-            <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
-            />
-            <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
-            />
-            {isRegistering && (
-                <input
-                    type="password"
-                    placeholder="Confirm Password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
+        <div className="relative">
+            <div className="relative">
+                <img
+                    src="/images/banner_account.png"
+                    alt="Account Banner"
+                    className="w-full h-64 object-cover"
                 />
-            )}
-            <button
-                onClick={handleSubmit}
-                className={`w-full p-2 mb-4 rounded ${
-                    isRegistering ? "bg-blue-500" : "bg-green-500"
-                } text-white hover:bg-opacity-90`}
-                disabled={authLoading}
-            >
-                {authLoading
-                    ? isRegistering
-                        ? "Registering..."
-                        : "Logging in..."
-                    : isRegistering
-                        ? "Register"
-                        : "Login"}
-            </button>
-            {!isRegistering && (
-                <button
-                    onClick={handlePasswordReset}
-                    className="w-full p-2 mb-4 bg-gray-500 text-white rounded hover:bg-gray-600"
-                    disabled={!email || authLoading}
-                >
-                    Forgot Password?
-                </button>
-            )}
-            <button
-                onClick={() => setIsRegistering(!isRegistering)}
-                className="w-full p-2 mb-4 bg-purple-500 text-white rounded hover:bg-purple-600"
-            >
-                {isRegistering ? "Switch to Login" : "Switch to Register"}
-            </button>
-            {message && <p className="text-red-500 mt-4">{message}</p>}
+                <h1 className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-4xl font-bold">
+                    My Account
+                </h1>
+            </div>
+
+            <div className="max-w-md mx-auto p-6 text-center">
+                {user ? (
+                    <>
+                        <h2 className="text-2xl font-bold mb-4">Welcome Back!</h2>
+                        <p className="text-gray-700">
+                            <strong>Email:</strong> {user.email}
+                        </p>
+                        <p className="text-gray-700">
+                            <strong>Registration Date:</strong> {user.metadata.creationTime}
+                        </p>
+                        <h2 className="text-xl font-bold mt-6 mb-2">Purchase History</h2>
+                        <ul className="list-disc list-inside text-left mx-auto max-w-xs">
+                            <li>Order #123 - $50.00 - Delivered</li>
+                            <li>Order #124 - $30.00 - In Progress</li>
+                        </ul>
+                        {message && <p className="text-green-500 mt-4">{message}</p>}
+                        <button
+                            onClick={handleLogout}
+                            className="mt-4 w-full bg-red-500 text-white p-2 rounded hover:bg-red-600"
+                        >
+                            Logout
+                        </button>
+                    </>
+                ) : (
+                    <>
+                        <h1 className="text-2xl font-bold mb-4">
+                            {isRegistering ? "Register" : "Login"}
+                        </h1>
+                        <input
+                            type="email"
+                            placeholder="Email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
+                        />
+                        <input
+                            type="password"
+                            placeholder="Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
+                        />
+                        {isRegistering && (
+                            <input
+                                type="password"
+                                placeholder="Confirm Password"
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
+                            />
+                        )}
+                        <button
+                            onClick={handleSubmit}
+                            className={`w-full p-2 mb-4 rounded ${
+                                isRegistering ? "bg-blue-500" : "bg-green-500"
+                            } text-white hover:bg-opacity-90`}
+                            disabled={authLoading}
+                        >
+                            {authLoading
+                                ? isRegistering
+                                    ? "Registering..."
+                                    : "Logging in..."
+                                : isRegistering
+                                    ? "Register"
+                                    : "Login"}
+                        </button>
+                        {!isRegistering && (
+                            <button
+                                onClick={handlePasswordReset}
+                                className="w-full p-2 mb-4 bg-gray-500 text-white rounded hover:bg-gray-600"
+                                disabled={!email || authLoading}
+                            >
+                                Forgot Password?
+                            </button>
+                        )}
+                        <button
+                            onClick={() => setIsRegistering(!isRegistering)}
+                            className="w-full p-2 mb-4 bg-purple-500 text-white rounded hover:bg-purple-600"
+                        >
+                            {isRegistering ? "Switch to Login" : "Switch to Register"}
+                        </button>
+                        {message && <p className="text-red-500 mt-4">{message}</p>}
+                    </>
+                )}
+            </div>
         </div>
     );
 };

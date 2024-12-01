@@ -21,7 +21,7 @@ const Header: React.FC = () => {
                 {[
                     { to: "/", label: "Home" },
                     { to: "/shop", label: "Shop" },
-                    { to: "/recipe", label: "Rezept" },
+                    { to: "/recipe", label: "Rezepte" },
                     { to: "/account", label: "Account" },
                 ].map(({ to, label }) => (
                     <NavLink

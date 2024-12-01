@@ -3,12 +3,12 @@ import { Link } from "react-router-dom";
 
 const Recipe: React.FC = () => {
     const recipes = [
-        { id: 1, category: "Kuchen", title: "Honig Kuchen", image: "/images/honey_cake.jpg" },
+        { id: 1, category: "Kuchen", title: "Honig Kuchen", image: "/images/honig_kuchen.png" },
         { id: 2, category: "Sauce", title: "Honig Sesam Sauce", image: "/images/honey_sesame_sauce.jpg" },
-        { id: 3, category: "Kuchen", title: "Honig Torte", image: "/images/honey_torte.jpg" },
-        { id: 4, category: "Dessert", title: "Honig Mousse", image: "/images/honey_mousse.jpg" },
-        { id: 5, category: "Getränk", title: "Honig Tee", image: "/images/honey_tea.jpg" },
-        { id: 6, category: "Snack", title: "Honig Kekse", image: "/images/honey_cookies.jpg" },
+        { id: 3, category: "Kuchen", title: "Honig Torte", image: "/images/honey_cake.jpg" },
+        { id: 4, category: "Dessert", title: "Honig Mousse", image: "/images/honig_mousse.png" },
+        { id: 5, category: "Getränk", title: "Honig Tee", image: "/images/honey_tea.png" },
+        { id: 6, category: "Snack", title: "Honig Kekse", image: "/images/honig_kekse.png" },
     ];
 
     return (
