@@ -1,9 +1,11 @@
 import React from "react";
 import { useCart } from "../../context/CartContext";
+import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
 import "react-toastify/dist/ReactToastify.css";
 
 const CartPage: React.FC = () => {
-    const { cartItems, removeFromCart, totalItems } = useCart();
+    const { cartItems, removeFromCart } = useCart();
+    const navigate = useNavigate(); // Initialize the navigate function
 
     const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
@@ -38,7 +40,10 @@ const CartPage: React.FC = () => {
             </ul>
             <div className="text-right mt-6">
                 <h3 className="text-xl font-semibold text-gray-800 mb-4">Total: CHF {totalPrice.toFixed(2)}</h3>
-                <button className="px-6 py-2 text-white bg-green-500 rounded hover:bg-green-600 transition-colors">
+                <button
+                    className="px-6 py-2 text-white bg-green-500 rounded hover:bg-green-600 transition-colors"
+                    onClick={() => navigate("/checkout")} // Redirect to the checkout page
+                >
                     Proceed to Checkout
                 </button>
             </div>
