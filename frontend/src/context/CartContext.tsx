@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { db } from '../firebaseConfig';
 import { collection, getDocs, addDoc, deleteDoc, doc, query, where, setDoc } from 'firebase/firestore';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import {toast} from "react-toastify";
 
 interface CartContextType {
     cartItems: CartItem[];
@@ -62,22 +63,20 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                     id: doc.id,
                     ...(doc.data() as Omit<CartItem, "id">),
                 }));
-            }
 
-            if (!userId) {
-                const localCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
-                firestoreItems = [...firestoreItems, ...localCart];
-
-                const uniqueItems = Array.from(
-                    new Map(firestoreItems.map((item) => [item.productId || item.cartItemId, item])).values()
-                );
-
-                firestoreItems = uniqueItems;
-
-                localStorage.setItem("guestCart", JSON.stringify(firestoreItems));
+                if (firestoreItems.length === 0) {
+                    const localCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
+                    firestoreItems = [...localCart];
+                }
             }
 
             setCartItems(firestoreItems);
+
+            if (!userId) {
+                localStorage.setItem("guestCart", JSON.stringify(firestoreItems));
+            }
+
+            console.log("Fetched cart items:", firestoreItems);
         } catch (error) {
             console.error("Error fetching cart items:", error);
         }
@@ -124,16 +123,20 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
     };
 
-
-    const removeFromCart = async (id: string) => {
+    const removeFromCart = async (itemId: string) => {
         try {
-            await deleteDoc(doc(db, "cart", id));
-            setCartItems((prev) => prev.filter((item) => item.id !== id));
+            const docRef = doc(db, "cart", itemId);
+            await deleteDoc(docRef);
 
-            const localCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
-            localStorage.setItem("guestCart", JSON.stringify(localCart.filter((item: CartItem) => item.cartItemId !== id)));
+            setCartItems((prev) => prev.filter((item) => item.id !== itemId));
+
+            if (!userId) {
+                const guestCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
+                const updatedCart = guestCart.filter((item: CartItem) => item.cartItemId !== itemId);
+                localStorage.setItem("guestCart", JSON.stringify(updatedCart));
+            }
         } catch (error) {
-            console.error("Error removing item from cart:", error);
+            toast.error("Failed to remove item. Please try again.");
         }
     };
 
