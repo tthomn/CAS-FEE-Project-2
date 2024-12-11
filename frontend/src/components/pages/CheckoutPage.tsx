@@ -1,57 +1,111 @@
 import React, { useState } from "react";
 import { useCart } from "../../context/CartContext";
 import Modal from "../shared/Modal";
+import { collection, addDoc } from "firebase/firestore";
+import { db } from "../../firebaseConfig";
+import emailjs from "@emailjs/browser";
 
 const CheckoutPage: React.FC = () => {
     const { cartItems, clearCart } = useCart();
     const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const shippingFee = 5.20;
 
+    const [email, setEmail] = useState("");
     const [deliveryAddress, setDeliveryAddress] = useState("Weltpoststrasse 5, 3015 Bern");
     const [isEditingAddress, setIsEditingAddress] = useState(false);
-    const [paymentDetails, setPaymentDetails] = useState({
-        cardNumber: "",
-        cardName: "",
-        cardExpiry: "",
-    });
     const [billingAddress, setBillingAddress] = useState("Gleiche Adresse wie die Lieferadresse");
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const [formError, setFormError] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setDeliveryAddress(e.target.value);
         setErrors((prev) => ({ ...prev, deliveryAddress: "" }));
     };
 
-    const handlePaymentDetailsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setPaymentDetails((prev) => ({
-            ...prev,
-            [name]: value,
-        }));
-        setErrors((prev) => ({ ...prev, [name]: "" }));
+    const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setEmail(e.target.value);
+        setErrors((prev) => ({ ...prev, email: "" }));
     };
 
     const toggleEditAddress = () => {
         setIsEditingAddress(!isEditingAddress);
     };
 
+    const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
     const validateForm = () => {
         const newErrors: { [key: string]: string } = {};
-        if (!deliveryAddress.trim()) newErrors.deliveryAddress = "Die Lieferadresse darf nicht leer sein.";
-        if (!paymentDetails.cardNumber.trim()) newErrors.cardNumber = "Kartennummer ist erforderlich.";
-        if (!paymentDetails.cardName.trim()) newErrors.cardName = "Name auf der Karte ist erforderlich.";
-        if (!paymentDetails.cardExpiry.trim()) newErrors.cardExpiry = "Gültigkeitsdatum ist erforderlich.";
+        if (!email.trim() || !validateEmail(email)) {
+            newErrors.email = "Bitte geben Sie eine gültige E-Mail-Adresse ein.";
+        }
+        if (!deliveryAddress.trim()) {
+            newErrors.deliveryAddress = "Die Lieferadresse darf nicht leer sein.";
+        }
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
-    const handlePlaceOrder = () => {
+    const sendInvoiceEmail = async (order: any, orderId: string) => {
+        const emailParams = {
+            to_name: email,
+            to_email: email,
+            order_id: orderId,
+            delivery_address: order.deliveryAddress,
+            billing_address: order.billingAddress,
+            total_price: order.totalPrice.toFixed(2),
+            items: order.cartItems
+                .map(
+                    (item: any) =>
+                        `${item.productName} (x${item.quantity}): CHF ${(item.price * item.quantity).toFixed(2)}`
+                )
+                .join("\n"),
+        };
+
+        console.log("Email parameters being sent to EmailJS:", JSON.stringify(emailParams, null, 2));
+
+        try {
+            await emailjs.send(
+                "service_ua1imoh",
+                "template_qdffusf",
+                emailParams,
+                "LhmWwd3pEmYkAMNKW"
+            );
+            console.log("Invoice email sent successfully!");
+        } catch (error: any) {
+            console.error("Error sending invoice email:", error?.text || error);
+            throw new Error("Failed to send email. Please check the logs for details.");
+        }
+    };
+
+    const handlePlaceOrder = async () => {
         if (validateForm()) {
-            clearCart();
-            setFormError("");
-            setIsModalOpen(true);
+            setIsLoading(true);
+            try {
+                const order = {
+                    deliveryAddress,
+                    billingAddress,
+                    email,
+                    cartItems,
+                    totalPrice: totalPrice + shippingFee,
+                    createdAt: new Date().toISOString(),
+                    status: "pending",
+                };
+
+                const docRef = await addDoc(collection(db, "orders"), order);
+                console.log("Order saved to Firestore with ID:", docRef.id);
+
+                await sendInvoiceEmail(order, docRef.id);
+
+                clearCart();
+                setIsModalOpen(true);
+            } catch (error) {
+                console.error("Error placing order:", error);
+                setFormError("Fehler beim Abschließen der Bestellung. Bitte versuchen Sie es erneut.");
+            } finally {
+                setIsLoading(false);
+            }
         } else {
             setFormError("Bitte überprüfen Sie die Eingaben.");
         }
@@ -59,9 +113,21 @@ const CheckoutPage: React.FC = () => {
 
     return (
         <div className="px-4 py-6 max-w-4xl mx-auto">
-            <h1 className="text-2xl font-bold text-gray-800 text-center mb-6">Versand und Bezahlung</h1>
+            <h1 className="text-2xl font-bold text-gray-800 text-center mb-6">Versand und Rechnung</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
+                    <h2 className="text-lg font-bold mb-4">E-Mail-Adresse</h2>
+                    <input
+                        type="email"
+                        value={email}
+                        onChange={handleEmailChange}
+                        className="w-full border p-2 mb-2"
+                        placeholder="E-Mail-Adresse eingeben"
+                    />
+                    {errors.email && (
+                        <p className="text-red-500 text-sm">{errors.email}</p>
+                    )}
+
                     <h2 className="text-lg font-bold mb-4">Lieferadresse</h2>
                     {isEditingAddress ? (
                         <div>
@@ -93,61 +159,7 @@ const CheckoutPage: React.FC = () => {
                             </button>
                         </div>
                     )}
-
-                    <h2 className="text-lg font-bold mt-6 mb-4">Zahlungsmethode</h2>
-                    <input
-                        type="text"
-                        name="cardNumber"
-                        placeholder="Kartennummer"
-                        className="w-full border p-2 mb-2"
-                        value={paymentDetails.cardNumber}
-                        onChange={handlePaymentDetailsChange}
-                    />
-                    {errors.cardNumber && <p className="text-red-500 text-sm">{errors.cardNumber}</p>}
-                    <input
-                        type="text"
-                        name="cardName"
-                        placeholder="Name auf der Karte"
-                        className="w-full border p-2 mb-2"
-                        value={paymentDetails.cardName}
-                        onChange={handlePaymentDetailsChange}
-                    />
-                    {errors.cardName && <p className="text-red-500 text-sm">{errors.cardName}</p>}
-                    <input
-                        type="text"
-                        name="cardExpiry"
-                        placeholder="MM/YY"
-                        className="w-full border p-2 mb-2"
-                        value={paymentDetails.cardExpiry}
-                        onChange={handlePaymentDetailsChange}
-                    />
-                    {errors.cardExpiry && <p className="text-red-500 text-sm">{errors.cardExpiry}</p>}
-
-                    <h2 className="text-lg font-bold mt-6 mb-4">Rechnungsadresse</h2>
-                    <div className="space-y-4">
-                        <label className="block border border-gray-300 rounded-md p-4 cursor-pointer hover:shadow-md">
-                            <input
-                                type="radio"
-                                name="billing"
-                                className="mr-2"
-                                checked={billingAddress === "Gleiche Adresse wie die Lieferadresse"}
-                                onChange={() => setBillingAddress("Gleiche Adresse wie die Lieferadresse")}
-                            />
-                            <span>Gleiche Adresse wie die Lieferadresse</span>
-                        </label>
-                        <label className="block border border-gray-300 rounded-md p-4 cursor-pointer hover:shadow-md">
-                            <input
-                                type="radio"
-                                name="billing"
-                                className="mr-2"
-                                checked={billingAddress === "Verwenden Sie eine andere Rechnungsadresse"}
-                                onChange={() => setBillingAddress("Verwenden Sie eine andere Rechnungsadresse")}
-                            />
-                            <span>Verwenden Sie eine andere Rechnungsadresse</span>
-                        </label>
-                    </div>
                 </div>
-
                 <div>
                     <h2 className="text-lg font-bold mb-4">Zusammenfassung</h2>
                     <ul className="mb-4">
@@ -174,10 +186,13 @@ const CheckoutPage: React.FC = () => {
             </div>
             <div>
                 <button
-                    className="mt-6 px-6 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                    className={`mt-6 px-6 py-2 bg-red-500 text-white rounded ${
+                        isLoading ? "opacity-50 cursor-not-allowed" : "hover:bg-red-600"
+                    }`}
                     onClick={handlePlaceOrder}
+                    disabled={isLoading}
                 >
-                    Bestellung abschließen
+                    {isLoading ? "Processing..." : "Bestellung abschliessen"}
                 </button>
                 {formError && (
                     <p className="mt-2 text-red-500 text-sm">{formError}</p>
@@ -187,7 +202,7 @@ const CheckoutPage: React.FC = () => {
             <Modal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                message="Ihre Bestellung wurde erfolgreich abgeschlossen! Vielen Dank."
+                message="Ihre Bestellung wurde erfolgreich abgeschlossen! Eine Rechnung wurde per E-Mail gesendet."
             />
         </div>
     );

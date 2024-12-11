@@ -23,4 +23,13 @@ export interface CartItem {
     cartItemId?: string;
 }
 
+export interface Order {
+    id: string;
+    userId?: string;
+    cartItems: CartItem[];
+    totalAmount: number;
+    status: "pending" | "completed" | "canceled";
+    createdAt: string;
+}
+
 

@@ -7,17 +7,22 @@ interface ModalProps {
 }
 
 const Modal: React.FC<ModalProps> = ({ isOpen, onClose, message }) => {
-    if (!isOpen) return null;
-
     useEffect(() => {
+        if (!isOpen) return;
+
         const handleKeyDown = (event: KeyboardEvent) => {
             if (event.key === "Escape") {
                 onClose();
             }
         };
+
         document.addEventListener("keydown", handleKeyDown);
-        return () => document.removeEventListener("keydown", handleKeyDown);
-    }, [onClose]);
+        return () => {
+            document.removeEventListener("keydown", handleKeyDown);
+        };
+    }, [isOpen, onClose]);
+
+    if (!isOpen) return null;
 
     return (
         <div
@@ -38,7 +43,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, message }) => {
                     onClick={onClose}
                     className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
                 >
-                    Schließen
+                    Schliessen
                 </button>
             </div>
         </div>
