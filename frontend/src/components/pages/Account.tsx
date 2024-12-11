@@ -7,6 +7,7 @@ const Account: React.FC = () => {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [isRegistering, setIsRegistering] = useState(false);
+    const [isForgotPassword, setIsForgotPassword] = useState(false);
     const [message, setMessage] = useState("");
     const [authLoading, setAuthLoading] = useState(false);
 
@@ -70,21 +71,42 @@ const Account: React.FC = () => {
             </div>
 
             <div className="max-w-md mx-auto p-6 text-center">
-                {user ? (
+                {isForgotPassword ? (
+                    <>
+                        <h2 className="text-xl font-bold mb-4">Restore Password</h2>
+                        <input
+                            type="email"
+                            placeholder="Enter your email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
+                        />
+                        <button
+                            onClick={handlePasswordReset}
+                            className={`w-full p-2 mb-4 rounded bg-blue-500 text-white hover:bg-blue-600 ${
+                                authLoading ? "opacity-50 cursor-not-allowed" : ""
+                            }`}
+                            disabled={authLoading || !email.trim()}
+                        >
+                            {authLoading ? "Sending..." : "Restore My Password"}
+                        </button>
+                        <button
+                            onClick={() => {
+                                setIsForgotPassword(false);
+                                setMessage("");
+                            }}
+                            className="w-full p-2 mb-4 rounded bg-gray-500 text-white hover:bg-gray-600"
+                        >
+                            Back to Login
+                        </button>
+                        {message && <p className="text-green-500 mt-4">{message}</p>}
+                    </>
+                ) : user ? (
                     <>
                         <h2 className="text-2xl font-bold mb-4">Welcome Back!</h2>
                         <p className="text-gray-700">
                             <strong>Email:</strong> {user.email}
                         </p>
-                        <p className="text-gray-700">
-                            <strong>Registration Date:</strong> {user.metadata.creationTime}
-                        </p>
-                        <h2 className="text-xl font-bold mt-6 mb-2">Purchase History</h2>
-                        <ul className="list-disc list-inside text-left mx-auto max-w-xs">
-                            <li>Order #123 - $50.00 - Delivered</li>
-                            <li>Order #124 - $30.00 - In Progress</li>
-                        </ul>
-                        {message && <p className="text-green-500 mt-4">{message}</p>}
                         <button
                             onClick={handleLogout}
                             className="mt-4 w-full bg-red-500 text-white p-2 rounded hover:bg-red-600"
@@ -104,13 +126,15 @@ const Account: React.FC = () => {
                             onChange={(e) => setEmail(e.target.value)}
                             className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
                         />
-                        <input
-                            type="password"
-                            placeholder="Password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
-                        />
+                        {!isForgotPassword && (
+                            <input
+                                type="password"
+                                placeholder="Password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
+                            />
+                        )}
                         {isRegistering && (
                             <input
                                 type="password"
@@ -137,9 +161,8 @@ const Account: React.FC = () => {
                         </button>
                         {!isRegistering && (
                             <button
-                                onClick={handlePasswordReset}
+                                onClick={() => setIsForgotPassword(true)}
                                 className="w-full p-2 mb-4 bg-gray-500 text-white rounded hover:bg-gray-600"
-                                disabled={!email || authLoading}
                             >
                                 Forgot Password?
                             </button>

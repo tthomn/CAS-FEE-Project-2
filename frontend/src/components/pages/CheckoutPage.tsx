@@ -63,8 +63,6 @@ const CheckoutPage: React.FC = () => {
                 .join("\n"),
         };
 
-        console.log("Email parameters being sent to EmailJS:", JSON.stringify(emailParams, null, 2));
-
         try {
             await emailjs.send(
                 "service_ua1imoh",
@@ -94,7 +92,6 @@ const CheckoutPage: React.FC = () => {
                 };
 
                 const docRef = await addDoc(collection(db, "orders"), order);
-                console.log("Order saved to Firestore with ID:", docRef.id);
 
                 await sendInvoiceEmail(order, docRef.id);
 
@@ -123,10 +120,9 @@ const CheckoutPage: React.FC = () => {
                         onChange={handleEmailChange}
                         className="w-full border p-2 mb-2"
                         placeholder="E-Mail-Adresse eingeben"
+                        disabled={isLoading}
                     />
-                    {errors.email && (
-                        <p className="text-red-500 text-sm">{errors.email}</p>
-                    )}
+                    {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
 
                     <h2 className="text-lg font-bold mb-4">Lieferadresse</h2>
                     {isEditingAddress ? (
@@ -137,6 +133,7 @@ const CheckoutPage: React.FC = () => {
                                 onChange={handleAddressChange}
                                 className="w-full border p-2 mb-2"
                                 placeholder="Lieferadresse eingeben"
+                                disabled={isLoading}
                             />
                             {errors.deliveryAddress && (
                                 <p className="text-red-500 text-sm">{errors.deliveryAddress}</p>
@@ -144,6 +141,7 @@ const CheckoutPage: React.FC = () => {
                             <button
                                 className="text-blue-500 underline mt-2"
                                 onClick={toggleEditAddress}
+                                disabled={isLoading}
                             >
                                 Save
                             </button>
@@ -154,6 +152,7 @@ const CheckoutPage: React.FC = () => {
                             <button
                                 className="text-blue-500 underline mt-2"
                                 onClick={toggleEditAddress}
+                                disabled={isLoading}
                             >
                                 Edit
                             </button>
@@ -164,23 +163,25 @@ const CheckoutPage: React.FC = () => {
                     <h2 className="text-lg font-bold mb-4">Zusammenfassung</h2>
                     <ul className="mb-4">
                         {cartItems.map((item) => (
-                            <li key={item.id} className="flex justify-between mb-2">
+                            <li key={item.id} className="flex justify-between mb-4">
                                 <span>{item.productName}</span>
                                 <span>CHF {item.price.toFixed(2)}</span>
                             </li>
                         ))}
                     </ul>
-                    <div className="flex justify-between">
-                        <span>Zwischensumme</span>
-                        <span>CHF {totalPrice.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                        <span>Versand</span>
-                        <span>CHF {shippingFee.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between font-bold">
-                        <span>Total</span>
-                        <span>CHF {(totalPrice + shippingFee).toFixed(2)}</span>
+                    <div className="flex flex-col gap-4">
+                        <div className="flex justify-between">
+                            <span>Zwischensumme</span>
+                            <span>CHF {totalPrice.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                            <span>Versand</span>
+                            <span>CHF {shippingFee.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between font-bold">
+                            <span>Total</span>
+                            <span>CHF {(totalPrice + shippingFee).toFixed(2)}</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -194,9 +195,7 @@ const CheckoutPage: React.FC = () => {
                 >
                     {isLoading ? "Processing..." : "Bestellung abschliessen"}
                 </button>
-                {formError && (
-                    <p className="mt-2 text-red-500 text-sm">{formError}</p>
-                )}
+                {formError && <p className="mt-2 text-red-500 text-sm">{formError}</p>}
             </div>
 
             <Modal

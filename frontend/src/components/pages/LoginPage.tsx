@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
+import {
+    getAuth,
+    signInWithEmailAndPassword,
+    onAuthStateChanged,
+    signOut,
+    sendPasswordResetEmail,
+} from "firebase/auth";
 
 const LoginPage: React.FC = () => {
     const [email, setEmail] = useState<string>("");
@@ -7,6 +13,7 @@ const LoginPage: React.FC = () => {
     const [errorMessage, setErrorMessage] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(false);
     const [user, setUser] = useState<{ email: string } | null>(null);
+    const [resetEmailSent, setResetEmailSent] = useState<boolean>(false);
 
     const auth = getAuth();
 
@@ -37,6 +44,27 @@ const LoginPage: React.FC = () => {
                 setErrorMessage("Incorrect password.");
             } else {
                 setErrorMessage("An error occurred. Please try again.");
+            }
+        }
+    };
+
+    const handleForgotPassword = async () => {
+        setErrorMessage("");
+        setResetEmailSent(false);
+
+        if (!email.trim()) {
+            setErrorMessage("Please enter your email to reset your password.");
+            return;
+        }
+
+        try {
+            await sendPasswordResetEmail(auth, email);
+            setResetEmailSent(true);
+        } catch (error: any) {
+            if (error.code === "auth/user-not-found") {
+                setErrorMessage("No account found with this email.");
+            } else {
+                setErrorMessage("Failed to send reset email. Please try again.");
             }
         }
     };
@@ -83,6 +111,15 @@ const LoginPage: React.FC = () => {
                                 {loading ? "Logging in..." : "Login"}
                             </button>
                         </form>
+                        <button
+                            onClick={handleForgotPassword}
+                            className="mt-4 text-blue-600 hover:underline text-sm"
+                        >
+                            Forgot Password?
+                        </button>
+                        {resetEmailSent && (
+                            <p className="text-green-600 mt-4">Password reset email sent!</p>
+                        )}
                         {errorMessage && <p className="text-red-500 mt-4">{errorMessage}</p>}
                     </>
                 ) : (
