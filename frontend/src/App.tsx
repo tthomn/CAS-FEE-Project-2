@@ -9,8 +9,9 @@ import RecipeDetail from "./components/pages/RecipeDetail";
 import Account from "./components/pages/Account";
 import Header from "./components/layouts/Header";
 import CartPage from "./components/pages/CartPage";
-import CheckoutPage from "./components/pages/CheckoutPage"; // Import CheckoutPage
+import CheckoutPage from "./components/pages/CheckoutPage";
 import NotFoundPage from "./components/pages/NotFoundPage";
+import SearchResultsPage from "./components/pages/SearchResultsPage";
 import { CartProvider } from "./context/CartContext";
 import { AuthProvider } from "./context/AuthContext";
 import FlyingBees from "./components/layouts/FlyingBees";
@@ -30,7 +31,8 @@ const App: React.FC = () => {
                             <Route path="/recipe/:id" element={<RecipeDetail />} />
                             <Route path="/account" element={<Account />} />
                             <Route path="/cart" element={<CartPage />} />
-                            <Route path="/checkout" element={<CheckoutPage />} /> {/* New Route */}
+                            <Route path="/checkout" element={<CheckoutPage />} />
+                            <Route path="/search" element={<SearchResultsPage />} />
                             <Route path="*" element={<NotFoundPage />} />
                         </Routes>
                     </div>
