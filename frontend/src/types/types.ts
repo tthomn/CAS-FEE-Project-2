@@ -11,7 +11,12 @@ export interface Product {
     imageUrl: string;
     categoryId: string;
     stock: number;
+    ratings?: {
+        totalRating: number;
+        ratingCount: number;
+    };
 }
+
 
 export interface CartItem {
     id: string;
