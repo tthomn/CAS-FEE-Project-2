@@ -49,7 +49,8 @@ const ProductDetail: React.FC = () => {
             quantity,
             imageUrl: product.imageUrl,
             productId: product.id,
-        });
+            cartItemId: "fromProductDetailsDEBUGG" //FIXME: Check if we need cartItem
+         });
 
         alert(`${product.name} added to cart!`);
     };

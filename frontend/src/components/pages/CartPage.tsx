@@ -31,7 +31,7 @@ const CartPage: React.FC = () => {
                         </div>
                         <button
                             className="px-3 py-1 text-sm text-white bg-red-500 rounded hover:bg-red-600 transition-colors"
-                            onClick={() => removeFromCart(item.id)}
+                            onClick={() => removeFromCart(item.cartItemId)}
                         >
                             Remove
                         </button>

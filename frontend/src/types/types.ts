@@ -25,7 +25,7 @@ export interface CartItem {
     quantity: number;
     imageUrl: string;
     productId: string;
-    cartItemId?: string;
+    cartItemId: string;
 }
 
 export interface Order {

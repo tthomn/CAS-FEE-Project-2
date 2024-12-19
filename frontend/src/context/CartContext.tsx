@@ -123,20 +123,61 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
     };
 
-    const removeFromCart = async (itemId: string) => {
+    //Removes an Item from the Cart (UI and FireStore)
+    const removeFromCart = async (cartItemId: string) => {
+        console.log("#########################################################");
+        console.log("removeFromCart function Called");
+        let  firestoreDocId = await findFirestoreDocByField(cartItemId); //Tries to fetch the
+
         try {
-            const docRef = doc(db, "cart", itemId);
-            await deleteDoc(docRef);
 
-            setCartItems((prev) => prev.filter((item) => item.id !== itemId));
+            //TODO: 18.12.2024: Prüfen ob Dokument exisitert (Wie in Vorluseung => Weil es sonnst gibt es einen Fehler)
 
-            if (!userId) {
-                const guestCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
-                const updatedCart = guestCart.filter((item: CartItem) => item.cartItemId !== itemId);
-                localStorage.setItem("guestCart", JSON.stringify(updatedCart));
+            await deleteDoc(doc(db, "cart", firestoreDocId));
+            setCartItems((prev) => prev.filter((item) => item.cartItemId !== cartItemId));
+            const localCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
+            console.log("item.cartItemId: " + cartItemId)
+            console.log("firestoreDocId: " + firestoreDocId)
+
+            console.log("Print of line #167 localCart:" + localCart);
+
+            //FIXME: Here is the error for the NOT AUTHENTICATED USER!!!!!!!!!!!
+            //TODO: Check if the id was correct BC what happens if i have X products with the same ID
+            localStorage.setItem("guestCart", JSON.stringify(localCart.filter((item: CartItem) => item.cartItemId !== cartItemId)));
+
+// OLD CODE:  localStorage.setItem("guestCart", JSON.stringify(localCart.filter((item: CartItem) => item.cartItemId !== firestoreDocId))); ==>
+
+
+
+        } catch (error) {
+            console.error("Error removing item from cart:", error);
+        }
+        console.log("_____________________________________________");
+        return;
+    };
+
+    // Function to find the Firestore document ID based on the `id` field
+    const findFirestoreDocByField = async (fieldValue: string) => {
+        try {
+            console.log(`Searching for document with id field: ${fieldValue}`);
+
+            // Query Firestore for documents where the `id` field matches the provided value
+            const q = query(collection(db, "cart"), where("cartItemId", "==", fieldValue));
+            const querySnapshot = await getDocs(q);
+
+            if (!querySnapshot.empty) {
+                // Get the first matching document (assuming `id` is unique)
+                const docRef = querySnapshot.docs[0];
+                console.log("Document found:", docRef.id);
+
+                return docRef.id; // Firestore document ID
+            } else {
+                console.log("No document found with the specified id field.");
+                return fieldValue;
             }
         } catch (error) {
-            toast.error("Failed to remove item. Please try again.");
+            console.error("Error finding Firestore document by field:", error);
+            return fieldValue;
         }
     };
 
