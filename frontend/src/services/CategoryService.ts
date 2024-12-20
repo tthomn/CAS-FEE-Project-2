@@ -18,3 +18,5 @@ export const getCategoryById = async (id: string) => {
         throw new Error("Category not found.");
     }
 };
+
+//TEST
