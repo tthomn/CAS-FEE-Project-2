@@ -29,32 +29,21 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         return guestId;
     };
 
-    
+  
     /**
-     * Synchronizes the local cart stored in localStorage to Firestore.
+     * Synchronizes the local cart stored in localStorage with the Firestore database.
      * 
-     * This function retrieves the local cart from localStorage, iterates over each item,
-     * and stores it in the Firestore database under the "cart" collection with the provided guest ID.
+     * @param guestId - The unique identifier for the guest user.
      * 
-     * @param {string} guestId - The ID of the guest to associate with the cart items in Firestore.
-     * @returns {Promise<void>} - A promise that resolves when the synchronization is complete.
-     * @throws {Error} - Throws an error if there is an issue syncing the local cart to Firestore.
+     * This function performs the following steps:
+     * 1. Retrieves the local cart items from localStorage.
+     * 2. Fetches the existing cart items from Firestore for the given guestId.
+     * 3. Filters out local cart items that are already present in Firestore.
+     * 4. Adds only the new items to Firestore.
+     * 5. Logs a message if new items were added to Firestore.
+     * 
+     * @throws Will log an error message if there is an issue syncing the local cart.
      */
-    //THIS IS THE OLD FUNCTION
-    /*
-    const syncLocalToFirestore = async (guestId: string) => {
-        const localCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
-        try {
-            for (const item of localCart) {
-                const docRef = doc(collection(db, "cart"), item.cartItemId);
-                await setDoc(docRef, { ...item, guestId });
-            }
-            console.log("Local cart synced to Firestore.");
-        } catch (error) {
-            console.error("Error syncing local cart:", error);*/
-      //  }
-    //};
-
     const syncLocalToFirestore = async (guestId: string) => {
         const localCart: CartItem[] = JSON.parse(localStorage.getItem("guestCart") || "[]");
         try {
@@ -119,32 +108,22 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                     ...(doc.data() as Omit<CartItem, "id">),
                 }));
             } else {
-                console.log("#########################################");
-                console.log("Fetching cart for guest user:", guestId);
-
-                console.log("#########################################");
-
+          
+                console.log("Fetching cart for guest user:", guestId);  
                 const q = query(collection(db, "cart"), where("guestId", "==", guestId));
                 const querySnapshot = await getDocs(q);
                 firestoreItems = querySnapshot.docs.map((doc) => ({
                     id: doc.id,
                     ...(doc.data() as Omit<CartItem, "id">),
                 }));                  
-                
-                 console.log("firestoreItems: " + firestoreItems);
-
-
-
-
-                //Fallback
+                           
                 if (firestoreItems.length === 0) {
                     const localCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
                     firestoreItems = [...localCart];
                 }
             }
 
-            // Update the cart items state with the fetched items (rerendering)
-            // => Ensures that the user interface reflects the current state of the cart!
+            // Update the cart items state with the fetched items (rerendering) => Ensures that the user interface reflects the current state of the cart!
             setCartItems(firestoreItems);
 
             if (!userId) {
@@ -156,8 +135,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             console.error("Error fetching cart items:", error);
         }
     }, [userId]);
-
-
 
 
     useEffect(() => {
@@ -261,7 +238,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
     };
 
-    //TODO: => Where used? 
     const clearCart = async () => {
         try {
             if (userId) {

@@ -18,7 +18,6 @@ const CartPage: React.FC = () => {
             <h1 className="text-2xl font-bold text-gray-800 text-center mb-6">Your Shopping Cart</h1>
             <ul className="list-none space-y-4">
                 {cartItems.map((item) => (
-                    //<li key={item.cartItemId || item.id} className="flex items-center p-4 border-b border-gray-200"> TODO: The Problem seemed to be:
                      <li key={item.cartItemId } className="flex items-center p-4 border-b border-gray-200">
                         <img
                             src={item.imageUrl}
