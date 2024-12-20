@@ -21,6 +21,7 @@ const ProductDetail: React.FC = () => {
     const { productId } = useParams<{ productId: string }>();
     const [product, setProduct] = useState<Product | null>(null);
     const [quantity, setQuantity] = useState(1);
+    const [popupVisible, setPopupVisible] = useState(false);
     const { addToCart } = useCart();
 
     useEffect(() => {
@@ -49,10 +50,12 @@ const ProductDetail: React.FC = () => {
             quantity,
             imageUrl: product.imageUrl,
             productId: product.id,
-            cartItemId: "fromProductDetailsDEBUGG" //FIXME: Check if we need cartItem
-         });
+            cartItemId: "fromProductDetailsDEBUGG",
+        });
 
-        alert(`${product.name} added to cart!`);
+        setPopupVisible(true);
+
+        setTimeout(() => setPopupVisible(false), 1000);
     };
 
     if (!product) {
@@ -65,6 +68,15 @@ const ProductDetail: React.FC = () => {
 
     return (
         <div className="max-w-3xl mx-auto p-6 text-center">
+            {popupVisible && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg w-80 text-center">
+                        <p className="text-lg font-bold text-gray-900">Product added to cart!</p>
+                        <p className="text-sm text-gray-600 mt-2">You can view it in your cart.</p>
+                    </div>
+                </div>
+            )}
+
             <h1 className="text-2xl font-bold mb-4">{product.name}</h1>
             <img
                 src={`/${product.imageUrl}`}
