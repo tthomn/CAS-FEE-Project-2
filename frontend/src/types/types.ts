@@ -18,6 +18,7 @@ export interface Product {
 }
 
 
+
 export interface CartItem {
     id: string;
     productName: string;
@@ -26,6 +27,7 @@ export interface CartItem {
     imageUrl: string;
     productId: string;
     cartItemId: string;
+    addedAt?: Date;    
 }
 
 export interface Order {

@@ -2,9 +2,11 @@ import React, { createContext, useContext, useState, useEffect, ReactNode, useCa
 import { CartItem } from '../types/types';
 import { v4 as uuidv4 } from 'uuid';
 import { db } from '../firebaseConfig';
-import { collection, getDocs, addDoc, deleteDoc, doc, query, where, setDoc } from 'firebase/firestore';
+import { collection, getDocs, addDoc, deleteDoc, doc, query, where, setDoc, updateDoc } from 'firebase/firestore';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import {toast} from "react-toastify";
+import { Timestamp } from "firebase/firestore";
+
 
 interface CartContextType {
     cartItems: CartItem[];
@@ -137,6 +139,8 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }, [userId]);
 
 
+
+    
     useEffect(() => {
         const auth = getAuth();
         const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -153,34 +157,76 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
 
 
-    const addToCart = async (item: CartItem) => {
-        const newItem = { ...item, cartItemId: uuidv4() };
-
-        try {
+  
+        const addToCart = async (item: CartItem) => {
+        const newItem = { ...item, cartItemId: uuidv4(), addedAt: Timestamp.now() };   
+        try 
+        {
             let payload;
-            if (userId) {
+            if (userId)                 
+            {       
+              const q = query(collection(db, "cart"), where("userId", "==", userId),where("productId", "==", item.productId) );
+              const querySnapshot = await getDocs(q);
+              if(!querySnapshot.empty)
+              {               
+                 const docRef = querySnapshot.docs[0].ref;
+                 const existingData = querySnapshot.docs[0].data();
+                 await updateDoc(docRef, {
+                    quantity: (existingData.quantity ?? 1) + (item.quantity ?? 1),
+                    updatedAt: Timestamp.now()
+                });        
+              }
+              else
+              {
                 payload = { ...newItem, userId };
-            } else {
+                await addDoc(collection(db, "cart"), payload);
+              }       
+                  
+            } 
+            else 
+            {
                 const guestId = getGuestId();
-                payload = { ...newItem, guestId };
+                const existingCart = JSON.parse(localStorage.getItem("guestCart") || "[]");            
+                const existingItem = existingCart.find((cartItem: CartItem) => cartItem.productId === item.productId );
 
-                const existingCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
-                localStorage.setItem(
-                    "guestCart",
-                    JSON.stringify([...existingCart, payload])
-                );
-            }
 
-            await addDoc(collection(db, "cart"), payload);
+                if (existingItem) {
+                    existingItem.quantity += item.quantity ?? 1;
+            
+                    // Update Firestore for existing item
+                    const q = query(collection(db, "cart"), where("guestId", "==", guestId),where("productId", "==", item.productId));
+                    const querySnapshot = await getDocs(q);
+            
+                    if (!querySnapshot.empty) {
+                        const docRef = querySnapshot.docs[0].ref;
+                        await updateDoc(docRef, {
+                            quantity: existingItem.quantity,
+                            addedAt: Timestamp.now()
+                        });
+                    }
+                } else {
+                    const newItem = {
+                        ...item,
+                        guestId,
+                        cartItemId: uuidv4(),
+                        addedAt: new Date(),            
+                    };            
+                    await addDoc(collection(db, "cart"), { ...newItem, addedAt: Timestamp.now()});        
+                    // Add new item to localStorage
+                    existingCart.push(newItem);
+                }
+            
+                localStorage.setItem("guestCart", JSON.stringify(existingCart));  }
+
             console.log("Item added to Firestore successfully.");
             fetchCartItems();
-        } catch (error) {
+        } 
+        catch (error) 
+        {
             console.error("Error adding item to cart:", error);
         }
     };
-
-
-
+    
 
     //Removes an Item from the Cart (UI and FireStore)
     const removeFromCart = async (cartItemId: string) => {
