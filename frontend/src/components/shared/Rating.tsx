@@ -17,7 +17,7 @@ const Rating: React.FC<RatingProps> = ({ productId, initialRating, ratingCount }
     const [userRating, setUserRating] = useState<number | null>(null);
     const [showPopup, setShowPopup] = useState<boolean>(false);
     const [selectedRating, setSelectedRating] = useState<number>(0);
-    const [alreadyRatedMessage, setAlreadyRatedMessage] = useState<boolean>(false);
+    const [alreadyRatedMessageVisible, setAlreadyRatedMessageVisible] = useState(false);
 
     useEffect(() => {
         const fetchUserRating = async () => {
@@ -45,7 +45,7 @@ const Rating: React.FC<RatingProps> = ({ productId, initialRating, ratingCount }
 
     const handleOpenPopup = () => {
         if (userRating !== null) {
-            setAlreadyRatedMessage(true);
+            setAlreadyRatedMessageVisible((prev) => !prev);
             return;
         }
         setShowPopup(true);
@@ -129,7 +129,7 @@ const Rating: React.FC<RatingProps> = ({ productId, initialRating, ratingCount }
                     >
                         Rate this product
                     </button>
-                    {alreadyRatedMessage && (
+                    {alreadyRatedMessageVisible && (
                         <p className="text-sm text-gray-500 mt-1">
                             <i className="fas fa-info-circle text-gray-400"></i> You already rated this product.
                         </p>
