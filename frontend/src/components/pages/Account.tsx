@@ -1,17 +1,53 @@
 import React, { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
+import CountryDropdown from "../shared/CountryDropdown";
 
 const Account: React.FC = () => {
     const { user, login, register, resetPassword, logout, loading } = useAuth();
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
+    const [formData, setFormData] = useState<{
+        email: string;
+        password: string;
+        confirmPassword: string;
+        title: string;
+        name: string;
+        surname: string;
+        dob: string;
+        street: string;
+        houseNumber: string;
+        plz: string;
+        city: string;
+        country: string | { value: string; label: string };
+    }>({
+        email: "",
+        password: "",
+        confirmPassword: "",
+        title: "",
+        name: "",
+        surname: "",
+        dob: "",
+        street: "",
+        houseNumber: "",
+        plz: "",
+        city: "",
+        country: "",
+    });
+
     const [isRegistering, setIsRegistering] = useState(false);
     const [isForgotPassword, setIsForgotPassword] = useState(false);
     const [message, setMessage] = useState("");
     const [authLoading, setAuthLoading] = useState(false);
-    const [showPassword, setShowPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+    const handleInputChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    ) => {
+        const { name, value } = e.target;
+        setFormData((prevData) => ({
+            ...prevData,
+            [name]: value,
+        }));
+    };
+
+
 
     const handleSubmit = async () => {
         setMessage("");
@@ -19,13 +55,29 @@ const Account: React.FC = () => {
 
         try {
             if (isRegistering) {
-                if (password !== confirmPassword) {
+                if (formData.password !== formData.confirmPassword) {
                     throw new Error("Passwords do not match.");
                 }
-                await register(email, password);
+                const countryName =
+                    typeof formData.country === "string"
+                        ? formData.country
+                        : formData.country?.label || "";
+
+                await register(formData.email, formData.password, {
+                    title: formData.title,
+                    name: formData.name,
+                    surname: formData.surname,
+                    dob: formData.dob,
+                    street: formData.street,
+                    houseNumber: formData.houseNumber,
+                    plz: formData.plz,
+                    city: formData.city,
+                    country: countryName,
+                });
+
                 setMessage("Registration successful! Please verify your email.");
             } else {
-                await login(email, password);
+                await login(formData.email, formData.password);
                 setMessage("Login successful!");
             }
         } catch (error: any) {
@@ -38,7 +90,7 @@ const Account: React.FC = () => {
     const handlePasswordReset = async () => {
         setMessage("");
         try {
-            await resetPassword(email);
+            await resetPassword(formData.email);
             setMessage("Password reset email sent. Please check your inbox.");
         } catch (error: any) {
             setMessage(error.message || "An unknown error occurred.");
@@ -60,7 +112,7 @@ const Account: React.FC = () => {
     }
 
     return (
-        <div className="relative">
+        <div className="relative mb-6">
             <div className="relative">
                 <img
                     src="/images/banner_account.png"
@@ -78,9 +130,10 @@ const Account: React.FC = () => {
                         <h2 className="text-xl font-bold mb-4">Restore Password</h2>
                         <input
                             type="email"
+                            name="email"
                             placeholder="Enter your email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            value={formData.email}
+                            onChange={handleInputChange}
                             className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
                         />
                         <button
@@ -88,7 +141,7 @@ const Account: React.FC = () => {
                             className={`w-full p-2 mb-4 rounded bg-blue-500 text-white hover:bg-blue-600 ${
                                 authLoading ? "opacity-50 cursor-not-allowed" : ""
                             }`}
-                            disabled={authLoading || !email.trim()}
+                            disabled={authLoading || !formData.email.trim()}
                         >
                             {authLoading ? "Sending..." : "Restore My Password"}
                         </button>
@@ -123,114 +176,108 @@ const Account: React.FC = () => {
                         </h1>
                         <input
                             type="email"
+                            name="email"
                             placeholder="Email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            value={formData.email}
+                            onChange={handleInputChange}
                             className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
                         />
-                        <div className="relative mb-4">
-                            <input
-                                type={showPassword ? "text" : "password"}
-                                placeholder="Password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500 pr-10"
-                            />
-                            <span
-                                onClick={() => setShowPassword(!showPassword)}
-                                className="absolute inset-y-0 right-3 flex items-center cursor-pointer text-gray-500"
-                            >
-                                {showPassword ? (
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        className="h-5 w-5"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                        strokeWidth={2}
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                        />
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-.34 1.36-1.02 2.623-1.92 3.682m-2.11 2.372A9.963 9.963 0 0112 19c-4.477 0-8.268-2.943-9.542-7-.34-1.36-1.02-2.623-1.92-3.682"
-                                        />
-                                    </svg>
-                                ) : (
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        className="h-5 w-5"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                        strokeWidth={2}
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            d="M3.98 8.29A10.024 10.024 0 0112 5c4.478 0 8.269 2.943 9.543 7-.34 1.361-1.02 2.624-1.92 3.682m-2.11 2.373A9.963 9.963 0 0112 19c-4.478 0-8.269-2.943-9.543-7a10.054 10.054 0 012.02-3.71m1.42-1.42l13.75 13.75"
-                                        />
-                                    </svg>
-                                )}
-                            </span>
-                        </div>
+                        <input
+                            type="password"
+                            name="password"
+                            placeholder="Password"
+                            value={formData.password}
+                            onChange={handleInputChange}
+                            className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
+                        />
                         {isRegistering && (
-                            <div className="relative mb-4">
+                            <>
                                 <input
-                                    type={showConfirmPassword ? "text" : "password"}
+                                    type="password"
+                                    name="confirmPassword"
                                     placeholder="Confirm Password"
-                                    value={confirmPassword}
-                                    onChange={(e) => setConfirmPassword(e.target.value)}
-                                    className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500 pr-10"
+                                    value={formData.confirmPassword}
+                                    onChange={handleInputChange}
+                                    className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
                                 />
-                                <span
-                                    onClick={() =>
-                                        setShowConfirmPassword(!showConfirmPassword)
-                                    }
-                                    className="absolute inset-y-0 right-3 flex items-center cursor-pointer text-gray-500"
-                                >
-                                    {showConfirmPassword ? (
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            className="h-5 w-5"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
-                                            strokeWidth={2}
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                                <hr className="my-4" />
+                                <div className="mb-4 text-left">
+                                    <label className="block mb-2 font-bold">Anrede</label>
+                                    <div className="flex items-center gap-4">
+                                        <label className="flex items-center">
+                                            <input
+                                                type="radio"
+                                                name="title"
+                                                value="Herr"
+                                                checked={formData.title === "Herr"}
+                                                onChange={handleInputChange}
+                                                className="mr-2"
                                             />
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-.34 1.36-1.02 2.623-1.92 3.682m-2.11 2.372A9.963 9.963 0 0112 19c-4.477 0-8.268-2.943-9.542-7-.34-1.36-1.02-2.623-1.92-3.682"
+                                            Herr
+                                        </label>
+                                        <label className="flex items-center">
+                                            <input
+                                                type="radio"
+                                                name="title"
+                                                value="Frau"
+                                                checked={formData.title === "Frau"}
+                                                onChange={handleInputChange}
+                                                className="mr-2"
                                             />
-                                        </svg>
-                                    ) : (
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            className="h-5 w-5"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
-                                            strokeWidth={2}
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                d="M3.98 8.29A10.024 10.024 0 0112 5c4.478 0 8.269 2.943 9.543 7-.34 1.361-1.02 2.624-1.92 3.682m-2.11 2.373A9.963 9.963 0 0112 19c-4.478 0-8.269-2.943-9.543-7a10.054 10.054 0 012.02-3.71m1.42-1.42l13.75 13.75"
-                                            />
-                                        </svg>
-                                    )}
-                                </span>
-                            </div>
+                                            Frau
+                                        </label>
+                                    </div>
+                                </div>
+                                <input
+                                    type="text"
+                                    name="street"
+                                    placeholder="Street"
+                                    value={formData.street}
+                                    onChange={handleInputChange}
+                                    className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
+                                />
+                                <input
+                                    type="text"
+                                    name="houseNumber"
+                                    placeholder="House Number"
+                                    value={formData.houseNumber}
+                                    onChange={handleInputChange}
+                                    className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
+                                />
+                                <input
+                                    type="text"
+                                    name="plz"
+                                    placeholder="PLZ"
+                                    value={formData.plz}
+                                    onChange={handleInputChange}
+                                    className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
+                                />
+                                <input
+                                    type="text"
+                                    name="city"
+                                    placeholder="City"
+                                    value={formData.city}
+                                    onChange={handleInputChange}
+                                    className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
+                                />
+                                <div className="flex items-center gap-4 w-full">
+                                    <CountryDropdown
+                                        value={
+                                            typeof formData.country === "object" && formData.country !== null
+                                                ? formData.country
+                                                : { value: "", label: "Select Country" }
+                                        }
+                                        onChange={(selectedOption) =>
+                                            setFormData((prevData) => ({
+                                                ...prevData,
+                                                country: selectedOption ?? { value: "", label: "Select Country" },
+                                            }))
+                                        }
+                                    />
+
+                                </div>
+
+                            </>
                         )}
                         <button
                             onClick={handleSubmit}

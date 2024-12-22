@@ -15,6 +15,8 @@ import SearchResultsPage from "./components/pages/SearchResultsPage";
 import { CartProvider } from "./context/CartContext";
 import { AuthProvider } from "./context/AuthContext";
 import FlyingBees from "./components/layouts/FlyingBees";
+import LoginPage from "./components/pages/LoginPage";
+import RegisterPage from "./components/pages/RegisterPage";
 
 const App: React.FC = () => {
     return (
@@ -33,6 +35,8 @@ const App: React.FC = () => {
                             <Route path="/cart" element={<CartPage />} />
                             <Route path="/checkout" element={<CheckoutPage />} />
                             <Route path="/search" element={<SearchResultsPage />} />
+                            <Route path="/login" element={<LoginPage />} />
+                            <Route path="/register" element={<RegisterPage />} />
                             <Route path="*" element={<NotFoundPage />} />
                         </Routes>
                     </div>

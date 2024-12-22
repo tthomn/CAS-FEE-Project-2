@@ -9,13 +9,26 @@ import {
     sendPasswordResetEmail,
     User,
 } from "firebase/auth";
+import { getFirestore, doc, setDoc } from "firebase/firestore";
+
+interface AdditionalData {
+    title: string;
+    name: string;
+    surname: string;
+    street: string;
+    houseNumber: string;
+    plz: string;
+    city: string;
+    country: string;
+    dob: string;
+}
 
 interface AuthContextType {
     user: User | null;
     loading: boolean;
     login: (email: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
-    register: (email: string, password: string) => Promise<void>;
+    register: (email: string, password: string, additionalData?: AdditionalData) => Promise<void>;
     resetPassword: (email: string) => Promise<void>;
 }
 
@@ -26,6 +39,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [loading, setLoading] = useState(true);
 
     const auth = getAuth();
+    const db = getFirestore();
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -57,11 +71,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     };
 
-    const register = async (email: string, password: string) => {
+    const register = async (email: string, password: string, additionalData?: AdditionalData) => {
         setLoading(true);
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            await sendEmailVerification(userCredential.user);
+            const user = userCredential.user;
+
+            if (additionalData) {
+                await setDoc(doc(db, "users", user.uid), {
+                    email,
+                    ...additionalData,
+                });
+            }
+
+            await sendEmailVerification(user);
         } catch (error: any) {
             throw new Error(error.message || "Failed to register");
         } finally {
