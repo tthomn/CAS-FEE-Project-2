@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import CountryDropdown from "../shared/CountryDropdown";
+//import { cartCleaner } from "../../context/CartContext";
+import { useCart } from "../../context/CartContext";
+
 
 const Account: React.FC = () => {
     const { user, login, register, resetPassword, logout, loading } = useAuth();
@@ -48,6 +51,10 @@ const Account: React.FC = () => {
     };
 
 
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const { cartCleaner } = useCart();
+
 
     const handleSubmit = async () => {
         setMessage("");
@@ -78,7 +85,19 @@ const Account: React.FC = () => {
                 setMessage("Registration successful! Please verify your email.");
             } else {
                 await login(formData.email, formData.password);
+                
+                await login(email, password);
+                
+                //This function is called which will be used to update the cart items in the backend
+
+                //Create promise of cartCleaner function and wait for it to finish
+                await cartCleaner();
+
+             //  await cartCleaner(); 
                 setMessage("Login successful!");
+                
+       
+          
             }
         } catch (error: any) {
             setMessage(error.message || "An unknown error occurred.");
