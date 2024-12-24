@@ -57,6 +57,7 @@ const Account: React.FC = () => {
 
 
     const handleSubmit = async () => {
+
         setMessage("");
         setAuthLoading(true);
 
@@ -84,20 +85,10 @@ const Account: React.FC = () => {
 
                 setMessage("Registration successful! Please verify your email.");
             } else {
-                await login(formData.email, formData.password);
-                
-                await login(email, password);
-                
-                //This function is called which will be used to update the cart items in the backend
 
-                //Create promise of cartCleaner function and wait for it to finish
-                await cartCleaner();
-
-             //  await cartCleaner(); 
-                setMessage("Login successful!");
-                
-       
-          
+                await login(formData.email, formData.password);     
+                await cartCleaner();                    
+                setMessage("Login successful!");                    
             }
         } catch (error: any) {
             setMessage(error.message || "An unknown error occurred.");
