@@ -65,33 +65,19 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                const querySnapshot = await getDocs(q);
                const docRef = querySnapshot.docs[0].ref;
                await deleteDoc(docRef);
-               //TODO: Update the local storrage correctly
-
 
 
             }
             else 
             {
-                console.log("EEELSSEEEE CALLED"); 
                 //Fetch the item from firestoreItems 
                let firestoreItem =  firestoreItems.find((firestoreItem) => firestoreItem.productId === item.productId); 
                let quantityFirestoreItem = firestoreItem?.quantity;
                let quantityLocalItem = item.quantity;
-               
-
-               console.log("Quantity Firestore Item: " + quantityFirestoreItem);
-               console.log("Quantity Local Item: " + quantityLocalItem);
-
+       
                //If the quantity of the local item is greater than the quantity of the firestore item update the quantity of the firestore item
                 if(quantityFirestoreItem !== undefined && quantityLocalItem > quantityFirestoreItem)
-                {                    
-                    console.log("Update CAAALLLED");
-                    console.log("Existing Item: " + existingItem.id);
-         
-             
-                    // Update Firestore for existing item
-                    //    const docRef = doc(db, "cart", existingItem.id); [OLD]
-
+                {              
                     const qq = query(collection(db, "cart"), where("userId", "==", userId),where("productId", "==", existingItem.id));
                     const querySnapshotqq = await getDocs(qq);
                     const docRef = querySnapshotqq.docs[0].ref;
@@ -106,15 +92,28 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                     const docRef2 = querySnapshot.docs[0].ref;
                     await deleteDoc(docRef2);
                  
-             }                   
+                }  
+                else
+                {
+                    const q = query(collection(db, "cart"), where("guestId", "==", guestId),where("productId", "==", item.productId));
+                    const querySnapshot = await getDocs(q);
+                    const docRef2 = querySnapshot.docs[0].ref;
+                    await deleteDoc(docRef2);
+
+
+                }                 
             }               
         }
+
+             console.log("G1");
+            localStorage.removeItem("guestCart");                 
+            console.log("G2");
+
             // Update the UI and clear the local Storage             
             triggerUpdateCart();    
 
 
-            //TODO: L
-            localStorage.removeItem("guestCart");                  
+           
         }
         catch (error) {
             console.error("Error cleaning cart:", error);
