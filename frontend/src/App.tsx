@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "./index.css";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import HomePage from "./components/pages/HomePage";
@@ -17,8 +17,12 @@ import { AuthProvider } from "./context/AuthContext";
 import FlyingBees from "./components/layouts/FlyingBees";
 import LoginPage from "./components/pages/LoginPage";
 import RegisterPage from "./components/pages/RegisterPage";
+import AdminPanel from "./components/pages/AdminPanel"; // Import the AdminPanel component
 
 const App: React.FC = () => {
+    const [loggedInUser, setLoggedInUser] = useState<string>("62xJXdO14EXWMCLS1CpHlI5PPFu1"); // Simulate logged-in user's UID
+    const adminUser = "62xJXdO14EXWMCLS1CpHlI5PPFu1"; // Real admin user UID
+
     return (
         <AuthProvider>
             <CartProvider>
@@ -37,6 +41,16 @@ const App: React.FC = () => {
                             <Route path="/search" element={<SearchResultsPage />} />
                             <Route path="/login" element={<LoginPage />} />
                             <Route path="/register" element={<RegisterPage />} />
+                            <Route
+                                path="/admin"
+                                element={
+                                    loggedInUser === adminUser ? (
+                                        <AdminPanel loggedInUser={loggedInUser} />
+                                    ) : (
+                                        <p>You do not have access to this page.</p>
+                                    )
+                                }
+                            />
                             <Route path="*" element={<NotFoundPage />} />
                         </Routes>
                     </div>
