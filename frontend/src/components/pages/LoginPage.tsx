@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useCart } from "../../context/CartContext";
+
 import {
     getAuth,
     signInWithEmailAndPassword,
@@ -14,6 +17,10 @@ const LoginPage: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [user, setUser] = useState<{ email: string } | null>(null);
     const [resetEmailSent, setResetEmailSent] = useState<boolean>(false);
+    const navigate = useNavigate();
+    const location = useLocation();
+    const { cartCleaner } = useCart();
+    
 
     const auth = getAuth();
 
@@ -36,6 +43,17 @@ const LoginPage: React.FC = () => {
         try {
             await signInWithEmailAndPassword(auth, email, password);
             setLoading(false);
+
+            //If sign in successful, do cart Cleanup and then redirect! 
+            await cartCleaner();                    
+
+
+            const fromCart = new URLSearchParams(location.search).get("fromCart");
+            if (fromCart) {
+                navigate("/checkout");
+            } else {
+                navigate("/");
+            }
         } catch (error: any) {
             setLoading(false);
             if (error.code === "auth/user-not-found") {

@@ -1,13 +1,45 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useCart } from "../../context/CartContext";
-import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
+import { useNavigate, useLocation } from "react-router-dom";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import "react-toastify/dist/ReactToastify.css";
 
 const CartPage: React.FC = () => {
     const { cartItems, removeFromCart } = useCart();
-    const navigate = useNavigate(); // Initialize the navigate function
+    const navigate = useNavigate();
+    const [showPopup, setShowPopup] = useState(false);
+    const [userEmail, setUserEmail] = useState<string | null>(null);
 
     const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+    useEffect(() => {
+        console.log("useEffect on CartPage called");
+        const auth = getAuth();
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user && user.email) {
+                setUserEmail(user.email);
+            } else {
+                setUserEmail(null);
+            }
+        });
+        return unsubscribe;
+    }, []);
+
+
+    const handleProceedToCheckout = () => {
+        console.log("handleProceedToCheckout called");
+                const isUserLoggedIn = userEmail;
+        if (!isUserLoggedIn) {
+            setShowPopup(true);
+        } else {
+            navigate("/checkout", { state: { email: userEmail } });
+        }
+    };
+
+    const closePopup = () => {
+        console.log("closePopup called");
+        setShowPopup(false);
+    };
 
     if (!cartItems.length) {
         return <p className="text-center text-lg text-gray-600">Your cart is currently empty.</p>;
@@ -18,7 +50,7 @@ const CartPage: React.FC = () => {
             <h1 className="text-2xl font-bold text-gray-800 text-center mb-6">Your Shopping Cart</h1>
             <ul className="list-none space-y-4">
                 {cartItems.map((item) => (
-                     <li key={item.cartItemId } className="flex items-center p-4 border-b border-gray-200">
+                    <li key={item.cartItemId} className="flex items-center p-4 border-b border-gray-200">
                         <img
                             src={item.imageUrl}
                             alt={item.productName}
@@ -42,11 +74,34 @@ const CartPage: React.FC = () => {
                 <h3 className="text-xl font-semibold text-gray-800 mb-4">Total: CHF {totalPrice.toFixed(2)}</h3>
                 <button
                     className="px-6 py-2 text-white bg-green-500 rounded hover:bg-green-600 transition-colors"
-                    onClick={() => navigate("/checkout")} // Redirect to the checkout page
+                    onClick={handleProceedToCheckout}
                 >
                     Proceed to Checkout
                 </button>
             </div>
+
+            {/* Popup for not logged-in users */}
+            {showPopup && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                    <div className="bg-white rounded-lg shadow-lg p-6 w-96 text-center">
+                        <h2 className="text-lg font-semibold mb-4">Please Log In</h2>
+                        <p className="text-sm text-gray-600 mb-4">
+                            You need to log in to proceed with the checkout.
+                        </p>
+                        <button
+                            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors mr-2"
+                            onClick={() => navigate("/login?fromCart=true")} >
+                            Go to Login
+                        </button>
+                        <button
+                            className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition-colors"
+                            onClick={closePopup}
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

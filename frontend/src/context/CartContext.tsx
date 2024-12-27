@@ -13,6 +13,7 @@ interface CartContextType {
     clearCart: () => void;
     totalItems: number;
     cartCleaner: () => Promise<void>; 
+    //TODO: Check if its complete? 
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -21,15 +22,14 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
     const [userId, setUserId] = useState<string | null>(null);
     const [cartUpdateFlag, setCartUpdateFlag] = useState(false); // Declare flag using useState
-    
+
     // Example function to update the flag
     const triggerUpdateCart = () => {
         console.log("triggerUpdateCart flag");
-        setCartUpdateFlag((prev) => !prev); // Toggles flag between true and false
+        setCartUpdateFlag((prev) => !prev);
     };
 
-      //Version 1 of cartCleaner => refactoring needed! 
-      //TODO: FUNCTION WHICH CHECKS if DOUCMENT EXISTS IN DB
+       //TODO: FUNCTION WHICH CHECKS if Doc EXISTS IN DB
       const cartCleaner = async () => 
       {
         try
@@ -65,8 +65,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                const querySnapshot = await getDocs(q);
                const docRef = querySnapshot.docs[0].ref;
                await deleteDoc(docRef);
-
-
             }
             else 
             {
@@ -99,21 +97,12 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                     const querySnapshot = await getDocs(q);
                     const docRef2 = querySnapshot.docs[0].ref;
                     await deleteDoc(docRef2);
-
-
                 }                 
             }               
         }
-
-             console.log("G1");
-            localStorage.removeItem("guestCart");                 
-            console.log("G2");
-
+            localStorage.removeItem("guestCart");              
             // Update the UI and clear the local Storage             
-            triggerUpdateCart();    
-
-
-           
+            triggerUpdateCart();              
         }
         catch (error) {
             console.error("Error cleaning cart:", error);
@@ -146,6 +135,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
      * @throws Will log an error message if there is an issue syncing the local cart.
      */
     const syncLocalToFirestore = async (guestId: string) => {
+        console.log("syncLocalToFirestore Called");
         const localCart: CartItem[] = JSON.parse(localStorage.getItem("guestCart") || "[]");
         try {
             // Fetch existing cart items from Firestore
@@ -241,8 +231,10 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
 
     useEffect(() => {
+        console.log("useEffect Called ###1");
         const auth = getAuth();
         const unsubscribe = onAuthStateChanged(auth, (user) => {
+            console.log("onAuthStateChanged ###1");
             setUserId(user ? user.uid : null);
             if (!user) syncLocalToFirestore(getGuestId());        
         });
@@ -251,21 +243,15 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
 
     useEffect(() => {
-        const auth = getAuth();
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            setUserId(user ? user.uid : null);
-            setUserId(user ? user.uid : null);
-            console.log(user?.uid);    
             fetchCartItems();
-            if (!user) syncLocalToFirestore(getGuestId());        
-        });
-        return unsubscribe;
     }, [cartUpdateFlag]);
 
  
     useEffect(() => { 
+        console.log("fetchCartItems useEffect Called (UserId change)");
             fetchCartItems();
-    }, [fetchCartItems]); //TODO: but userID here instead of fetchCartItems
+    }, [userId]); 
+ //   }, [fetchCartItems]); //TODO: but userID here instead of fetchCartItems
 
   
         const addToCart = async (item: CartItem) => {
@@ -354,7 +340,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             //console.log("firestoreDocId: " + firestoreDocId)
  
 
-            //FIXME: Here is the error for the NOT AUTHENTICATED USER!!!!!!!!!!!
+            //FIXME: Here is the error for the NOT AUTHENTICATED USER!!!!!!!!!!
             //TODO: Check if the id was correct BC what happens if i have X products with the same ID
             localStorage.setItem("guestCart", JSON.stringify(localCart.filter((item: CartItem) => item.cartItemId !== cartItemId)));
 
@@ -390,6 +376,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     };
 
     const clearCart = async () => {
+        console.log("clearCart function Called");
         try {
             if (userId) {
                 const deletePromises = cartItems.map((item) =>

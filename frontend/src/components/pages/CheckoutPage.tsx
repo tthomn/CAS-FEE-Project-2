@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useCart } from "../../context/CartContext";
 import Modal from "../shared/Modal";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebaseConfig";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import emailjs from "@emailjs/browser";
 
 const CheckoutPage: React.FC = () => {
@@ -11,13 +12,52 @@ const CheckoutPage: React.FC = () => {
     const shippingFee = 5.20;
 
     const [email, setEmail] = useState("");
-    const [deliveryAddress, setDeliveryAddress] = useState("Weltpoststrasse 5, 3015 Bern");
+    const [deliveryAddress, setDeliveryAddress] = useState("");
     const [isEditingAddress, setIsEditingAddress] = useState(false);
-    const [billingAddress, setBillingAddress] = useState("Gleiche Adresse wie die Lieferadresse");
+    const [billingAddress, setBillingAddress] = useState("");
+    const [userName, setUserName] = useState("");
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const [formError, setFormError] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [name, setName] = useState("");
+    const [surname, setSurname] = useState("");
+
+    useEffect(() => {
+        const fetchUserDetails = async (userId: string) => {
+            try {
+                const userDoc = doc(db, "users", userId);
+                const userSnapshot = await getDoc(userDoc);
+
+                if (userSnapshot.exists()) {
+                    const userData = userSnapshot.data();
+                    setEmail(userData.email || "");
+                    setDeliveryAddress(
+                        `${userData.street || ""} ${userData.houseNumber || ""}, ${userData.plz || ""} ${userData.city || ""}`
+                    );
+                    setBillingAddress(
+                        `${userData.street || ""} ${userData.houseNumber || ""}, ${userData.plz || ""} ${userData.city || ""}`
+                    );
+                    setUserName(`${userData.title || ""} ${userData.name || ""} ${userData.surname || ""}`.trim());
+                    setName(userData.name || "");
+                    setSurname(userData.surname || "");
+                } else {
+                    console.error("User document does not exist.");
+                }
+            } catch (error) {
+                console.error("Error fetching user details:", error);
+            }
+        };
+
+        const auth = getAuth();
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user && user.uid) {
+                fetchUserDetails(user.uid);
+            }
+        });
+
+        return unsubscribe;
+    }, []);
 
     const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setDeliveryAddress(e.target.value);
@@ -27,6 +67,14 @@ const CheckoutPage: React.FC = () => {
     const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setEmail(e.target.value);
         setErrors((prev) => ({ ...prev, email: "" }));
+    };
+
+    const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setName(e.target.value);
+    };
+
+    const handleSurnameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSurname(e.target.value);
     };
 
     const toggleEditAddress = () => {
@@ -43,38 +91,14 @@ const CheckoutPage: React.FC = () => {
         if (!deliveryAddress.trim()) {
             newErrors.deliveryAddress = "Die Lieferadresse darf nicht leer sein.";
         }
+        if (!name.trim()) {
+            newErrors.name = "Vorname darf nicht leer sein.";
+        }
+        if (!surname.trim()) {
+            newErrors.surname = "Nachname darf nicht leer sein.";
+        }
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
-    };
-
-    const sendInvoiceEmail = async (order: any, orderId: string) => {
-        const emailParams = {
-            to_name: email,
-            to_email: email,
-            order_id: orderId,
-            delivery_address: order.deliveryAddress,
-            billing_address: order.billingAddress,
-            total_price: order.totalPrice.toFixed(2),
-            items: order.cartItems
-                .map(
-                    (item: any) =>
-                        `${item.productName} (x${item.quantity}): CHF ${(item.price * item.quantity).toFixed(2)}`
-                )
-                .join("\n"),
-        };
-
-        try {
-            await emailjs.send(
-                "service_ua1imoh",
-                "template_qdffusf",
-                emailParams,
-                "LhmWwd3pEmYkAMNKW"
-            );
-            console.log("Invoice email sent successfully!");
-        } catch (error: any) {
-            console.error("Error sending invoice email:", error?.text || error);
-            throw new Error("Failed to send email. Please check the logs for details.");
-        }
     };
 
     const handlePlaceOrder = async () => {
@@ -92,8 +116,6 @@ const CheckoutPage: React.FC = () => {
                 };
 
                 const docRef = await addDoc(collection(db, "orders"), order);
-
-                await sendInvoiceEmail(order, docRef.id);
 
                 clearCart();
                 setIsModalOpen(true);
@@ -113,6 +135,29 @@ const CheckoutPage: React.FC = () => {
             <h1 className="text-2xl font-bold text-gray-800 text-center mb-6">Versand und Rechnung</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
+                    <h2 className="text-lg font-bold mb-4">Persönliche Daten</h2>
+                    <label className="block mb-4">
+                        Vorname:
+                        <input
+                            type="text"
+                            value={name}
+                            onChange={handleNameChange}
+                            className="w-full border p-2 mt-2"
+                            placeholder="Vorname eingeben"
+                        />
+                        {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
+                    </label>
+                    <label className="block mb-4">
+                        Nachname:
+                        <input
+                            type="text"
+                            value={surname}
+                            onChange={handleSurnameChange}
+                            className="w-full border p-2 mt-2"
+                            placeholder="Nachname eingeben"
+                        />
+                        {errors.surname && <p className="text-red-500 text-sm">{errors.surname}</p>}
+                    </label>
                     <h2 className="text-lg font-bold mb-4">E-Mail-Adresse</h2>
                     <input
                         type="email"
@@ -148,7 +193,7 @@ const CheckoutPage: React.FC = () => {
                         </div>
                     ) : (
                         <div>
-                            <p>{deliveryAddress}</p>
+                            <p>{deliveryAddress || "Keine Adresse angegeben"}</p>
                             <button
                                 className="text-blue-500 underline mt-2"
                                 onClick={toggleEditAddress}

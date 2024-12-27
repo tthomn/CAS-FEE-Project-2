@@ -21,7 +21,7 @@ import AdminPanel from "./components/pages/AdminPanel"; // Import the AdminPanel
 
 const App: React.FC = () => {
     const [loggedInUser, setLoggedInUser] = useState<string>("62xJXdO14EXWMCLS1CpHlI5PPFu1"); // Simulate logged-in user's UID
-    const adminUser = "62xJXdO14EXWMCLS1CpHlI5PPFu1"; // Real admin user UID
+    const adminUser = "62xJXdO14EXWMCLS1CpHlI5PPFu1"; // Real admin user UID //FIXME: Update it with functionality
 
     return (
         <AuthProvider>

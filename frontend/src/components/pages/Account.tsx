@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import CountryDropdown from "../shared/CountryDropdown";
-//import { cartCleaner } from "../../context/CartContext";
 import { useCart } from "../../context/CartContext";
-
 
 const Account: React.FC = () => {
     const { user, login, register, resetPassword, logout, loading } = useAuth();
@@ -112,6 +110,8 @@ const Account: React.FC = () => {
         try {
             await logout();
             setMessage("Logged out successfully!");
+            console.log("Logged out successfully!");
+
         } catch (error: any) {
             setMessage("Failed to log out.");
         }
