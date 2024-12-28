@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import Modal from "../shared/Modal";
 import { collection, addDoc, doc, getDoc } from "firebase/firestore";
@@ -196,9 +197,15 @@ const CheckoutPage: React.FC = () => {
                     </div>
                 </div>
             </div>
-            <div>
+            <div className="flex justify-between mt-6">
+                <Link
+                    to="/cart"
+                    className="px-6 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition"
+                >
+                    Zurück zum Warenkorb
+                </Link>
                 <button
-                    className={`mt-6 px-6 py-2 bg-red-500 text-white rounded ${
+                    className={`px-6 py-2 bg-red-500 text-white rounded ${
                         isLoading ? "opacity-50 cursor-not-allowed" : "hover:bg-red-600"
                     }`}
                     onClick={handlePlaceOrder}
@@ -206,9 +213,9 @@ const CheckoutPage: React.FC = () => {
                 >
                     {isLoading ? "Processing..." : "Bestellung abschliessen"}
                 </button>
-                {formError && <p className="mt-2 text-red-500 text-sm">{formError}</p>}
             </div>
 
+            {formError && <p className="mt-2 text-red-500 text-sm">{formError}</p>}
             <Modal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
