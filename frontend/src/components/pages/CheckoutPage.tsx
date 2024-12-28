@@ -4,7 +4,6 @@ import Modal from "../shared/Modal";
 import { collection, addDoc, doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebaseConfig";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import emailjs from "@emailjs/browser";
 
 const CheckoutPage: React.FC = () => {
     const { cartItems, clearCart } = useCart();
@@ -115,7 +114,7 @@ const CheckoutPage: React.FC = () => {
                     status: "pending",
                 };
 
-                const docRef = await addDoc(collection(db, "orders"), order);
+                await addDoc(collection(db, "orders"), order);
 
                 clearCart();
                 setIsModalOpen(true);
@@ -168,48 +167,15 @@ const CheckoutPage: React.FC = () => {
                         disabled={isLoading}
                     />
                     {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
-
-                    <h2 className="text-lg font-bold mb-4">Lieferadresse</h2>
-                    {isEditingAddress ? (
-                        <div>
-                            <input
-                                type="text"
-                                value={deliveryAddress}
-                                onChange={handleAddressChange}
-                                className="w-full border p-2 mb-2"
-                                placeholder="Lieferadresse eingeben"
-                                disabled={isLoading}
-                            />
-                            {errors.deliveryAddress && (
-                                <p className="text-red-500 text-sm">{errors.deliveryAddress}</p>
-                            )}
-                            <button
-                                className="text-blue-500 underline mt-2"
-                                onClick={toggleEditAddress}
-                                disabled={isLoading}
-                            >
-                                Save
-                            </button>
-                        </div>
-                    ) : (
-                        <div>
-                            <p>{deliveryAddress || "Keine Adresse angegeben"}</p>
-                            <button
-                                className="text-blue-500 underline mt-2"
-                                onClick={toggleEditAddress}
-                                disabled={isLoading}
-                            >
-                                Edit
-                            </button>
-                        </div>
-                    )}
                 </div>
                 <div>
                     <h2 className="text-lg font-bold mb-4">Zusammenfassung</h2>
                     <ul className="mb-4">
                         {cartItems.map((item) => (
                             <li key={item.id} className="flex justify-between mb-4">
-                                <span>{item.productName}</span>
+                                <span>
+                                    {item.productName} <span className="text-black">({item.quantity} Stück)</span>
+                                </span>
                                 <span>CHF {item.price.toFixed(2)}</span>
                             </li>
                         ))}
