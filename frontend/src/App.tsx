@@ -17,7 +17,7 @@ import { AuthProvider } from "./context/AuthContext";
 import FlyingBees from "./components/layouts/FlyingBees";
 import LoginPage from "./components/pages/LoginPage";
 import RegisterPage from "./components/pages/RegisterPage";
-import AdminPanel from "./components/pages/AdminPanel"; // Import the AdminPanel component
+import AdminPanel from "./components/pages/AdminPanel";
 
 const App: React.FC = () => {
     const [loggedInUser, setLoggedInUser] = useState<string>("62xJXdO14EXWMCLS1CpHlI5PPFu1"); // Simulate logged-in user's UID
@@ -30,7 +30,7 @@ const App: React.FC = () => {
                     <div className="relative min-h-screen">
                         <Header />
                         <Routes>
-                            <Route path="/" element={<><FlyingBees /><HomePage /></>} />
+                            <Route path="/" element={<><HomePage /></>} />
                             <Route path="/shop" element={<ShopPage />} />
                             <Route path="/shop/:productId" element={<ProductDetail />} />
                             <Route path="/recipe" element={<Recipe />} />
