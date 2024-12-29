@@ -25,7 +25,7 @@ const App: React.FC = () => {
 
     return (
         <AuthProvider>
-            <CartProvider>
+          <CartProvider>
                 <Router>
                     <div className="relative min-h-screen">
                         <Header />
@@ -43,8 +43,7 @@ const App: React.FC = () => {
                             <Route path="/register" element={<RegisterPage />} />
                             <Route
                                 path="/admin"
-                                element={
-                                    loggedInUser === adminUser ? (
+                                element={ loggedInUser === adminUser ? (
                                         <AdminPanel loggedInUser={loggedInUser} />
                                     ) : (
                                         <p>You do not have access to this page.</p>

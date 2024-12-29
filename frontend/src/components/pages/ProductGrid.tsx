@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { db } from "../../firebaseConfig";
+import { db } from "../../services/firebase/firebaseConfig";
 import { collection, query, where, getDocs } from "firebase/firestore";
-import { Product } from "../../types/types";
+import { Product } from "../../types/product";
 
 interface ProductGridProps {
     categoryId: string | null;

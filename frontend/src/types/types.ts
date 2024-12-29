@@ -1,8 +1,13 @@
-export interface Category {
+import { Product } from '../types/product';
+
+//TODO: Delete later!
+
+/*export interface Category {
     id: string;
     name: string;
 }
-
+*/
+/*
 export interface Product {
     id: string;
     name: string;
@@ -15,10 +20,10 @@ export interface Product {
         totalRating: number;
         ratingCount: number;
     };
-}
+}*/
 
 
-
+/*
 export interface CartItem {
     id: string;
     productName: string;
@@ -28,8 +33,8 @@ export interface CartItem {
     productId: string;
     cartItemId: string;
     addedAt?: Date;    
-}
-
+}*/
+/*
 export interface Order {
     id: string;
     userId?: string;
@@ -38,5 +43,4 @@ export interface Order {
     status: "pending" | "completed" | "canceled";
     createdAt: string;
 }
-
-
+*/

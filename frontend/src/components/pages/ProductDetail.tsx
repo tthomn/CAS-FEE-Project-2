@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { db } from "../../firebaseConfig";
+import { db } from "../../services/firebase/firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
 import { useCart } from "../../context/CartContext";
 import Rating from "../shared/Rating";

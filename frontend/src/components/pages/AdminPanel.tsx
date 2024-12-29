@@ -1,24 +1,10 @@
-import React, { useState, useEffect } from "react";
-
-import {
-    getFirestore,
-    collection,
-    addDoc,
-    updateDoc,
-    deleteDoc,
-    doc,
-    getDocs,
-} from "firebase/firestore";
-import {
-    getStorage,
-    ref,
-    uploadBytesResumable,
-    getDownloadURL,
-} from "firebase/storage";
-import { Product } from "../../types/types";
+import React, { useState, useEffect } from "react"; //OK
+import {getFirestore, collection,addDoc, updateDoc,deleteDoc,doc, getDocs,} from "firebase/firestore"; //OK
+import { getStorage, ref, uploadBytesResumable, getDownloadURL,} from "firebase/storage"; //OK
+import { Product } from "../../types/product"; //OK
 
 interface AdminPanelProps {
-    loggedInUser: string;
+     loggedInUser: string;
 }
 
 const AdminPanel: React.FC<AdminPanelProps> = ({ loggedInUser }) => {
@@ -40,6 +26,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ loggedInUser }) => {
 
     useEffect(() => {
         if (loggedInUser === adminUser) {
+            
             const fetchProducts = async () => {
                 try {
                     const querySnapshot = await getDocs(collection(db, "products"));
@@ -146,11 +133,14 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ loggedInUser }) => {
         return <p>You do not have access to the Admin Panel.</p>;
     }
 
+
+
+
+    ///This is 
     return (
         <div className="p-4">
             <h1 className="text-2xl font-bold mb-4">Admin Panel</h1>
-
-            {/* Add Product Section */}
+            {/* Add Product Section*/}
             <div className="mb-6">
                 <h2 className="text-xl font-semibold mb-2">Add Product</h2>
                 {errorMessage && <p className="text-red-500">{errorMessage}</p>}

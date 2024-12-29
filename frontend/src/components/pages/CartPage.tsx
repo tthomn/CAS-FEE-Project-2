@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useCart } from "../../context/CartContext";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -45,6 +45,7 @@ const CartPage: React.FC = () => {
         return <p className="text-center text-lg text-gray-600">Your cart is currently empty.</p>;
     }
 
+    
     return (
         <div className="px-4 py-6 max-w-4xl mx-auto">
             <h1 className="text-2xl font-bold text-gray-800 text-center mb-6">Your Shopping Cart</h1>

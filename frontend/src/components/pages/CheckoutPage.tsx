@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import Modal from "../shared/Modal";
 import { collection, addDoc, doc, getDoc } from "firebase/firestore";
-import { db } from "../../firebaseConfig";
+import { db } from "../../services/firebase/firebaseConfig";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 const CheckoutPage: React.FC = () => {

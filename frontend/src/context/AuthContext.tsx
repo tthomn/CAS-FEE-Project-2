@@ -1,14 +1,5 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-import {
-    getAuth,
-    onAuthStateChanged,
-    signInWithEmailAndPassword,
-    signOut,
-    createUserWithEmailAndPassword,
-    sendEmailVerification,
-    sendPasswordResetEmail,
-    User,
-} from "firebase/auth";
+import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut,createUserWithEmailAndPassword,sendEmailVerification,sendPasswordResetEmail,User,} from "firebase/auth";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
 
 interface AdditionalData {
@@ -32,9 +23,9 @@ interface AuthContextType {
     resetPassword: (email: string) => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext =  createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
 

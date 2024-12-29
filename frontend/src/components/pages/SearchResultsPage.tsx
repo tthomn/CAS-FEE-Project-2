@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { collection, getDocs, query, where } from "firebase/firestore";
-import { db } from "../../firebaseConfig";
+import { db } from "../../services/firebase/firebaseConfig";
 
 interface SearchResult {
     id: string;

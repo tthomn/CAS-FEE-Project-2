@@ -1,10 +1,12 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback, useRef } from 'react';
-import { CartItem } from '../types/types';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import { CartItem } from '../types/cartItem';
 import { v4 as uuidv4 } from 'uuid';
-import { db } from '../firebaseConfig';
-import { collection, getDocs, addDoc, deleteDoc, doc, query, where, setDoc, updateDoc } from 'firebase/firestore';
-import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
+import { db } from '../services/firebase/firebaseConfig';
+import { collection, getDocs, addDoc, deleteDoc, doc, query, where, setDoc, updateDoc, DocumentReference, LoadBundleTask } from 'firebase/firestore';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { Timestamp } from "firebase/firestore";
+import {getDocsBy1Condition, addDocToCollection, getDocRefsBy2Condition, deleteDocByRef, updateDocByRef} from "../services/firebase/firestoreService";
+
 
 interface CartContextType {
     cartItems: CartItem[];
@@ -19,32 +21,28 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
     const [userId, setUserId] = useState<string | null>(null);
     const [cartUpdateFlag, setCartUpdateFlag] = useState(false); // Declare flag using useState
-
-    // Example function to update the flag
+    
+    // Example function to update the flag //TODO: Something for Hook? 
     const triggerUpdateCart = () => {
         console.log("triggerUpdateCart flag");
         setCartUpdateFlag((prev) => !prev);
     };
 
-       //TODO: FUNCTION WHICH CHECKS if Doc EXISTS IN DB
       const cartCleaner = async () => 
       {
         try
         {
+         let firestoreItems: CartItem[] = [];
 
         const guestId = localStorage.getItem("guestId");
         const localCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
-        let userId  = getAuth().currentUser?.uid;       
+        let userId  = getAuth().currentUser?.uid;                
+        firestoreItems = await getDocsBy1Condition("cart", "userId", "==", userId) ;          
 
-        const qu = query(collection(db, "cart"), where("userId", "==", userId));       
-        const querySnapshot = await getDocs(qu);
-        const firestoreItems = querySnapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...(doc.data() as Omit<CartItem, "id">),
-        }));
         //Check if localCart is empty and if empty exist the function
         if(localCart.length === 0)
         { return; }
@@ -57,14 +55,11 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             const existingItem = firestoreItems.find((firestoreItem) => firestoreItem.productId === item.productId);
 
             if (!existingItem) 
-              {                         
-               const newItem = { ...item, cartItemId: uuidv4()};   
-               const  payload = { ...newItem, userId, addedAt: Timestamp.now() };       
-               await addDoc(collection(db, "cart"), payload);       
-               const q = query(collection(db, "cart"), where("guestId", "==", guestId),where("productId", "==", item.productId));
-               const querySnapshot = await getDocs(q);
-               const docRef = querySnapshot.docs[0].ref;
-               await deleteDoc(docRef);
+              {   
+               const payload = { ...item, cartItemId: uuidv4(), userId};         
+               await addDocToCollection("cart", payload);          
+               const docRefComplete = await getDocRefsBy2Condition("cart", "guestId", "==", guestId, "productId", "==", item.productId);  
+               await deleteDocByRef(docRefComplete[0]);    
             }
             else 
             {
@@ -75,28 +70,16 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
        
                //If the quantity of the local item is greater than the quantity of the firestore item update the quantity of the firestore item
                 if(quantityFirestoreItem !== undefined && quantityLocalItem > quantityFirestoreItem)
-                {              
-                    const qq = query(collection(db, "cart"), where("userId", "==", userId),where("productId", "==", existingItem.id));
-                    const querySnapshotqq = await getDocs(qq);
-                    const docRef = querySnapshotqq.docs[0].ref;
-
-                 await updateDoc(docRef, {
-                      quantity: quantityLocalItem,
-                      addedAt: Timestamp.now()
-                 });      
-                 //remove the item from the cart via the Guest id and the product id
-                    const q = query(collection(db, "cart"), where("guestId", "==", guestId),where("productId", "==", item.productId));
-                    const querySnapshot = await getDocs(q);
-                    const docRef2 = querySnapshot.docs[0].ref;
-                    await deleteDoc(docRef2);
-                 
+                {           
+                    const docRefComplete = await getDocRefsBy2Condition("cart", "userId", "==", userId, "productId", "==", existingItem.id);  
+                    await updateDocByRef(docRefComplete[0], quantityLocalItem);                             
+                    const docRefComplete1 = await getDocRefsBy2Condition("cart", "guestId", "==", guestId, "productId", "==", item.productId);  
+                    await deleteDocByRef(docRefComplete1[0]);               
                 }  
                 else
-                {
-                    const q = query(collection(db, "cart"), where("guestId", "==", guestId),where("productId", "==", item.productId));
-                    const querySnapshot = await getDocs(q);
-                    const docRef2 = querySnapshot.docs[0].ref;
-                    await deleteDoc(docRef2);
+                {                 
+                    const docRefComplete1 = await getDocRefsBy2Condition("cart", "guestId", "==", guestId, "productId", "==", item.productId);  
+                    await deleteDocByRef(docRefComplete1[0]);                  
                 }                 
             }               
         }
@@ -109,6 +92,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }  
        }         
 
+
         const getGuestId = (): string => {
         
         let guestId = localStorage.getItem("guestId");
@@ -120,32 +104,24 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     };
  
   
-    /**
-     * Synchronizes the local cart stored in localStorage with the Firestore database.
-     * 
-     * @param guestId - The unique identifier for the guest user.
-     * 
-     * This function performs the following steps:
-     * 1. Retrieves the local cart items from localStorage.
-     * 2. Fetches the existing cart items from Firestore for the given guestId.
-     * 3. Filters out local cart items that are already present in Firestore.
-     * 4. Adds only the new items to Firestore.
-     * 5. Logs a message if new items were added to Firestore.
-     * 
-     * @throws Will log an error message if there is an issue syncing the local cart.
+    /** 
      */
     const syncLocalToFirestore = async (guestId: string) => {
-        console.log("syncLocalToFirestore Called");
         const localCart: CartItem[] = JSON.parse(localStorage.getItem("guestCart") || "[]");
         try {
+            let firestoreItems: CartItem[] = [];
+
             // Fetch existing cart items from Firestore
+            /*
             const q = query(collection(db, "cart"), where("guestId", "==", guestId));
             const querySnapshot = await getDocs(q);
             const firestoreItems = querySnapshot.docs.map((doc) => ({
                 id: doc.id,
                 ...(doc.data() as Omit<CartItem, "id">),
             }));
-    
+            */
+             firestoreItems = await getDocsBy1Condition("cart", "guestId", "==", guestId);       
+   
             // Filter out local cart items that are already in Firestore
             const newItems = localCart.filter(
                 (localItem: CartItem) => !firestoreItems.some((firestoreItem) => firestoreItem.cartItemId === localItem.cartItemId)
@@ -154,7 +130,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             // Add only new items to Firestore
             for (const item of newItems) {
                 const docRef = doc(collection(db, "cart"), item.cartItemId);
-                await setDoc(docRef, { ...item, guestId });
+                await setDoc(docRef, { ...item, guestId }); //TODO: setDOC? 
             }
     
             if (newItems.length > 0) {
@@ -166,50 +142,21 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     };
 
 
-    /**
-     * 
-     * Fetches cart items from Firestore based on the user's authentication status.
-     * 
-     * - If the user is authenticated, fetches the cart items associated with the `userId`.
-     * - If the user is not authenticated, fetches the cart items associated with the `guestId`.
-     * - If no cart items are found for the guest user in Firestore, retrieves the cart items from local storage.
-     * 
-     * Updates the cart items state with the fetched items and stores the guest cart items in local storage if the user is not authenticated.
-     * 
-     * @async
-     * @function fetchCartItems
-     * @returns {Promise<void>} A promise that resolves when the cart items have been fetched and the state has been updated.
-     * @throws Will log an error message if there is an issue fetching the cart items.
-     * 
-     * @dependency {string | undefined} userId - The ID of the authenticated user, if available.
-     */    
+   //TODO:: Is this really CONTEXT??? 
     const fetchCartItems = useCallback(async () => {
         try {
             console.log("fetchCartItems Called");
             let firestoreItems: CartItem[] = [];
             const guestId = getGuestId();
 
-            if (userId) {
-                const q = query(collection(db, "cart"), where("userId", "==", userId));
-            
-                const querySnapshot = await getDocs(q);
-            
-
-                firestoreItems = querySnapshot.docs.map((doc) => ({
-                    id: doc.id,
-                    ...(doc.data() as Omit<CartItem, "id">),
-                }));
+            if (userId) {                  
+               firestoreItems = await getDocsBy1Condition("cart", "userId", "==", userId) ;            
 
             } else {
-          
+
                 console.log("Fetching cart for guest user:", guestId);  
-                const q = query(collection(db, "cart"), where("guestId", "==", guestId));
-                const querySnapshot = await getDocs(q);
-                firestoreItems = querySnapshot.docs.map((doc) => ({
-                    id: doc.id,
-                    ...(doc.data() as Omit<CartItem, "id">),
-                }));                  
-                           
+                firestoreItems = await getDocsBy1Condition("cart", "guestId", "==", guestId) ;          
+             
                 if (firestoreItems.length === 0) {
                     const localCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
                     firestoreItems = [...localCart];
@@ -231,10 +178,8 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
 
     useEffect(() => {
-        console.log("useEffect Called ###1");
         const auth = getAuth();
         const unsubscribe = onAuthStateChanged(auth, (user) => {
-            console.log("onAuthStateChanged ###1");
             setUserId(user ? user.uid : null);
             if (!user) syncLocalToFirestore(getGuestId());        
         });
@@ -243,15 +188,21 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
 
     useEffect(() => {
+        const auth = getAuth();
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            setUserId(user ? user.uid : null);
+            setUserId(user ? user.uid : null);
+            console.log(user?.uid);    
             fetchCartItems();
+            if (!user) syncLocalToFirestore(getGuestId());        
+        });
+        return unsubscribe;
     }, [cartUpdateFlag]);
 
  
     useEffect(() => { 
-        console.log("fetchCartItems useEffect Called (UserId change)");
             fetchCartItems();
-    }, [userId]); 
- //   }, [fetchCartItems]); //TODO: but userID here instead of fetchCartItems
+    }, [fetchCartItems]); //TODO: but userID here instead of fetchCartItems
 
   
         const addToCart = async (item: CartItem) => {
@@ -340,7 +291,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             //console.log("firestoreDocId: " + firestoreDocId)
  
 
-            //FIXME: Here is the error for the NOT AUTHENTICATED USER!!!!!!!!!!
+            //FIXME: Here is the error for the NOT AUTHENTICATED USER!!!!!!!!!!!
             //TODO: Check if the id was correct BC what happens if i have X products with the same ID
             localStorage.setItem("guestCart", JSON.stringify(localCart.filter((item: CartItem) => item.cartItemId !== cartItemId)));
 
@@ -376,7 +327,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     };
 
     const clearCart = async () => {
-        console.log("clearCart function Called");
         try {
             if (userId) {
                 const deletePromises = cartItems.map((item) =>

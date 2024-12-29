@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { doc, updateDoc, getDoc, collection, query, where, getDocs, setDoc } from "firebase/firestore";
-import { db } from "../../firebaseConfig";
+import { db } from "../../services/firebase/firebaseConfig";
 import { useAuth } from "../../context/AuthContext";
 
 interface RatingProps {
