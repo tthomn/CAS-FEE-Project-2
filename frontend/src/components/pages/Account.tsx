@@ -37,6 +37,9 @@ const Account: React.FC = () => {
     const [isForgotPassword, setIsForgotPassword] = useState(false);
     const [message, setMessage] = useState("");
     const [authLoading, setAuthLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const { cartCleaner } = useCart();
 
     const handleInputChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -48,14 +51,7 @@ const Account: React.FC = () => {
         }));
     };
 
-
-    const [showPassword, setShowPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const { cartCleaner } = useCart();
-
-
     const handleSubmit = async () => {
-
         setMessage("");
         setAuthLoading(true);
 
@@ -83,10 +79,9 @@ const Account: React.FC = () => {
 
                 setMessage("Registration successful! Please verify your email.");
             } else {
-
-                await login(formData.email, formData.password);     
-                await cartCleaner();                    
-                setMessage("Login successful!");                    
+                await login(formData.email, formData.password);
+                await cartCleaner();
+                setMessage("Login successful!");
             }
         } catch (error: any) {
             setMessage(error.message || "An unknown error occurred.");
@@ -110,8 +105,6 @@ const Account: React.FC = () => {
         try {
             await logout();
             setMessage("Logged out successfully!");
-            console.log("Logged out successfully!");
-
         } catch (error: any) {
             setMessage("Failed to log out.");
         }
@@ -192,25 +185,138 @@ const Account: React.FC = () => {
                             onChange={handleInputChange}
                             className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
                         />
-                        <input
-                            type="password"
-                            name="password"
-                            placeholder="Password"
-                            value={formData.password}
-                            onChange={handleInputChange}
-                            className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
-                        />
+                        <div className="relative mb-4">
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                name="password"
+                                placeholder="Password"
+                                value={formData.password}
+                                onChange={handleInputChange}
+                                className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500 pr-10"
+                            />
+                            <span
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute inset-y-0 right-3 flex items-center justify-center cursor-pointer text-gray-500"
+                            >
+                                {showPassword ? (
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-5 w-5"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                        strokeWidth={2}
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                                        />
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-.34 1.36-1.02 2.623-1.92 3.682m-2.11 2.372A9.963 9.963 0 0112 19c-4.477 0-8.268-2.943-9.542-7-.34-1.36-1.02-2.623-1.92-3.682"
+                                        />
+                                    </svg>
+                                ) : (
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-5 w-5"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                        strokeWidth={2}
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            d="M3.98 8.29A10.024 10.024 0 0112 5c4.478 0 8.269 2.943 9.543 7-.34 1.361-1.02 2.624-1.92 3.682m-2.11 2.373A9.963 9.963 0 0112 19c-4.478 0-8.269-2.943-9.543-7a10.054 10.054 0 012.02-3.71m1.42-1.42l13.75 13.75"
+                                        />
+                                    </svg>
+                                )}
+                            </span>
+                        </div>
                         {isRegistering && (
                             <>
-                                <input
-                                    type="password"
-                                    name="confirmPassword"
-                                    placeholder="Confirm Password"
-                                    value={formData.confirmPassword}
-                                    onChange={handleInputChange}
-                                    className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
-                                />
-                                <hr className="my-4" />
+                                <div className="relative mb-4">
+                                    <input
+                                        type={showConfirmPassword ? "text" : "password"}
+                                        placeholder="Confirm Password"
+                                        value={formData.confirmPassword}
+                                        onChange={(e) =>
+                                            setFormData((prev) => ({ ...prev, confirmPassword: e.target.value }))
+                                        }
+                                        className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500 pr-10"
+                                    />
+                                    <span
+                                        onClick={() =>
+                                            setShowConfirmPassword(!showConfirmPassword)
+                                        }
+                                        className="absolute inset-y-0 right-3 flex items-center cursor-pointer text-gray-500"
+                                    >
+                {showConfirmPassword ? (
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                        />
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-.34 1.36-1.02 2.623-1.92 3.682m-2.11 2.372A9.963 9.963 0 0112 19c-4.477 0-8.268-2.943-9.542-7-.34-1.36-1.02-2.623-1.92-3.682"
+                        />
+                    </svg>
+                ) : (
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M3.98 8.29A10.024 10.024 0 0112 5c4.478 0 8.269 2.943 9.543 7-.34 1.361-1.02 2.624-1.92 3.682m-2.11 2.373A9.963 9.963 0 0112 19c-4.478 0-8.269-2.943-9.543-7a10.054 10.054 0 012.02-3.71m1.42-1.42l13.75 13.75"
+                        />
+                    </svg>
+
+                )}
+            </span>
+                                </div>
+                                <div className="mb-4">
+                                    <input
+                                        type="text"
+                                        name="name"
+                                        placeholder="Name"
+                                        value={formData.name}
+                                        onChange={handleInputChange}
+                                        className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
+                                    />
+                                </div>
+                                <div className="mb-4">
+                                    <input
+                                        type="text"
+                                        name="surname"
+                                        placeholder="Surname"
+                                        value={formData.surname}
+                                        onChange={handleInputChange}
+                                        className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
+                                    />
+                                </div>
+                            </>
+                        )}
+                        {isRegistering && (
+                            <>
                                 <div className="mb-4 text-left">
                                     <label className="block mb-2 font-bold">Anrede</label>
                                     <div className="flex items-center gap-4">
@@ -238,39 +344,51 @@ const Account: React.FC = () => {
                                         </label>
                                     </div>
                                 </div>
-                                <input
-                                    type="text"
-                                    name="street"
-                                    placeholder="Street"
-                                    value={formData.street}
-                                    onChange={handleInputChange}
-                                    className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
-                                />
-                                <input
-                                    type="text"
-                                    name="houseNumber"
-                                    placeholder="House Number"
-                                    value={formData.houseNumber}
-                                    onChange={handleInputChange}
-                                    className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
-                                />
-                                <input
-                                    type="text"
-                                    name="plz"
-                                    placeholder="PLZ"
-                                    value={formData.plz}
-                                    onChange={handleInputChange}
-                                    className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
-                                />
-                                <input
-                                    type="text"
-                                    name="city"
-                                    placeholder="City"
-                                    value={formData.city}
-                                    onChange={handleInputChange}
-                                    className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
-                                />
-                                <div className="flex items-center gap-4 w-full">
+                                {/* Street */}
+                                <div className="mb-4">
+                                    <input
+                                        type="text"
+                                        name="street"
+                                        placeholder="Street"
+                                        value={formData.street}
+                                        onChange={handleInputChange}
+                                        className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
+                                    />
+                                </div>
+                                {/* House Number */}
+                                <div className="mb-4">
+                                    <input
+                                        type="text"
+                                        name="houseNumber"
+                                        placeholder="House Number"
+                                        value={formData.houseNumber}
+                                        onChange={handleInputChange}
+                                        className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
+                                    />
+                                </div>
+                                {/* Postal Code */}
+                                <div className="mb-4">
+                                    <input
+                                        type="text"
+                                        name="plz"
+                                        placeholder="Postal Code (PLZ)"
+                                        value={formData.plz}
+                                        onChange={handleInputChange}
+                                        className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
+                                    />
+                                </div>
+                                {/* City */}
+                                <div className="mb-4">
+                                    <input
+                                        type="text"
+                                        name="city"
+                                        placeholder="City"
+                                        value={formData.city}
+                                        onChange={handleInputChange}
+                                        className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
+                                    />
+                                </div>
+                                <div className="mb-4">
                                     <CountryDropdown
                                         value={
                                             typeof formData.country === "object" && formData.country !== null
@@ -284,9 +402,7 @@ const Account: React.FC = () => {
                                             }))
                                         }
                                     />
-
                                 </div>
-
                             </>
                         )}
                         <button
@@ -305,19 +421,39 @@ const Account: React.FC = () => {
                                     : "Login"}
                         </button>
                         {!isRegistering && (
-                            <button
-                                onClick={() => setIsForgotPassword(true)}
-                                className="w-full p-2 mb-4 bg-gray-500 text-white rounded hover:bg-gray-600"
-                            >
-                                Forgot Password?
-                            </button>
+                            <div className="mt-4">
+                                <button
+                                    onClick={() => setIsForgotPassword(true)}
+                                    className="text-blue-600 hover:underline text-sm bg-transparent border-none cursor-pointer"
+                                >
+                                    Forgot Password?
+                                </button>
+                            </div>
                         )}
-                        <button
-                            onClick={() => setIsRegistering(!isRegistering)}
-                            className="w-full p-2 mb-4 bg-purple-500 text-white rounded hover:bg-purple-600"
-                        >
-                            {isRegistering ? "Switch to Login" : "Switch to Register"}
-                        </button>
+                        <div className="mt-4">
+                            <button
+                                onClick={() => {
+                                    setIsRegistering(!isRegistering);
+                                    setFormData({
+                                        email: "",
+                                        password: "",
+                                        confirmPassword: "",
+                                        title: "",
+                                        name: "",
+                                        surname: "",
+                                        dob: "",
+                                        street: "",
+                                        houseNumber: "",
+                                        plz: "",
+                                        city: "",
+                                        country: "",
+                                    });
+                                }}
+                                className="text-blue-600 hover:underline text-sm bg-transparent border-none cursor-pointer"
+                            >
+                                {isRegistering ? "← Back to Login" : "Switch to Register"}
+                            </button>
+                        </div>
                         {message && <p className="text-red-500 mt-4">{message}</p>}
                     </>
                 )}
