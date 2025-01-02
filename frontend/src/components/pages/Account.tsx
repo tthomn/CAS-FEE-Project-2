@@ -40,6 +40,7 @@ const Account: React.FC = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const { cartCleaner } = useCart();
+    const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
     const handleInputChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -51,14 +52,57 @@ const Account: React.FC = () => {
         }));
     };
 
+    const validateForm = () => {
+        const newErrors: { [key: string]: string } = {};
+
+        const isRequired = (value: string, fieldName: string) =>
+            value.trim() ? "" : `${fieldName} is required`;
+
+        const emailError = isRequired(formData.email, "Email") ||
+            (!formData.email.includes("@") ? "Invalid email address" : "");
+        if (emailError) newErrors.email = emailError;
+
+        const passwordError = isRequired(formData.password, "Password");
+        if (passwordError) newErrors.password = passwordError;
+
+        if (isRegistering) {
+            if (formData.password !== formData.confirmPassword) {
+                newErrors.confirmPassword = "Passwords do not match";
+            }
+
+            ["name", "surname", "street", "houseNumber", "plz", "city"].forEach((field) => {
+                const fieldValue = (formData as any)[field];
+                const fieldError = isRequired(fieldValue, field.charAt(0).toUpperCase() + field.slice(1));
+                if (fieldError) newErrors[field] = fieldError;
+            });
+
+            if (!formData.country || formData.country === "") {
+                newErrors.country = "Country is required";
+            }
+        }
+
+        console.log("Validation errors full object:", newErrors);
+
+        setErrors(newErrors);
+
+        return Object.keys(newErrors).length === 0;
+    };
+
     const handleSubmit = async () => {
         setMessage("");
         setAuthLoading(true);
 
+        const isValid = validateForm();
+        console.log("Validation status:", isValid);
+
+        if (!isValid) {
+            setAuthLoading(false);
+            return;
+        }
         try {
             if (isRegistering) {
                 if (formData.password !== formData.confirmPassword) {
-                    throw new Error("Passwords do not match.");
+                    throw new Error("Passwords do not match");
                 }
                 const countryName =
                     typeof formData.country === "string"
@@ -84,7 +128,7 @@ const Account: React.FC = () => {
                 setMessage("Login successful!");
             }
         } catch (error: any) {
-            setMessage(error.message || "An unknown error occurred.");
+            setMessage(error.message || "An unknown error occurred");
         } finally {
             setAuthLoading(false);
         }
@@ -96,7 +140,7 @@ const Account: React.FC = () => {
             await resetPassword(formData.email);
             setMessage("Password reset email sent. Please check your inbox.");
         } catch (error: any) {
-            setMessage(error.message || "An unknown error occurred.");
+            setMessage(error.message || "An unknown error occurred");
         }
     };
 
@@ -131,14 +175,21 @@ const Account: React.FC = () => {
                 {isForgotPassword ? (
                     <>
                         <h2 className="text-xl font-bold mb-4">Restore Password</h2>
-                        <input
-                            type="email"
-                            name="email"
-                            placeholder="Enter your email"
-                            value={formData.email}
-                            onChange={handleInputChange}
-                            className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
-                        />
+                        <div className="mb-4">
+                            <input
+                                type="email"
+                                name="email"
+                                placeholder="Email"
+                                value={formData.email}
+                                onChange={handleInputChange}
+                                className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
+                            />
+                            {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
+
+                        </div>
+
+                        {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
+
                         <button
                             onClick={handlePasswordReset}
                             className={`w-full p-2 mb-4 rounded bg-blue-500 text-white hover:bg-blue-600 ${
@@ -177,23 +228,33 @@ const Account: React.FC = () => {
                         <h1 className="text-2xl font-bold mb-4">
                             {isRegistering ? "Register" : "Login"}
                         </h1>
-                        <input
-                            type="email"
-                            name="email"
-                            placeholder="Email"
-                            value={formData.email}
-                            onChange={handleInputChange}
-                            className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
-                        />
-                        <div className="relative mb-4">
+                        <div className="mb-4">
                             <input
-                                type={showPassword ? "text" : "password"}
-                                name="password"
-                                placeholder="Password"
-                                value={formData.password}
+                                type="email"
+                                name="email"
+                                placeholder="Email"
+                                value={formData.email}
                                 onChange={handleInputChange}
-                                className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500 pr-10"
+                                className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
                             />
+                            {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
+
+                        </div>
+
+                        <div className="relative mb-4">
+                            <div className="mb-4">
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    name="password"
+                                    placeholder="Password"
+                                    value={formData.password}
+                                    onChange={handleInputChange}
+                                    className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500 pr-10"
+                                />
+                                {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
+
+                            </div>
+
                             <span
                                 onClick={() => setShowPassword(!showPassword)}
                                 className="absolute inset-y-0 right-3 flex items-center justify-center cursor-pointer text-gray-500"
@@ -294,24 +355,32 @@ const Account: React.FC = () => {
             </span>
                                 </div>
                                 <div className="mb-4">
-                                    <input
-                                        type="text"
-                                        name="name"
-                                        placeholder="Name"
-                                        value={formData.name}
-                                        onChange={handleInputChange}
-                                        className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
-                                    />
+                                    <div className="mb-4">
+                                        <input
+                                            type="text"
+                                            name="name"
+                                            placeholder="Name"
+                                            value={formData.name}
+                                            onChange={handleInputChange}
+                                            className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
+                                        />
+                                        {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
+                                    </div>
+
                                 </div>
                                 <div className="mb-4">
-                                    <input
-                                        type="text"
-                                        name="surname"
-                                        placeholder="Surname"
-                                        value={formData.surname}
-                                        onChange={handleInputChange}
-                                        className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
-                                    />
+                                    <div className="mb-4">
+                                        <input
+                                            type="text"
+                                            name="surname"
+                                            placeholder="Surname"
+                                            value={formData.surname}
+                                            onChange={handleInputChange}
+                                            className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
+                                        />
+                                        {errors.surname && <p className="text-red-500 text-sm">{errors.surname}</p>}
+                                    </div>
+
                                 </div>
                             </>
                         )}
@@ -344,29 +413,32 @@ const Account: React.FC = () => {
                                         </label>
                                     </div>
                                 </div>
-                                {/* Street */}
                                 <div className="mb-4">
-                                    <input
-                                        type="text"
-                                        name="street"
-                                        placeholder="Street"
-                                        value={formData.street}
-                                        onChange={handleInputChange}
-                                        className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
-                                    />
+                                    <div className="mb-4">
+                                        <input
+                                            type="text"
+                                            name="street"
+                                            placeholder="Street"
+                                            value={formData.street}
+                                            onChange={handleInputChange}
+                                            className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
+                                        />
+                                        {errors.street && <p className="text-red-500 text-sm">{errors.street}</p>}
+                                    </div>
                                 </div>
-                                {/* House Number */}
                                 <div className="mb-4">
-                                    <input
-                                        type="text"
-                                        name="houseNumber"
-                                        placeholder="House Number"
-                                        value={formData.houseNumber}
-                                        onChange={handleInputChange}
-                                        className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
-                                    />
+                                    <div className="mb-4">
+                                        <input
+                                            type="text"
+                                            name="houseNumber"
+                                            placeholder="House Number"
+                                            value={formData.houseNumber}
+                                            onChange={handleInputChange}
+                                            className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
+                                        />
+                                        {errors.houseNumber && <p className="text-red-500 text-sm">{errors.houseNumber}</p>}
+                                    </div>
                                 </div>
-                                {/* Postal Code */}
                                 <div className="mb-4">
                                     <input
                                         type="text"
@@ -376,8 +448,8 @@ const Account: React.FC = () => {
                                         onChange={handleInputChange}
                                         className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
                                     />
+                                    {errors.plz && <p className="text-red-500 text-sm">{errors.plz}</p>}
                                 </div>
-                                {/* City */}
                                 <div className="mb-4">
                                     <input
                                         type="text"
@@ -385,8 +457,9 @@ const Account: React.FC = () => {
                                         placeholder="City"
                                         value={formData.city}
                                         onChange={handleInputChange}
-                                        className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
+                                        className="w-full p-2 mb-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
                                     />
+                                    {errors.city && <p className="text-red-500 text-sm">{errors.city}</p>}
                                 </div>
                                 <div className="mb-4">
                                     <CountryDropdown
@@ -434,6 +507,7 @@ const Account: React.FC = () => {
                             <button
                                 onClick={() => {
                                     setIsRegistering(!isRegistering);
+                                    setErrors({});
                                     setFormData({
                                         email: "",
                                         password: "",
