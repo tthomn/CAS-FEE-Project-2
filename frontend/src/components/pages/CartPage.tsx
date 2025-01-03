@@ -6,17 +6,24 @@ import "react-toastify/dist/ReactToastify.css";
 
 const CartPage: React.FC = () => {
     const { cartItems, removeFromCart } = useCart();
+    const { totalPrice } = useCart();    
     const navigate = useNavigate();
     const [showPopup, setShowPopup] = useState(false);
+
+
+    //TODO: We need somehow a global State for the Login perhaps this is suppose to change
     const [userEmail, setUserEmail] = useState<string | null>(null);
 
-    const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-    useEffect(() => {
+   //Listens for changes in the Firebase Authentification state (user Logs in or out)
+   //This is used to check if the user is logged in or not => to check if a popup should be shown
+   // This useeffect is in the right 
+   //TODO: We need a global statemanagement for the user. => Type already created: AuthUser.ts 
+   useEffect(() => {
         console.log("useEffect on CartPage called");
         const auth = getAuth();
         const unsubscribe = onAuthStateChanged(auth, (user) => {
-            if (user && user.email) {
+            if (user && user.email) { //Checks if user && user.email is NOT null
                 setUserEmail(user.email);
             } else {
                 setUserEmail(null);
@@ -26,6 +33,9 @@ const CartPage: React.FC = () => {
     }, []);
 
 
+
+
+    
     const handleProceedToCheckout = () => {
         console.log("handleProceedToCheckout called");
                 const isUserLoggedIn = userEmail;
@@ -45,7 +55,6 @@ const CartPage: React.FC = () => {
         return <p className="text-center text-lg text-gray-600">Your cart is currently empty.</p>;
     }
 
-    
     return (
         <div className="px-4 py-6 max-w-4xl mx-auto">
             <h1 className="text-2xl font-bold text-gray-800 text-center mb-6">Your Shopping Cart</h1>

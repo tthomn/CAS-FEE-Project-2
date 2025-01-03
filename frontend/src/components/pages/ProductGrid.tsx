@@ -18,7 +18,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({ categoryId }) => {
         setError(null);
 
         try {
-            console.log("Fetching products from Firestore...");
+          //  console.log("Fetching products from Firestore...");
             const productsRef = collection(db, "products");
             const productsQuery = categoryId
                 ? query(productsRef, where("categoryId", "==", categoryId))
@@ -28,7 +28,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({ categoryId }) => {
             if (querySnapshot.empty) {
                 console.log("No products found.");
             } else {
-                console.log("Fetched products:", querySnapshot.docs.map((doc) => doc.data()));
+               // console.log("Fetched products:", querySnapshot.docs.map((doc) => doc.data()));
             }
 
             const productsData = querySnapshot.docs.map((doc) => ({

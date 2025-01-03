@@ -109,6 +109,9 @@ const Account: React.FC = () => {
                         ? formData.country
                         : formData.country?.label || "";
 
+
+
+
                 await register(formData.email, formData.password, {
                     title: formData.title,
                     name: formData.name,
@@ -118,11 +121,12 @@ const Account: React.FC = () => {
                     houseNumber: formData.houseNumber,
                     plz: formData.plz,
                     city: formData.city,
-                    country: countryName,
+                    country: countryName,                   
                 });
 
                 setMessage("Registration successful! Please verify your email.");
             } else {
+               
                 await login(formData.email, formData.password);
                 await cartCleaner();
                 setMessage("Login successful!");
