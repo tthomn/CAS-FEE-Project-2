@@ -5,6 +5,8 @@ import Modal from "../shared/Modal";
 import { collection, addDoc, doc, getDoc } from "firebase/firestore";
 import { db } from "../../services/firebase/firebaseConfig";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
+import {useAuth} from "../../context/AuthContext";
+
 
 const CheckoutPage: React.FC = () => {
     const { cartItems, clearCart } = useCart();
@@ -22,6 +24,8 @@ const CheckoutPage: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [name, setName] = useState("");
     const [surname, setSurname] = useState("");
+    const { isAuthenticated, authUser} = useAuth();
+
 
     useEffect(() => {
         const fetchUserDetails = async (userId: string) => {
@@ -102,9 +106,14 @@ const CheckoutPage: React.FC = () => {
     };
 
     const handlePlaceOrder = async () => {
+
+        
         if (validateForm()) {
             setIsLoading(true);
             try {
+
+                console.log("UserID:", authUser?.id  );
+
                 const order = {
                     deliveryAddress,
                     billingAddress,
@@ -113,8 +122,11 @@ const CheckoutPage: React.FC = () => {
                     totalPrice: totalPrice + shippingFee,
                     createdAt: new Date().toISOString(),
                     status: "pending",
+                    userId: authUser?.id,
+                    
                 };
 
+                console.log("Order:", order);
                 await addDoc(collection(db, "orders"), order);
 
                 clearCart();

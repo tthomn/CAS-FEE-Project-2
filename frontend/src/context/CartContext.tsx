@@ -9,9 +9,6 @@ import {getDocDataBy1Condition, addDocToCollection, getDocRefsBy1Condition,getDo
 import {useAuth} from "./AuthContext";
 
 
-
-
-
 interface CartContextType {
     cartItems: CartItem[];
     addToCart: (item: CartItem) => void;
@@ -20,7 +17,6 @@ interface CartContextType {
     totalItems: number;
     cartCleaner: () => Promise<void>; 
     totalPrice: number;
-
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -28,14 +24,10 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
 
-    const { isAuthenticated, authUser} = useAuth(); //Status which is used to check if the user is authenticated or not     
+    const { isAuthenticated, authUser} = useAuth(); 
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
-
     let totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-    console.log("totalItems: " + totalItems);
     const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-
-
         useEffect(() => {
             const auth = getAuth();
             const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -44,9 +36,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             });
             return unsubscribe;
         }, [isAuthenticated]);        
-
-
-
 
         const fetchCartItems = async () => {
             try {
@@ -57,8 +46,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 if (authUser?.id) {                  
                    firestoreItems = await getDocDataBy1Condition("cart", "userId", "==", authUser?.id) ;            
         
-                } else {
-        
+                } else {    
                     console.log("Fetching cart for guest user:", guestId);  
                     firestoreItems = await getDocDataBy1Condition("cart", "guestId", "==", guestId) ;          
                  
@@ -78,7 +66,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             }
         }
         
-
       const cartCleaner = async () => 
       {
         console.log("cartCleaner Called");
@@ -137,12 +124,10 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
             localStorage.removeItem("guestCart");   
               
-            //FIXME: Could ve been done in a better way (§)
+            //FIXME: Could ve been done in a better way 
             firestoreItems = await getDocDataBy1Condition("cart", "userId", "==", userId) ;
             setCartItems(firestoreItems);
-            console.log("*******************totalItems: " + totalItems);
 
-    
         }
         catch (error) {
             console.error("Error cleaning cart:", error);
@@ -215,7 +200,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                     addedAt: Timestamp.now()
                 });        
               }
-
               else
               {
                 payload = { ...newItem, userId: authUser?.id };
@@ -231,33 +215,17 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
 
                 if (existingItem) {
-                    existingItem.quantity += item.quantity ?? 1; 
-    
-                    // Update Firestore for existing item
-                  /*
-                    const q = query(collection(db, "cart"), where("guestId", "==", guestId),where("productId", "==", item.productId));
-                    const querySnapshot = await getDocs(q);
-                 */
+                    existingItem.quantity += item.quantity ?? 1;    
+     
                     const docRefComplete = await getDocRefsBy2Condition("cart", "guestId", "==", guestId, "productId", "==", item.productId);  
-
-                  // if (!querySnapshot.empty) {
                     if (docRefComplete.length !== 0) {
-                        console.log("new functio called"); 
 
                         const fieldsToUpdate: Partial<DocumentData> = {
                             quantity: existingItem.quantity,
                             addedAt: Timestamp.now()
                         };
                         await updateDocByRef(docRefComplete[0], fieldsToUpdate);    
-                        console.log("new functio called"); 
-
-
-               /*
-                          const docRef = querySnapshot.docs[0].ref;
-                        await updateDoc(docRef, {
-                            quantity: existingItem.quantity,
-                            addedAt: Timestamp.now()
-                        });*/
+                
                     
                     }
                 } else {
@@ -270,8 +238,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                     await addDoc(collection(db, "cart"), { ...newItem, addedAt: Timestamp.now()});        
                     // Add new item to localStorage
                     existingCart.push(newItem);
-                }
-            
+                }            
                 localStorage.setItem("guestCart", JSON.stringify(existingCart));  }
 
             console.log("Item added to Firestore successfully.");
