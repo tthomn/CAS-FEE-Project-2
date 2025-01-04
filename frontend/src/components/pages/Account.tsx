@@ -1,10 +1,15 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import { useAuth } from "../../context/AuthContext";
 import CountryDropdown from "../shared/CountryDropdown";
 import { useCart } from "../../context/CartContext";
+import { getDocDataBy1Condition } from "../../services/firebase/firestoreService";
+import UserInfo from "../shared/UserInfo";
+import OrdersList from "../shared/OrdersList";
+import {Order} from "../../types/order";
+import {AuthUser} from "../../types/authUser";
 
 const Account: React.FC = () => {
-    const { user, login, register, resetPassword, logout, loading } = useAuth();
+    const {  user, login, register, resetPassword, logout, loading } = useAuth();
     const [formData, setFormData] = useState<{
         email: string;
         password: string;
@@ -41,6 +46,30 @@ const Account: React.FC = () => {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const { cartCleaner } = useCart();
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
+    const [showOrders, setShowOrders] = useState(false);
+    const { isAuthenticated, authUser} = useAuth();
+
+    const [orders, setOrders] = useState<Order[]>([]);
+    const [ordersLoading, setOrdersLoading] = useState(false);
+    const [ordersError, setOrdersError] = useState<string | null>(null);
+
+
+    useEffect(() => {
+        const fetchOrders = async () => {
+            if (!user?.uid) return;
+            setOrdersLoading(true);
+            try {
+                const fetchedOrders = await getDocDataBy1Condition<Order>("orders", "userId", "==", user.uid);
+                setOrders(fetchedOrders);
+            } catch (error: any) {
+                setOrdersError("Failed to fetch orders: " + error.message);
+            } finally {
+                setOrdersLoading(false);
+            }
+        };
+
+        fetchOrders();
+    }, [user?.uid]);
 
     const handleInputChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -121,12 +150,12 @@ const Account: React.FC = () => {
                     houseNumber: formData.houseNumber,
                     plz: formData.plz,
                     city: formData.city,
-                    country: countryName,                   
+                    country: countryName,
                 });
 
                 setMessage("Registration successful! Please verify your email.");
             } else {
-               
+
                 await login(formData.email, formData.password);
                 await cartCleaner();
                 setMessage("Login successful!");
@@ -164,6 +193,7 @@ const Account: React.FC = () => {
 
     return (
         <div className="relative mb-6">
+            {/* Banner Section */}
             <div className="relative">
                 <img
                     src="/images/banner_account.png"
@@ -175,94 +205,154 @@ const Account: React.FC = () => {
                 </h1>
             </div>
 
-            <div className="max-w-md mx-auto p-6 text-center">
-                {isForgotPassword ? (
-                    <>
-                        <h2 className="text-xl font-bold mb-4">Restore Password</h2>
-                        <div className="mb-4">
-                            <input
-                                type="email"
-                                name="email"
-                                placeholder="Email"
-                                value={formData.email}
-                                onChange={handleInputChange}
-                                className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
-                            />
-                            {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
-
-                        </div>
-
-                        {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
-
-                        <button
-                            onClick={handlePasswordReset}
-                            className={`w-full p-2 mb-4 rounded bg-blue-500 text-white hover:bg-blue-600 ${
-                                authLoading ? "opacity-50 cursor-not-allowed" : ""
-                            }`}
-                            disabled={authLoading || !formData.email.trim()}
-                        >
-                            {authLoading ? "Sending..." : "Restore My Password"}
-                        </button>
-                        <button
-                            onClick={() => {
-                                setIsForgotPassword(false);
-                                setMessage("");
-                            }}
-                            className="w-full p-2 mb-4 rounded bg-gray-500 text-white hover:bg-gray-600"
-                        >
-                            Back to Login
-                        </button>
-                        {message && <p className="text-green-500 mt-4">{message}</p>}
-                    </>
-                ) : user ? (
-                    <>
-                        <h2 className="text-2xl font-bold mb-4">Welcome Back!</h2>
-                        <p className="text-gray-700">
-                            <strong>Email:</strong> {user.email}
-                        </p>
-                        <button
-                            onClick={handleLogout}
-                            className="mt-4 w-full bg-red-500 text-white p-2 rounded hover:bg-red-600"
-                        >
-                            Logout
-                        </button>
-                    </>
-                ) : (
-                    <>
-                        <h1 className="text-2xl font-bold mb-4">
-                            {isRegistering ? "Register" : "Login"}
-                        </h1>
-                        <div className="mb-4">
-                            <input
-                                type="email"
-                                name="email"
-                                placeholder="Email"
-                                value={formData.email}
-                                onChange={handleInputChange}
-                                className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
-                            />
-                            {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
-
-                        </div>
-
-                        <div className="relative mb-4">
-                            <div className="mb-4">
-                                <input
-                                    type={showPassword ? "text" : "password"}
-                                    name="password"
-                                    placeholder="Password"
-                                    value={formData.password}
-                                    onChange={handleInputChange}
-                                    className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500 pr-10"
-                                />
-                                {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
-
-                            </div>
-
-                            <span
-                                onClick={() => setShowPassword(!showPassword)}
-                                className="absolute inset-y-0 right-3 flex items-center justify-center cursor-pointer text-gray-500"
+            {/* Main Content Section */}
+            <div className="flex max-w-6xl mx-auto">
+                {/* Sidebar */}
+                {user && (
+                    <div className="w-1/4 p-4 border-r border-gray-300 hidden lg:block">
+                        <h2 className="text-xl font-semibold mb-6 text-gray-800">Account</h2>
+                        <ul className="space-y-4">
+                            <li
+                                className={`cursor-pointer ${!showOrders ? "text-blue-600 font-semibold" : "text-gray-600 hover:text-blue-500"}`}
+                                onClick={() => setShowOrders(false)}
                             >
+                                Profile
+                            </li>
+                            <li
+                                className={`cursor-pointer ${showOrders ? "text-blue-600 font-semibold" : "text-gray-600 hover:text-blue-500"}`}
+                                onClick={() => setShowOrders(true)}
+                            >
+                                Orders
+                            </li>
+                            <li
+                                className="text-gray-600 cursor-pointer hover:text-blue-500"
+                                onClick={handleLogout}
+                            >
+                                Log Out
+                            </li>
+                        </ul>
+                    </div>
+                )}
+
+                {/* Login/Account Content */}
+                <div className={`flex-1 ${user ? "p-6" : ""}`}>
+                    <div className={`mx-auto ${user ? "max-w-full p-12" : "max-w-md p-6"} text-center`}>
+                    {isForgotPassword ? (
+                            <>
+                                <h2 className="text-xl font-bold mb-4">Restore Password</h2>
+                                <div className="mb-4">
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        placeholder="Email"
+                                        value={formData.email}
+                                        onChange={handleInputChange}
+                                        className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
+                                    />
+                                    {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
+
+                                </div>
+
+                                {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
+
+                                <button
+                                    onClick={handlePasswordReset}
+                                    className={`w-full p-2 mb-4 rounded bg-blue-500 text-white hover:bg-blue-600 ${
+                                        authLoading ? "opacity-50 cursor-not-allowed" : ""
+                                    }`}
+                                    disabled={authLoading || !formData.email.trim()}
+                                >
+                                    {authLoading ? "Sending..." : "Restore My Password"}
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        setIsForgotPassword(false);
+                                        setMessage("");
+                                    }}
+                                    className="w-full p-2 mb-4 rounded bg-gray-500 text-white hover:bg-gray-600"
+                                >
+                                    Back to Login
+                                </button>
+                                {message && <p className="text-green-500 mt-4">{message}</p>}
+                            </>
+                        ) : user ? (
+                            <div className="w-full px-12 py-4 -mt-8">
+                            <>
+                                </>
+
+                                {showOrders ? (
+                                    <div>
+                                        <h2 className="text-2xl font-bold mb-4 mt-0">My Orders</h2>
+                                        <OrdersList
+                                            orders={orders}
+                                            loading={ordersLoading}
+                                            error={ordersError}
+                                        />
+                                        <button
+                                            onClick={() => setShowOrders(false)}
+                                            className="mt-4 text-blue-500 hover:underline"
+                                        >
+                                            Back to Profile
+                                        </button>
+
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <h2 className="text-2xl font-bold mb-8">My Information</h2>
+                                        <div className="rounded-lg shadow-md p-12 bg-white max-w-4xl mx-auto">
+                                        <UserInfo
+                                            authUser={authUser}
+                                            userEmail={authUser?.userName || "No email available"}
+                                            loading={loading}
+                                            // error={error}
+                                            onLogout={handleLogout}
+                                        />
+                                        </div>
+                                        <button
+                                            onClick={() => setShowOrders(true)}
+                                            className="mt-4 text-blue-500 hover:underline"
+                                        >
+                                            View My Orders
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <>
+                                <h1 className="text-2xl font-bold mb-4">
+                                    {isRegistering ? "Register" : "Login"}
+                                </h1>
+                                <div className="mb-4">
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        placeholder="Email"
+                                        value={formData.email}
+                                        onChange={handleInputChange}
+                                        className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
+                                    />
+                                    {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
+
+                                </div>
+
+                                <div className="relative mb-4">
+                                    <div className="mb-4">
+                                        <input
+                                            type={showPassword ? "text" : "password"}
+                                            name="password"
+                                            placeholder="Password"
+                                            value={formData.password}
+                                            onChange={handleInputChange}
+                                            className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500 pr-10"
+                                        />
+                                        {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
+
+                                    </div>
+
+                                    <span
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute inset-y-0 right-3 flex items-center justify-center cursor-pointer text-gray-500"
+                                    >
                                 {showPassword ? (
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
@@ -300,25 +390,25 @@ const Account: React.FC = () => {
                                     </svg>
                                 )}
                             </span>
-                        </div>
-                        {isRegistering && (
-                            <>
-                                <div className="relative mb-4">
-                                    <input
-                                        type={showConfirmPassword ? "text" : "password"}
-                                        placeholder="Confirm Password"
-                                        value={formData.confirmPassword}
-                                        onChange={(e) =>
-                                            setFormData((prev) => ({ ...prev, confirmPassword: e.target.value }))
-                                        }
-                                        className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500 pr-10"
-                                    />
-                                    <span
-                                        onClick={() =>
-                                            setShowConfirmPassword(!showConfirmPassword)
-                                        }
-                                        className="absolute inset-y-0 right-3 flex items-center cursor-pointer text-gray-500"
-                                    >
+                                </div>
+                                {isRegistering && (
+                                    <>
+                                        <div className="relative mb-4">
+                                            <input
+                                                type={showConfirmPassword ? "text" : "password"}
+                                                placeholder="Confirm Password"
+                                                value={formData.confirmPassword}
+                                                onChange={(e) =>
+                                                    setFormData((prev) => ({ ...prev, confirmPassword: e.target.value }))
+                                                }
+                                                className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500 pr-10"
+                                            />
+                                            <span
+                                                onClick={() =>
+                                                    setShowConfirmPassword(!showConfirmPassword)
+                                                }
+                                                className="absolute inset-y-0 right-3 flex items-center cursor-pointer text-gray-500"
+                                            >
                 {showConfirmPassword ? (
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -357,184 +447,186 @@ const Account: React.FC = () => {
 
                 )}
             </span>
-                                </div>
-                                <div className="mb-4">
-                                    <div className="mb-4">
-                                        <input
-                                            type="text"
-                                            name="name"
-                                            placeholder="Name"
-                                            value={formData.name}
-                                            onChange={handleInputChange}
-                                            className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
-                                        />
-                                        {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
-                                    </div>
+                                        </div>
+                                        <div className="mb-4">
+                                            <div className="mb-4">
+                                                <input
+                                                    type="text"
+                                                    name="name"
+                                                    placeholder="Name"
+                                                    value={formData.name}
+                                                    onChange={handleInputChange}
+                                                    className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
+                                                />
+                                                {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
+                                            </div>
 
-                                </div>
-                                <div className="mb-4">
-                                    <div className="mb-4">
-                                        <input
-                                            type="text"
-                                            name="surname"
-                                            placeholder="Surname"
-                                            value={formData.surname}
-                                            onChange={handleInputChange}
-                                            className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
-                                        />
-                                        {errors.surname && <p className="text-red-500 text-sm">{errors.surname}</p>}
-                                    </div>
+                                        </div>
+                                        <div className="mb-4">
+                                            <div className="mb-4">
+                                                <input
+                                                    type="text"
+                                                    name="surname"
+                                                    placeholder="Surname"
+                                                    value={formData.surname}
+                                                    onChange={handleInputChange}
+                                                    className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
+                                                />
+                                                {errors.surname && <p className="text-red-500 text-sm">{errors.surname}</p>}
+                                            </div>
 
-                                </div>
-                            </>
-                        )}
-                        {isRegistering && (
-                            <>
-                                <div className="mb-4 text-left">
-                                    <label className="block mb-2 font-bold">Anrede</label>
-                                    <div className="flex items-center gap-4">
-                                        <label className="flex items-center">
+                                        </div>
+                                    </>
+                                )}
+                                {isRegistering && (
+                                    <>
+                                        <div className="mb-4 text-left">
+                                            <label className="block mb-2 font-bold">Anrede</label>
+                                            <div className="flex items-center gap-4">
+                                                <label className="flex items-center">
+                                                    <input
+                                                        type="radio"
+                                                        name="title"
+                                                        value="Herr"
+                                                        checked={formData.title === "Herr"}
+                                                        onChange={handleInputChange}
+                                                        className="mr-2"
+                                                    />
+                                                    Herr
+                                                </label>
+                                                <label className="flex items-center">
+                                                    <input
+                                                        type="radio"
+                                                        name="title"
+                                                        value="Frau"
+                                                        checked={formData.title === "Frau"}
+                                                        onChange={handleInputChange}
+                                                        className="mr-2"
+                                                    />
+                                                    Frau
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div className="mb-4">
+                                            <div className="mb-4">
+                                                <input
+                                                    type="text"
+                                                    name="street"
+                                                    placeholder="Street"
+                                                    value={formData.street}
+                                                    onChange={handleInputChange}
+                                                    className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
+                                                />
+                                                {errors.street && <p className="text-red-500 text-sm">{errors.street}</p>}
+                                            </div>
+                                        </div>
+                                        <div className="mb-4">
+                                            <div className="mb-4">
+                                                <input
+                                                    type="text"
+                                                    name="houseNumber"
+                                                    placeholder="House Number"
+                                                    value={formData.houseNumber}
+                                                    onChange={handleInputChange}
+                                                    className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
+                                                />
+                                                {errors.houseNumber && <p className="text-red-500 text-sm">{errors.houseNumber}</p>}
+                                            </div>
+                                        </div>
+                                        <div className="mb-4">
                                             <input
-                                                type="radio"
-                                                name="title"
-                                                value="Herr"
-                                                checked={formData.title === "Herr"}
+                                                type="text"
+                                                name="plz"
+                                                placeholder="Postal Code (PLZ)"
+                                                value={formData.plz}
                                                 onChange={handleInputChange}
-                                                className="mr-2"
+                                                className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
                                             />
-                                            Herr
-                                        </label>
-                                        <label className="flex items-center">
+                                            {errors.plz && <p className="text-red-500 text-sm">{errors.plz}</p>}
+                                        </div>
+                                        <div className="mb-4">
                                             <input
-                                                type="radio"
-                                                name="title"
-                                                value="Frau"
-                                                checked={formData.title === "Frau"}
+                                                type="text"
+                                                name="city"
+                                                placeholder="City"
+                                                value={formData.city}
                                                 onChange={handleInputChange}
-                                                className="mr-2"
+                                                className="w-full p-2 mb-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
                                             />
-                                            Frau
-                                        </label>
-                                    </div>
-                                </div>
-                                <div className="mb-4">
-                                    <div className="mb-4">
-                                        <input
-                                            type="text"
-                                            name="street"
-                                            placeholder="Street"
-                                            value={formData.street}
-                                            onChange={handleInputChange}
-                                            className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
-                                        />
-                                        {errors.street && <p className="text-red-500 text-sm">{errors.street}</p>}
-                                    </div>
-                                </div>
-                                <div className="mb-4">
-                                    <div className="mb-4">
-                                        <input
-                                            type="text"
-                                            name="houseNumber"
-                                            placeholder="House Number"
-                                            value={formData.houseNumber}
-                                            onChange={handleInputChange}
-                                            className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
-                                        />
-                                        {errors.houseNumber && <p className="text-red-500 text-sm">{errors.houseNumber}</p>}
-                                    </div>
-                                </div>
-                                <div className="mb-4">
-                                    <input
-                                        type="text"
-                                        name="plz"
-                                        placeholder="Postal Code (PLZ)"
-                                        value={formData.plz}
-                                        onChange={handleInputChange}
-                                        className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
-                                    />
-                                    {errors.plz && <p className="text-red-500 text-sm">{errors.plz}</p>}
-                                </div>
-                                <div className="mb-4">
-                                    <input
-                                        type="text"
-                                        name="city"
-                                        placeholder="City"
-                                        value={formData.city}
-                                        onChange={handleInputChange}
-                                        className="w-full p-2 mb-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
-                                    />
-                                    {errors.city && <p className="text-red-500 text-sm">{errors.city}</p>}
-                                </div>
-                                <div className="mb-4">
-                                    <CountryDropdown
-                                        value={
-                                            typeof formData.country === "object" && formData.country !== null
-                                                ? formData.country
-                                                : { value: "", label: "Select Country" }
-                                        }
-                                        onChange={(selectedOption) =>
-                                            setFormData((prevData) => ({
-                                                ...prevData,
-                                                country: selectedOption ?? { value: "", label: "Select Country" },
-                                            }))
-                                        }
-                                    />
-                                </div>
-                            </>
-                        )}
-                        <button
-                            onClick={handleSubmit}
-                            className={`w-full p-2 mb-4 rounded ${
-                                isRegistering ? "bg-blue-500" : "bg-green-500"
-                            } text-white hover:bg-opacity-90`}
-                            disabled={authLoading}
-                        >
-                            {authLoading
-                                ? isRegistering
-                                    ? "Registering..."
-                                    : "Logging in..."
-                                : isRegistering
-                                    ? "Register"
-                                    : "Login"}
-                        </button>
-                        {!isRegistering && (
-                            <div className="mt-4">
+                                            {errors.city && <p className="text-red-500 text-sm">{errors.city}</p>}
+                                        </div>
+                                        <div className="mb-4">
+                                            <CountryDropdown
+                                                value={
+                                                    typeof formData.country === "object" && formData.country !== null
+                                                        ? formData.country
+                                                        : { value: "", label: "Select Country" }
+                                                }
+                                                onChange={(selectedOption) =>
+                                                    setFormData((prevData) => ({
+                                                        ...prevData,
+                                                        country: selectedOption ?? { value: "", label: "Select Country" },
+                                                    }))
+                                                }
+                                            />
+                                        </div>
+                                    </>
+                                )}
                                 <button
-                                    onClick={() => setIsForgotPassword(true)}
-                                    className="text-blue-600 hover:underline text-sm bg-transparent border-none cursor-pointer"
+                                    onClick={handleSubmit}
+                                    className={`w-full p-2 mb-4 rounded ${
+                                        isRegistering ? "bg-blue-500" : "bg-green-500"
+                                    } text-white hover:bg-opacity-90`}
+                                    disabled={authLoading}
                                 >
-                                    Forgot Password?
+                                    {authLoading
+                                        ? isRegistering
+                                            ? "Registering..."
+                                            : "Logging in..."
+                                        : isRegistering
+                                            ? "Register"
+                                            : "Login"}
                                 </button>
-                            </div>
+                                {!isRegistering && (
+                                    <div className="mt-4">
+                                        <button
+                                            onClick={() => setIsForgotPassword(true)}
+                                            className="text-blue-600 hover:underline text-sm bg-transparent border-none cursor-pointer"
+                                        >
+                                            Forgot Password?
+                                        </button>
+                                    </div>
+                                )}
+                                <div className="mt-4">
+                                    <button
+                                        onClick={() => {
+                                            setIsRegistering(!isRegistering);
+                                            setErrors({});
+                                            setFormData({
+                                                email: "",
+                                                password: "",
+                                                confirmPassword: "",
+                                                title: "",
+                                                name: "",
+                                                surname: "",
+                                                dob: "",
+                                                street: "",
+                                                houseNumber: "",
+                                                plz: "",
+                                                city: "",
+                                                country: "",
+                                            });
+                                        }}
+                                        className="text-blue-600 hover:underline text-sm bg-transparent border-none cursor-pointer"
+                                    >
+                                        {isRegistering ? "← Back to Login" : "Switch to Register"}
+                                    </button>
+                                </div>
+                                {message && <p className="text-red-500 mt-4">{message}</p>}
+                            </>
                         )}
-                        <div className="mt-4">
-                            <button
-                                onClick={() => {
-                                    setIsRegistering(!isRegistering);
-                                    setErrors({});
-                                    setFormData({
-                                        email: "",
-                                        password: "",
-                                        confirmPassword: "",
-                                        title: "",
-                                        name: "",
-                                        surname: "",
-                                        dob: "",
-                                        street: "",
-                                        houseNumber: "",
-                                        plz: "",
-                                        city: "",
-                                        country: "",
-                                    });
-                                }}
-                                className="text-blue-600 hover:underline text-sm bg-transparent border-none cursor-pointer"
-                            >
-                                {isRegistering ? "← Back to Login" : "Switch to Register"}
-                            </button>
-                        </div>
-                        {message && <p className="text-red-500 mt-4">{message}</p>}
-                    </>
-                )}
+                    </div>
+                </div>
             </div>
         </div>
     );

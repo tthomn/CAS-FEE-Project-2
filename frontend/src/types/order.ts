@@ -6,7 +6,7 @@ export interface Order {
     id: string;
     userId?: string;
     cartItems: CartItem[];
-    totalAmount: number;
+    totalPrice: number;
     status: "pending" | "completed" | "canceled";
     createdAt: string;
 }
