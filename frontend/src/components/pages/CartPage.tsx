@@ -5,7 +5,7 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import "react-toastify/dist/ReactToastify.css";
 
 const CartPage: React.FC = () => {
-    const { cartItems, removeFromCart } = useCart();
+    const { cartItems, removeFromCart, updateQuantity } = useCart();
     const { totalPrice } = useCart();    
     const navigate = useNavigate();
     const [showPopup, setShowPopup] = useState(false);
@@ -69,7 +69,25 @@ const CartPage: React.FC = () => {
                         <div className="flex-1">
                             <h4 className="text-lg font-semibold text-gray-800">{item.productName}</h4>
                             <p className="text-sm text-gray-600">CHF {item.price.toFixed(2)}</p>
-                            <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
+                            <div className="mt-2">
+                                <span className="text-sm font-medium text-gray-800">Quantity:</span>
+                                <div className="flex items-center gap-2 mt-1">
+                                    <button
+                                        className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
+                                        onClick={() => updateQuantity(item.cartItemId, item.quantity - 1)}
+                                    >
+                                        -
+                                    </button>
+                                    <p className="text-sm">{item.quantity}</p>
+                                    <button
+                                        className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
+                                        onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)}
+                                    >
+                                        +
+                                    </button>
+                                </div>
+                            </div>
+
                         </div>
                         <button
                             className="px-3 py-1 text-sm text-white bg-red-500 rounded hover:bg-red-600 transition-colors"

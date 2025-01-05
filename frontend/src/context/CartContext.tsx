@@ -17,6 +17,7 @@ interface CartContextType {
     totalItems: number;
     cartCleaner: () => Promise<void>; 
     totalPrice: number;
+    updateQuantity: (cartItemId: string, newQuantity: number) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -292,12 +293,40 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             console.error("Error clearing cart:", error);
         }
     };
-    
+
+    const updateQuantity = async (cartItemId: string, newQuantity: number) => {
+        if (newQuantity <= 0) {
+            await removeFromCart(cartItemId);
+        } else {
+            try {
+                const docRefComplete = await getDocRefsBy1Condition("cart", "cartItemId", "==", cartItemId);
+                if (docRefComplete.length > 0) {
+                    await updateDocByRef(docRefComplete[0], {
+                        quantity: newQuantity,
+                        addedAt: Timestamp.now(),
+                    });
+                }
+                setCartItems((prevItems) =>
+                    prevItems.map((item) =>
+                        item.cartItemId === cartItemId ? { ...item, quantity: newQuantity } : item
+                    )
+                );
+
+                // Sync to localStorage for guest users
+                const localCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
+                const updatedLocalCart = localCart.map((item: CartItem) =>
+                    item.cartItemId === cartItemId ? { ...item, quantity: newQuantity } : item
+                );
+                localStorage.setItem("guestCart", JSON.stringify(updatedLocalCart));
+            } catch (error) {
+                console.error("Error updating quantity:", error);
+            }
+        }
+    };
 
 
-    
     return (
-        <CartContext.Provider value={{  cartItems, addToCart, removeFromCart, clearCart, totalItems, cartCleaner, totalPrice }}>
+        <CartContext.Provider value={{  cartItems, addToCart, removeFromCart, clearCart, totalItems, cartCleaner, totalPrice, updateQuantity }}>
             {children}
         </CartContext.Provider>
     );    
