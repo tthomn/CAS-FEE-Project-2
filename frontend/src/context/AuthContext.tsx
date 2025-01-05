@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut,createUserWithEmailAndPassword,sendEmailVerification,sendPasswordResetEmail,User, Auth} from "firebase/auth";
-import { getFirestore, doc, setDoc } from "firebase/firestore";
+import { getFirestore, doc, setDoc, Timestamp } from "firebase/firestore";
+
 
 import {AuthUser} from "../types/authUser";
 import { getDocRefsBy1Condition,getDocDataBy1Condition } from "../services/firebase/firestoreService";
@@ -14,10 +15,13 @@ interface AdditionalData {
     surname: string;
     street: string;
     houseNumber: string;
-    plz: string;
+    zip: string;
     city: string;
     country: string;
-    dob: string;
+    dob: string; 
+    addedAt: Date;
+    authType: string;
+
 }
 
 interface AuthContextType {
@@ -59,7 +63,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             setLoading(false);              
 
             if (user) {
-               
+            
                 console.log("User is signed in");  
                 const fetchedUser = await fetchAuthUser(user?.email);
                 if (fetchedUser) {
@@ -148,6 +152,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             //TODO: Define User Role (Admin?) ==> Default User is the Standard 
 
             if (additionalData) {
+             
                 await setDoc(doc(db, "users", user.uid), {
                     email,
                     ...additionalData,

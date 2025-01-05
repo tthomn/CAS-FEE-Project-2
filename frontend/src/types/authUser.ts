@@ -15,5 +15,5 @@ export type AuthUser = {
     zip: string;                // zip code of related user in firebase db 'users'
     street: string;             // street of related user in firebase db 'users'
     gender: string;             // gender of related user in firebase db 'users'    
-    addedAt?: Date;          // date/time of user creation in firebase db 'users'             
+    addedAt?: string;          // date/time of user creation in firebase db 'users'             
 }

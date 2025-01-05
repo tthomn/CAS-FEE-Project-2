@@ -1,7 +1,7 @@
 // src/services/firebase/firestoreService.ts
 import {db} from "./firebaseConfig";
 import {DocumentData, Timestamp } from "firebase/firestore";
-import {collection, getDocs, addDoc, deleteDoc, doc, query, where, setDoc, updateDoc, DocumentReference  } from 'firebase/firestore';
+import {collection, getDocs, addDoc, deleteDoc,  query, where, updateDoc, DocumentReference  } from 'firebase/firestore';
 
 
 //Query for Doc fields (Cart Items) with 1 condition

@@ -6,7 +6,13 @@ import { getDocDataBy1Condition } from "../../services/firebase/firestoreService
 import UserInfo from "../shared/UserInfo";
 import OrdersList from "../shared/OrdersList";
 import {Order} from "../../types/order";
+
+
+
+
 import {AuthUser} from "../../types/authUser";
+
+
 
 const Account: React.FC = () => {
     const {  user, login, register, resetPassword, logout, loading } = useAuth();
@@ -20,9 +26,10 @@ const Account: React.FC = () => {
         dob: string;
         street: string;
         houseNumber: string;
-        plz: string;
+        zip: string;
         city: string;
         country: string | { value: string; label: string };
+        authType: string;
     }>({
         email: "",
         password: "",
@@ -33,9 +40,10 @@ const Account: React.FC = () => {
         dob: "",
         street: "",
         houseNumber: "",
-        plz: "",
+        zip: "",
         city: "",
         country: "",
+        authType: "user",
     });
 
     const [isRegistering, setIsRegistering] = useState(false);
@@ -47,6 +55,9 @@ const Account: React.FC = () => {
     const { cartCleaner } = useCart();
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const [showOrders, setShowOrders] = useState(false);
+
+
+
     const { isAuthenticated, authUser} = useAuth();
 
     const [orders, setOrders] = useState<Order[]>([]);
@@ -139,8 +150,6 @@ const Account: React.FC = () => {
                         : formData.country?.label || "";
 
 
-
-
                 await register(formData.email, formData.password, {
                     title: formData.title,
                     name: formData.name,
@@ -148,9 +157,11 @@ const Account: React.FC = () => {
                     dob: formData.dob,
                     street: formData.street,
                     houseNumber: formData.houseNumber,
-                    plz: formData.plz,
+                    zip: formData.zip,
                     city: formData.city,
                     country: countryName,
+                    authType: formData.authType,
+                    addedAt: new Date(),
                 });
 
                 setMessage("Registration successful! Please verify your email.");
@@ -536,13 +547,13 @@ const Account: React.FC = () => {
                                         <div className="mb-4">
                                             <input
                                                 type="text"
-                                                name="plz"
-                                                placeholder="Postal Code (PLZ)"
-                                                value={formData.plz}
+                                                name="zip"
+                                                placeholder="Postal Code (ZIP)"
+                                                value={formData.zip}
                                                 onChange={handleInputChange}
                                                 className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
                                             />
-                                            {errors.plz && <p className="text-red-500 text-sm">{errors.plz}</p>}
+                                            {errors.zip && <p className="text-red-500 text-sm">{errors.zip}</p>}
                                         </div>
                                         <div className="mb-4">
                                             <input
@@ -612,9 +623,10 @@ const Account: React.FC = () => {
                                                 dob: "",
                                                 street: "",
                                                 houseNumber: "",
-                                                plz: "",
+                                                zip: "",
                                                 city: "",
                                                 country: "",
+                                                authType: "user",
                                             });
                                         }}
                                         className="text-blue-600 hover:underline text-sm bg-transparent border-none cursor-pointer"

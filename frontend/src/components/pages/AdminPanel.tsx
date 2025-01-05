@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from "react"; //OK
-import {getFirestore, collection,addDoc, updateDoc,deleteDoc,doc, getDocs,} from "firebase/firestore"; //OK
-import { getStorage, ref, uploadBytesResumable, getDownloadURL,} from "firebase/storage"; //OK
-import { Product } from "../../types/product"; //OK
+import React, { useState, useEffect } from "react"; 
+import {getFirestore, collection,addDoc, updateDoc,deleteDoc,doc, getDocs,} from "firebase/firestore";
+ 
+import { getStorage, ref, uploadBytesResumable, getDownloadURL,} from "firebase/storage";
+import { Product } from "../../types/product"; 
+import {useAuth} from "../../context/AuthContext";
 
 interface AdminPanelProps {
      loggedInUser: string;
@@ -20,6 +22,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ loggedInUser }) => {
     const [editingProductId, setEditingProductId] = useState<string | null>(null);
     const [uploadingImage, setUploadingImage] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
+      const { isAuthenticated, authUser} = useAuth(); 
+    
+
+
     const adminUser = "62xJXdO14EXWMCLS1CpHlI5PPFu1";
     const db = getFirestore();
     const storage = getStorage();
@@ -136,7 +142,6 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ loggedInUser }) => {
 
 
 
-    ///This is 
     return (
         <div className="p-4">
             <h1 className="text-2xl font-bold mb-4">Admin Panel</h1>
