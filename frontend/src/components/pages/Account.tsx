@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import CountryDropdown from "../shared/CountryDropdown";
 import { useCart } from "../../context/CartContext";
@@ -235,6 +236,15 @@ const Account: React.FC = () => {
                             >
                                 Orders
                             </li>
+
+                            {authUser?.authType === "admin" && (
+                                <li className="cursor-pointer text-gray-600 hover:text-blue-500">
+                                    <Link to="/admin" className="block">
+                                        Admin Page
+                                    </Link>
+                                </li>
+                            )}
+
                             <li
                                 className="text-gray-600 cursor-pointer hover:text-blue-500"
                                 onClick={handleLogout}
