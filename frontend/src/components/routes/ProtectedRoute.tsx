@@ -1,29 +1,26 @@
-export {};
+import React from "react";
+import { Navigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
+interface ProtectedRouteProps {
+    children: React.ReactElement;
+    requiredRole?: "admin" | "user"; // Optional prop to define role access
+}
 
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole }) => {
+    const { authUser } = useAuth(); // Get the authenticated user
 
-
-//TODO: If not needed it can be deleted! 
-
-/*import React from 'react';
-import { Navigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-
-
-
-const ProtectedRoute: React.FC<{ children: React.ReactElement }> = ({ children }) => {
-    const { user, loading } = useAuth();
-
-    if (loading) {
-        return <p>Loading...</p>;
+    if (!authUser) {
+        // Redirect to login page if not authenticated
+        return <Navigate to="/login" replace />;
     }
 
-    if (!user) {
+    if (requiredRole && authUser.authType !== requiredRole) {
+        // Redirect to home or show Access Denied if the role doesn’t match
         return <Navigate to="/" replace />;
     }
 
-    return children;
+    return children; // Render the protected component if role matches or not required
 };
 
 export default ProtectedRoute;
-*/

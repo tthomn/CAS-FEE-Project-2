@@ -18,6 +18,7 @@ import FlyingBees from "./components/layouts/FlyingBees";
 import LoginPage from "./components/pages/LoginPage";
 import RegisterPage from "./components/pages/RegisterPage";
 import AdminPanel from "./components/pages/AdminPanel";
+import ProtectedRoute from "./components/routes/ProtectedRoute";
 
 const App: React.FC = () => {
     const [loggedInUser, setLoggedInUser] = useState<string>("62xJXdO14EXWMCLS1CpHlI5PPFu1"); // Simulate logged-in user's UID
@@ -43,11 +44,10 @@ const App: React.FC = () => {
                             <Route path="/register" element={<RegisterPage />} />
                             <Route
                                 path="/admin"
-                                element={ loggedInUser === adminUser ? (
+                                element={
+                                    <ProtectedRoute requiredRole="admin">
                                         <AdminPanel loggedInUser={loggedInUser} />
-                                    ) : (
-                                        <p>You do not have access to this page.</p>
-                                    )
+                                    </ProtectedRoute>
                                 }
                             />
                             <Route path="*" element={<NotFoundPage />} />
