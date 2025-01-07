@@ -268,15 +268,17 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     };
 
 
-    //TODO: Where used? 
     const clearCart = async () => {
         console.log("clearCart function Called");
         try {
             if (authUser?.id) {
-                const deletePromises = cartItems.map((item) =>
-                    deleteDoc(doc(db, "cart", item.id))
-                );
-                await Promise.all(deletePromises);
+            
+                    const docRefComplete = await getDocRefsBy1Condition("cart", "userId", "==", authUser?.id);  
+                    
+                    const deleteDocByRefPromises = docRefComplete.map((docRef) => deleteDocByRef(docRef));
+                    await Promise.all(deleteDocByRefPromises);  
+
+
             } else {
                 const guestId = getGuestId();
                 const q = query(collection(db, "cart"), where("guestId", "==", guestId));
@@ -287,6 +289,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 await Promise.all(deletePromises);
                 localStorage.removeItem("guestCart");
             }
+
 
             setCartItems([]);
         } catch (error) {

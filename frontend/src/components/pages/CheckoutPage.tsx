@@ -3,95 +3,64 @@ import { Link } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import Modal from "../shared/Modal";
 import { collection, addDoc, doc, getDoc } from "firebase/firestore";
-import { db } from "../../services/firebase/firebaseConfig";
+import { auth, db } from "../../services/firebase/firebaseConfig";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import {useAuth} from "../../context/AuthContext";
-
+import { useAuth } from "../../context/AuthContext";
 
 const CheckoutPage: React.FC = () => {
     const { cartItems, clearCart } = useCart();
     const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const shippingFee = 5.20;
 
-    const [email, setEmail] = useState("");
     const [deliveryAddress, setDeliveryAddress] = useState("");
-    const [isEditingAddress, setIsEditingAddress] = useState(false);
     const [billingAddress, setBillingAddress] = useState("");
-    const [userName, setUserName] = useState("");
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
-    const [formError, setFormError] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [name, setName] = useState("");
     const [surname, setSurname] = useState("");
-    const { isAuthenticated, authUser} = useAuth();
+    const { authUser } = useAuth(); // Auth context for user email and ID
+    const [email, setEmail] = useState(""); // To display the email
 
+    const [isEditing, setIsEditing] = useState(false);
+    const [backupData, setBackupData] = useState({ name: "", surname: "", deliveryAddress: "" });
 
+    // Load saved data on mount
     useEffect(() => {
-        const fetchUserDetails = async (userId: string) => {
-            try {
-                const userDoc = doc(db, "users", userId);
-                const userSnapshot = await getDoc(userDoc);
+        const savedDetails = localStorage.getItem("userDetails");
 
-                if (userSnapshot.exists()) {
-                    const userData = userSnapshot.data();
-                    setEmail(userData.email || "");
-                    setDeliveryAddress(
-                        `${userData.street || ""} ${userData.houseNumber || ""}, ${userData.plz || ""} ${userData.city || ""}`
-                    );
-                    setBillingAddress(
-                        `${userData.street || ""} ${userData.houseNumber || ""}, ${userData.plz || ""} ${userData.city || ""}`
-                    );
-                    setUserName(`${userData.title || ""} ${userData.name || ""} ${userData.surname || ""}`.trim());
-                    setName(userData.name || "");
-                    setSurname(userData.surname || "");
-                } else {
-                    console.error("User document does not exist.");
-                }
-            } catch (error) {
-                console.error("Error fetching user details:", error);
-            }
-        };
+        if (savedDetails) {
+            const { name, surname, deliveryAddress } = JSON.parse(savedDetails);
+            setName(name || "");
+            setSurname(surname || "");
+            setDeliveryAddress(deliveryAddress || "");
+        } else if (authUser?.id) {
+            fetchUserDetails(authUser.id);
+        }
 
-        const auth = getAuth();
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            if (user && user.uid) {
-                fetchUserDetails(user.uid);
-            }
-        });
+        // if (authUser?.email) {
+        //     setEmail(authUser.email); // Use email from the authUser directly
+        // }
+    }, [authUser]);
 
-        return unsubscribe;
-    }, []);
+    const fetchUserDetails = async (userId: string) => {
+          try {
 
-    const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setDeliveryAddress(e.target.value);
-        setErrors((prev) => ({ ...prev, deliveryAddress: "" }));
+                setEmail(authUser?.userName || "Keine E-Mail verfügbar");
+                const fullAddress = `${authUser?.street || ""} ${authUser?.houseNumber || ""}, ${authUser?.zip || ""} ${authUser?.city || ""}`;
+                setDeliveryAddress(fullAddress);
+                setBillingAddress(fullAddress);
+                setName(authUser?.name || "");
+                setSurname(authUser?.surname || "");
+                localStorage.setItem("userDetails", JSON.stringify({ name: authUser?.name, surname: authUser?.surname, deliveryAddress: fullAddress }));
+
+        } catch (error) {
+            console.error("Error fetching user details:", error);
+        }
     };
-
-    const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setEmail(e.target.value);
-        setErrors((prev) => ({ ...prev, email: "" }));
-    };
-
-    const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setName(e.target.value);
-    };
-
-    const handleSurnameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSurname(e.target.value);
-    };
-
-    const toggleEditAddress = () => {
-        setIsEditingAddress(!isEditingAddress);
-    };
-
-    const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
     const validateForm = () => {
         const newErrors: { [key: string]: string } = {};
-        if (!email.trim() || !validateEmail(email)) {
-            newErrors.email = "Bitte geben Sie eine gültige E-Mail-Adresse ein.";
-        }
         if (!deliveryAddress.trim()) {
             newErrors.deliveryAddress = "Die Lieferadresse darf nicht leer sein.";
         }
@@ -106,40 +75,47 @@ const CheckoutPage: React.FC = () => {
     };
 
     const handlePlaceOrder = async () => {
+        if (!validateForm()) return;
 
-        
-        if (validateForm()) {
-            setIsLoading(true);
-            try {
+        setIsLoading(true);
+        try {
+            const order = {
+                deliveryAddress,
+                billingAddress: billingAddress || deliveryAddress,
+                email: authUser?.userName,
+                name,
+                surname,
+                cartItems,
+                totalPrice: totalPrice + shippingFee,
+                createdAt: new Date().toISOString(),
+                status: "pending",
+                userId: authUser?.id || "guest",
+            };
 
-                console.log("UserID:", authUser?.id  );
+            await addDoc(collection(db, "orders"), order);
+            await clearCart();
+            localStorage.removeItem("userDetails");
 
-                const order = {
-                    deliveryAddress,
-                    billingAddress,
-                    email,
-                    cartItems,
-                    totalPrice: totalPrice + shippingFee,
-                    createdAt: new Date().toISOString(),
-                    status: "pending",
-                    userId: authUser?.id,
-                    
-                };
 
-                console.log("Order:", order);
-                await addDoc(collection(db, "orders"), order);
-
-                clearCart();
-                setIsModalOpen(true);
-            } catch (error) {
-                console.error("Error placing order:", error);
-                setFormError("Fehler beim Abschließen der Bestellung. Bitte versuchen Sie es erneut.");
-            } finally {
-                setIsLoading(false);
-            }
-        } else {
-            setFormError("Bitte überprüfen Sie die Eingaben.");
+            setIsModalOpen(true);
+        } catch (error) {
+            console.error("Error placing order:", error);
+        } finally {
+            setIsLoading(false);
         }
+    };
+
+    const handleSaveDetails = () => {
+        localStorage.setItem("userDetails", JSON.stringify({ name, surname, deliveryAddress }));
+        alert("Daten wurden erfolgreich gespeichert!");
+        setIsEditing(false);
+    };
+
+    const handleCancelEdit = () => {
+        setName(backupData.name);
+        setSurname(backupData.surname);
+        setDeliveryAddress(backupData.deliveryAddress);
+        setIsEditing(false);
     };
 
     return (
@@ -148,38 +124,83 @@ const CheckoutPage: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <h2 className="text-lg font-bold mb-4">Persönliche Daten</h2>
-                    <label className="block mb-4">
-                        Vorname:
-                        <input
-                            type="text"
-                            value={name}
-                            onChange={handleNameChange}
-                            className="w-full border p-2 mt-2"
-                            placeholder="Vorname eingeben"
-                        />
+                    <div className="block mb-4">
+                        <strong>Vorname:</strong>
+                        {!isEditing ? (
+                            <p>{name || "Keine Angabe"}</p>
+                        ) : (
+                            <input
+                                type="text"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                className="w-full border p-2 mt-2 rounded"
+                                placeholder="Vorname eingeben"
+                            />
+                        )}
                         {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
-                    </label>
-                    <label className="block mb-4">
-                        Nachname:
-                        <input
-                            type="text"
-                            value={surname}
-                            onChange={handleSurnameChange}
-                            className="w-full border p-2 mt-2"
-                            placeholder="Nachname eingeben"
-                        />
+                    </div>
+                    <div className="block mb-4">
+                        <strong>Nachname:</strong>
+                        {!isEditing ? (
+                            <p>{surname || "Keine Angabe"}</p>
+                        ) : (
+                            <input
+                                type="text"
+                                value={surname}
+                                onChange={(e) => setSurname(e.target.value)}
+                                className="w-full border p-2 mt-2 rounded"
+                                placeholder="Nachname eingeben"
+                            />
+                        )}
                         {errors.surname && <p className="text-red-500 text-sm">{errors.surname}</p>}
-                    </label>
-                    <h2 className="text-lg font-bold mb-4">E-Mail-Adresse</h2>
-                    <input
-                        type="email"
-                        value={email}
-                        onChange={handleEmailChange}
-                        className="w-full border p-2 mb-2"
-                        placeholder="E-Mail-Adresse eingeben"
-                        disabled={isLoading}
-                    />
-                    {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
+                    </div>
+                    {/*<div className="block mb-4">*/}
+                    {/*    <strong>E-Mail-Adresse:</strong>*/}
+                    {/*    <p>{email || "Keine E-Mail verfügbar"}</p>*/}
+                    {/*</div>*/}
+                    <div className="block mb-4">
+                        <strong>Lieferadresse:</strong>
+                        {!isEditing ? (
+                            <p>{deliveryAddress || "Keine Angabe"}</p>
+                        ) : (
+                            <input
+                                type="text"
+                                value={deliveryAddress}
+                                onChange={(e) => setDeliveryAddress(e.target.value)}
+                                className="w-full border p-2 mt-2 rounded"
+                                placeholder="Lieferadresse eingeben"
+                            />
+                        )}
+                        {errors.deliveryAddress && <p className="text-red-500 text-sm">{errors.deliveryAddress}</p>}
+                    </div>
+                    <div className="flex gap-4 mt-4">
+                        {!isEditing ? (
+                            <button
+                                onClick={() => {
+                                    setBackupData({ name, surname, deliveryAddress });
+                                    setIsEditing(true);
+                                }}
+                                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                            >
+                                Daten bearbeiten
+                            </button>
+                        ) : (
+                            <>
+                                <button
+                                    onClick={handleSaveDetails}
+                                    className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                                >
+                                    Speichern
+                                </button>
+                                <button
+                                    onClick={handleCancelEdit}
+                                    className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+                                >
+                                    Abbrechen
+                                </button>
+                            </>
+                        )}
+                    </div>
                 </div>
                 <div>
                     <h2 className="text-lg font-bold mb-4">Zusammenfassung</h2>
@@ -227,12 +248,13 @@ const CheckoutPage: React.FC = () => {
                 </button>
             </div>
 
-            {formError && <p className="mt-2 text-red-500 text-sm">{formError}</p>}
-            <Modal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                message="Ihre Bestellung wurde erfolgreich abgeschlossen! Eine Rechnung wurde per E-Mail gesendet."
-            />
+            {isModalOpen && (
+                <Modal
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    message="Ihre Bestellung wurde erfolgreich abgeschlossen! Eine Rechnung wurde per E-Mail gesendet."
+                />
+            )}
         </div>
     );
 };
