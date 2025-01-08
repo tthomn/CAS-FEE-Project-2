@@ -6,6 +6,7 @@ import { collection, addDoc, doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../../services/firebase/firebaseConfig";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const CheckoutPage: React.FC = () => {
     const { cartItems, clearCart } = useCart();
@@ -24,6 +25,7 @@ const CheckoutPage: React.FC = () => {
 
     const [isEditing, setIsEditing] = useState(false);
     const [backupData, setBackupData] = useState({ name: "", surname: "", deliveryAddress: "" });
+    const navigate = useNavigate();
 
     // Load saved data on mount
     useEffect(() => {
@@ -251,7 +253,10 @@ const CheckoutPage: React.FC = () => {
             {isModalOpen && (
                 <Modal
                     isOpen={isModalOpen}
-                    onClose={() => setIsModalOpen(false)}
+                    onClose={() => {
+                        setIsModalOpen(false);
+                        navigate("/shop");
+                    }}
                     message="Ihre Bestellung wurde erfolgreich abgeschlossen! Eine Rechnung wurde per E-Mail gesendet."
                 />
             )}
