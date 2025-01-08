@@ -1,10 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import Footer from "../layouts/Footer";
 
 const HomePage: React.FC = () => {
     return (
         <div className="min-h-screen flex flex-col bg-[#fff8e1]">
-            <div className="flex flex-col md:flex-row items-center justify-end max-w-7xl mx-auto px-10 h-[calc(90vh+2rem)] pt-8">
+        <main className="flex-1 flex flex-col">
+                <div className="flex flex-col md:flex-row items-center justify-end max-w-7xl mx-auto px-10 h-[calc(90vh+2rem)] pt-8">
+
                 <div className="flex flex-col items-start max-w-lg space-y-4 md:w-1/2 md:h-auto ml-auto transform -translate-y-8 md:translate-x-20">
                     <h1 className="text-7xl font-serif font-bold text-gray-800 leading-tight">
                         Honey Hive Treasures
@@ -28,7 +31,7 @@ const HomePage: React.FC = () => {
                 </div>
             </div>
 
-            <section className="py-10">
+                <section className="flex-grow py-10">
                 <div className="container mx-auto px-6 text-center">
                     <h2 className="text-3xl font-bold text-yellow-700">Why Choose Us?</h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
@@ -50,12 +53,8 @@ const HomePage: React.FC = () => {
                     </div>
                 </div>
             </section>
-
-            <footer className="bg-yellow-700 text-white py-4">
-                <div className="container mx-auto px-6 text-center">
-                    <p className="text-sm">© 2024 Honey Hive Treasures. All rights reserved.</p>
-                </div>
-            </footer>
+            </main>
+            <Footer />
         </div>
     );
 };

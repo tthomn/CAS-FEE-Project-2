@@ -7,11 +7,7 @@ import { getDocDataBy1Condition } from "../../services/firebase/firestoreService
 import UserInfo from "../shared/UserInfo";
 import OrdersList from "../shared/OrdersList";
 import {Order} from "../../types/order";
-
-
-
-
-import {AuthUser} from "../../types/authUser";
+import Footer from "../layouts/Footer";
 
 
 
@@ -204,8 +200,8 @@ const Account: React.FC = () => {
     }
 
     return (
-        <div className="relative mb-6">
-            {/* Banner Section */}
+        <div className="min-h-screen flex flex-col bg-[#fff8e1]">
+        {/* Banner Section */}
             <div className="relative">
                 <img
                     src="/images/banner_account.png"
@@ -217,8 +213,8 @@ const Account: React.FC = () => {
                 </h1>
             </div>
 
-            {/* Main Content Section */}
-            <div className="flex max-w-6xl mx-auto">
+            <main className="flex-grow">
+                <div className="flex max-w-6xl mx-auto">
                 {/* Sidebar */}
                 {user && (
                     <div className="w-1/4 p-4 border-r border-gray-300 hidden lg:block">
@@ -650,6 +646,8 @@ const Account: React.FC = () => {
                     </div>
                 </div>
             </div>
+            </main>
+            <Footer />
         </div>
     );
 };

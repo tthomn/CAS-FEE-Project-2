@@ -100,7 +100,7 @@ const ProductDetail: React.FC = () => {
             {/* Back to Shopping Button */}
             <button
                 onClick={() => navigate("/shop")}
-                className="absolute top-16 left-8 bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded shadow"
+                className="fixed top-24 md:top-32 left-4 md:left-8 bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded shadow z-50"
             >
                 &larr; Back to Shopping
             </button>

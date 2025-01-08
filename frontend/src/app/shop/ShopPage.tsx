@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import CategorySidebar from "../../components/shared/CategorySidebar";
 import ProductGrid from "../../components/pages/ProductGrid";
 import { getCategories } from "../../services/CategoryService";
+import Footer from "../../components/layouts/Footer";
 
 const ShopPage: React.FC = () => {
     const [categories, setCategories] = useState<any[]>([]);
@@ -29,8 +30,9 @@ const ShopPage: React.FC = () => {
     }
 
     return (
-        <div>
-            <div
+        <div className="min-h-screen flex flex-col bg-[#fff8e1]">
+
+        <div
                 className="relative w-full h-[300px] bg-cover bg-center"
                 style={{
                     backgroundImage: `url('/images/banner_bee.png')`,
@@ -46,7 +48,8 @@ const ShopPage: React.FC = () => {
             </div>
 
             {}
-            <div className="shop-page flex gap-6 p-4">
+            <main className="flex-grow">
+                <div className="shop-page flex gap-6 p-4">
                 {}
                 <CategorySidebar
                     categories={categories}
@@ -59,7 +62,9 @@ const ShopPage: React.FC = () => {
 
                 {}
                 <ProductGrid categoryId={selectedCategoryId} />
-            </div>
+                </div>
+            </main>
+            <Footer />
         </div>
     );
 };

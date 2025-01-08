@@ -1,11 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import Footer from "../layouts/Footer";
 
 
 const Recipe: React.FC = () => {
     const recipes = [
-      { id: 1, category: "Kuchen", title: "Honig Kuchen", image: require('../../assets/images/honig_kuchen.png') },  
-      {  id: 2, category: "Sauce", title: "Honig Sesam Sauce", image: require('../../assets/images/honey_sesame_sauce.jpg') },
+        { id: 1, category: "Kuchen", title: "Honig Kuchen", image: require('../../assets/images/honig_kuchen.png') },
+        {  id: 2, category: "Sauce", title: "Honig Sesam Sauce", image: require('../../assets/images/honey_sesame_sauce.jpg') },
         { id: 3, category: "Kuchen", title: "Honig Torte", image:  require('../../assets/images/honey_cake.jpg')},
         { id: 4, category: "Dessert", title: "Honig Mousse", image: require('../../assets/images/honig_mousse.png')},
         { id: 5, category: "Getränk", title: "Honig Tee", image:  require('../../assets/images/honey_tea.png')},
@@ -13,7 +14,7 @@ const Recipe: React.FC = () => {
     ];
 
     return (
-        <div className="bg-[#f8e5a1]">
+        <div className="min-h-screen flex flex-col bg-[#f8e5a1]">
             {}
             <div className="relative">
                 <img
@@ -27,23 +28,26 @@ const Recipe: React.FC = () => {
             </div>
 
             {}
-            <div className="max-w-6xl mx-auto py-12 px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {recipes.map((recipe) => (
-                    <Link to={`/recipe/${recipe.id}`} key={recipe.id}>
-                        <div className="bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow">
-                            <img
-                                src={recipe.image}
-                                alt={recipe.title}
-                                className="w-full h-40 object-cover rounded-t-lg"
-                            />
-                            <div className="p-4">
-                                <p className="text-orange-600 text-sm uppercase font-semibold">{recipe.category}</p>
-                                <h2 className="text-gray-800 text-lg font-bold">{recipe.title}</h2>
+            <main className="flex-grow">
+                <div className="max-w-6xl mx-auto py-12 px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {recipes.map((recipe) => (
+                        <Link to={`/recipe/${recipe.id}`} key={recipe.id}>
+                            <div className="bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+                                <img
+                                    src={recipe.image}
+                                    alt={recipe.title}
+                                    className="w-full h-40 object-cover rounded-t-lg"
+                                />
+                                <div className="p-4">
+                                    <p className="text-orange-600 text-sm uppercase font-semibold">{recipe.category}</p>
+                                    <h2 className="text-gray-800 text-lg font-bold">{recipe.title}</h2>
+                                </div>
                             </div>
-                        </div>
-                    </Link>
-                ))}
-            </div>
+                        </Link>
+                    ))}
+                </div>
+            </main>
+            <Footer />
         </div>
     );
 };

@@ -2,9 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body {
-    @apply bg-[#fff8e1] overflow-x-hidden min-h-screen;
+html, body, #root {
+    @apply overflow-x-hidden;
     margin: 0;
     padding: 0;
+    background-color: #fff8e1;
+    height: 100%;
 }
 
+#root {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex-grow: 1;
+}
+
+footer {
+    margin: 0;
+    background-color: #fbbf24;
+}
