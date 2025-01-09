@@ -132,6 +132,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         try {
             await signOut(auth);
             setAuthUser(null);
+            localStorage.removeItem("userDetails");
             
         } catch (error: any) {
             setAuthUser(null);

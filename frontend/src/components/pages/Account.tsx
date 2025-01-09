@@ -108,7 +108,7 @@ const Account: React.FC = () => {
                 newErrors.confirmPassword = "Passwords do not match";
             }
 
-            ["name", "surname", "street", "houseNumber", "plz", "city"].forEach((field) => {
+            ["name", "surname", "street", "houseNumber", "zip", "city"].forEach((field) => {
                 const fieldValue = (formData as any)[field];
                 const fieldError = isRequired(fieldValue, field.charAt(0).toUpperCase() + field.slice(1));
                 if (fieldError) newErrors[field] = fieldError;
@@ -190,6 +190,9 @@ const Account: React.FC = () => {
         setMessage("");
         try {
             await logout();
+            localStorage.removeItem("userDetails");
+
+
             setMessage("Logged out successfully!");
         } catch (error: any) {
             setMessage("Failed to log out.");

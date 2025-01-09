@@ -82,17 +82,19 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ loggedInUser }) => {
     const addProduct = async () => {
         setErrorMessage("");
 
-        if (
-            !newProduct.name ||
+        if (!newProduct.name ||
             newProduct.price <= 0 ||
-            newProduct.stock < 0 ||
-            !newProduct.imageUrl
-        ) {
+            newProduct.stock < 0 /*||
+           // !newProduct.imageUrl*/) {
             setErrorMessage("Please provide valid product details.");
             return;
         }
+    
 
         try {
+
+
+
             await addDoc(collection(db, "products"), newProduct);
             setNewProduct({
                 name: "",

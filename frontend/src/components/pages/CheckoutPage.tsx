@@ -28,21 +28,19 @@ const CheckoutPage: React.FC = () => {
     const navigate = useNavigate();
 
     // Load saved data on mount
-    useEffect(() => {
-        const savedDetails = localStorage.getItem("userDetails");
+    useEffect(() => {      
 
+
+        const savedDetails = localStorage.getItem("userDetails");
         if (savedDetails) {
             const { name, surname, deliveryAddress } = JSON.parse(savedDetails);
             setName(name || "");
             setSurname(surname || "");
             setDeliveryAddress(deliveryAddress || "");
         } else if (authUser?.id) {
+          
             fetchUserDetails(authUser.id);
         }
-
-        // if (authUser?.email) {
-        //     setEmail(authUser.email); // Use email from the authUser directly
-        // }
     }, [authUser]);
 
     const fetchUserDetails = async (userId: string) => {

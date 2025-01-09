@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { CartItem } from '../types/cartItem';
 import { v4 as uuidv4 } from 'uuid';
 import { db } from '../services/firebase/firebaseConfig';
-import { collection, getDocs, addDoc, deleteDoc, doc, query, where, setDoc, updateDoc, DocumentData} from 'firebase/firestore';
+import { collection, addDoc, doc, setDoc,DocumentData} from 'firebase/firestore';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { Timestamp } from "firebase/firestore";
 import {getDocDataBy1Condition, addDocToCollection, getDocRefsBy1Condition,getDocRefsBy2Condition, deleteDocByRef, updateDocByRef} from "../services/firebase/firestoreService";
@@ -125,7 +125,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
             localStorage.removeItem("guestCart");   
               
-            //FIXME: Could ve been done in a better way 
+            //FIXME: Could be done in a better way 
             firestoreItems = await getDocDataBy1Condition("cart", "userId", "==", userId) ;
             setCartItems(firestoreItems);
 
@@ -186,21 +186,17 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
          try 
         {
             let payload;
-            if (authUser?.id) //Authenticated USER                
+            if (authUser?.id)      
             {       
-              const q = query(collection(db, "cart"), where("userId", "==", authUser?.id),where("productId", "==", item.productId) );
-              const querySnapshot = await getDocs(q);            
+                const [docRef] = await getDocRefsBy2Condition("cart", "userId", "==", authUser.id, "productId", "==", item.productId);
 
-              if(!querySnapshot.empty)
-              {               
-                 const docRef = querySnapshot.docs[0].ref;
-                 const existingData = querySnapshot.docs[0].data();
-
-                 await updateDoc(docRef, {
-                    quantity: (existingData.quantity ?? 1) + (item.quantity ?? 1),
-                    addedAt: Timestamp.now()
-                });        
-              }
+                if (docRef) {
+                    // Update directly if document exists
+                    await updateDocByRef(docRef, {
+                        quantity: (item.quantity ?? 1) + 1, // Assume default quantity increment by 1
+                        addedAt: Timestamp.now(),
+                    });
+                }
               else
               {
                 payload = { ...newItem, userId: authUser?.id };
@@ -216,8 +212,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
 
                 if (existingItem) {
-                    existingItem.quantity += item.quantity ?? 1;    
-     
+                    existingItem.quantity += item.quantity ?? 1;         
                     const docRefComplete = await getDocRefsBy2Condition("cart", "guestId", "==", guestId, "productId", "==", item.productId);  
                     if (docRefComplete.length !== 0) {
 
@@ -235,9 +230,11 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                         guestId,
                         cartItemId: uuidv4(),
                         addedAt: new Date(),            
-                    };            
-                    await addDoc(collection(db, "cart"), { ...newItem, addedAt: Timestamp.now()});        
-                    // Add new item to localStorage
+                    };      
+                    await addDocToCollection("cart", {
+                        ...newItem,
+                        addedAt: Timestamp.now(),
+                    });      
                     existingCart.push(newItem);
                 }            
                 localStorage.setItem("guestCart", JSON.stringify(existingCart));  }
@@ -256,9 +253,8 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         console.log("removeFromCart function Called");
         const docRefComplete = await getDocRefsBy1Condition("cart", "cartItemId", "==", cartItemId);      
         try {
-           await deleteDocByRef(docRefComplete[0]);
+            await deleteDocByRef(docRefComplete[0]);
             setCartItems((prev) => prev.filter((item) => item.cartItemId !== cartItemId));
-
             const localCart = JSON.parse(localStorage.getItem("guestCart") || "[]");            
             localStorage.setItem("guestCart", JSON.stringify(localCart.filter((item: CartItem) => item.cartItemId !== cartItemId)));
         } catch (error) {
@@ -271,26 +267,18 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const clearCart = async () => {
         console.log("clearCart function Called");
         try {
-            if (authUser?.id) {
-            
-                    const docRefComplete = await getDocRefsBy1Condition("cart", "userId", "==", authUser?.id);  
-                    
+            if (authUser?.id) {            
+                    const docRefComplete = await getDocRefsBy1Condition("cart", "userId", "==", authUser?.id);                      
                     const deleteDocByRefPromises = docRefComplete.map((docRef) => deleteDocByRef(docRef));
-                    await Promise.all(deleteDocByRefPromises);  
-
-
+                    await Promise.all(deleteDocByRefPromises); 
             } else {
-                const guestId = getGuestId();
-                const q = query(collection(db, "cart"), where("guestId", "==", guestId));
-                const querySnapshot = await getDocs(q);
-                const deletePromises = querySnapshot.docs.map((doc) =>
-                    deleteDoc(doc.ref)
-                );
-                await Promise.all(deletePromises);
+                console.log("Clearing cart for guest user. HAS BEEN CHANGED 09.01.2025 21:15");
+                const guestId = getGuestId(); 
+                const docRefComplete = await getDocRefsBy1Condition("cart", "guestId", "==",guestId);                      
+                const deleteDocByRefPromises = docRefComplete.map((docRef) => deleteDocByRef(docRef));
+                await Promise.all(deleteDocByRefPromises); 
                 localStorage.removeItem("guestCart");
             }
-
-
             setCartItems([]);
         } catch (error) {
             console.error("Error clearing cart:", error);
