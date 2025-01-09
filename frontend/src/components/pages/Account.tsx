@@ -60,6 +60,7 @@ const Account: React.FC = () => {
     const [orders, setOrders] = useState<Order[]>([]);
     const [ordersLoading, setOrdersLoading] = useState(false);
     const [ordersError, setOrdersError] = useState<string | null>(null);
+    const [showSidebar, setShowSidebar] = useState(false);
 
 
     useEffect(() => {
@@ -206,55 +207,64 @@ const Account: React.FC = () => {
                 <img
                     src="/images/banner_account.png"
                     alt="Account Banner"
-                    className="w-full h-64 object-cover"
+                    className="w-full h-40 sm:h-64 object-cover"
                 />
-                <h1 className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-4xl font-bold">
+                <h1 className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-2xl sm:text-4xl font-bold">
                     My Account
                 </h1>
             </div>
 
+            <button
+                className="sm:hidden p-2 bg-yellow-500 text-white rounded"
+                onClick={() => setShowSidebar(!showSidebar)}
+            >
+                {showSidebar ? "Close Menu" : "Menu"}
+            </button>
+
             <main className="flex-grow">
-                <div className="flex max-w-6xl mx-auto">
+                <div className="flex flex-col sm:flex-row max-w-full sm:max-w-6xl mx-auto">
                 {/* Sidebar */}
-                {user && (
-                    <div className="w-1/4 p-4 border-r border-gray-300 hidden lg:block">
-                        <h2 className="text-xl font-semibold mb-6 text-gray-800">Account</h2>
-                        <ul className="space-y-4">
-                            <li
-                                className={`cursor-pointer ${!showOrders ? "text-blue-600 font-semibold" : "text-gray-600 hover:text-blue-500"}`}
-                                onClick={() => setShowOrders(false)}
-                            >
-                                Profile
-                            </li>
-                            <li
-                                className={`cursor-pointer ${showOrders ? "text-blue-600 font-semibold" : "text-gray-600 hover:text-blue-500"}`}
-                                onClick={() => setShowOrders(true)}
-                            >
-                                Orders
-                            </li>
-
-                            {authUser?.authType === "admin" && (
-                                <li className="cursor-pointer text-gray-600 hover:text-blue-500">
-                                    <Link to="/admin" className="block">
-                                        Admin Page
-                                    </Link>
+                    {user && (
+                        <div
+                            className={`${
+                                showSidebar ? "block" : "hidden"
+                            } sm:block w-full sm:w-1/4 p-4 border-r border-gray-300`}
+                        >
+                            <h2 className="text-center sm:text-left text-xl font-semibold mb-6 text-gray-800">Account</h2>
+                            <ul className="space-y-4 text-center sm:text-left">
+                                <li
+                                    className={`cursor-pointer ${!showOrders ? "text-blue-600 font-semibold" : "text-gray-600 hover:text-blue-500"}`}
+                                    onClick={() => setShowOrders(false)}
+                                >
+                                    Profile
                                 </li>
-                            )}
+                                <li
+                                    className={`cursor-pointer ${showOrders ? "text-blue-600 font-semibold" : "text-gray-600 hover:text-blue-500"}`}
+                                    onClick={() => setShowOrders(true)}
+                                >
+                                    Orders
+                                </li>
+                                {authUser?.authType === "admin" && (
+                                    <li className="cursor-pointer text-gray-600 hover:text-blue-500">
+                                        <Link to="/admin" className="block">
+                                            Admin Page
+                                        </Link>
+                                    </li>
+                                )}
+                                <li
+                                    className="text-gray-600 cursor-pointer hover:text-blue-500"
+                                    onClick={handleLogout}
+                                >
+                                    Log Out
+                                </li>
+                            </ul>
+                        </div>
+                    )}
 
-                            <li
-                                className="text-gray-600 cursor-pointer hover:text-blue-500"
-                                onClick={handleLogout}
-                            >
-                                Log Out
-                            </li>
-                        </ul>
-                    </div>
-                )}
-
-                {/* Login/Account Content */}
-                <div className={`flex-1 ${user ? "p-6" : ""}`}>
-                    <div className={`mx-auto ${user ? "max-w-full p-12" : "max-w-md p-6"} text-center`}>
-                    {isForgotPassword ? (
+                    {/* Login/Account Content */}
+                    <div className={`flex-1 ${user ? "p-4 sm:p-6" : ""}`}>
+                        <div className={`mx-auto ${user ? "max-w-full p-6 sm:p-12" : "max-w-md p-6"} text-center`}>
+                        {isForgotPassword ? (
                             <>
                                 <h2 className="text-xl font-bold mb-4">Restore Password</h2>
                                 <div className="mb-4">
@@ -274,7 +284,7 @@ const Account: React.FC = () => {
 
                                 <button
                                     onClick={handlePasswordReset}
-                                    className={`w-full p-2 mb-4 rounded bg-blue-500 text-white hover:bg-blue-600 ${
+                                    className={`w-full p-2 sm:p-3 mb-4 rounded bg-blue-500 text-white hover:bg-blue-600 ${
                                         authLoading ? "opacity-50 cursor-not-allowed" : ""
                                     }`}
                                     disabled={authLoading || !formData.email.trim()}
@@ -286,7 +296,7 @@ const Account: React.FC = () => {
                                         setIsForgotPassword(false);
                                         setMessage("");
                                     }}
-                                    className="w-full p-2 mb-4 rounded bg-gray-500 text-white hover:bg-gray-600"
+                                    className="w-full p-2 sm:p-3 mb-4 rounded bg-gray-500 text-white hover:bg-gray-600"
                                 >
                                     Back to Login
                                 </button>
@@ -316,7 +326,7 @@ const Account: React.FC = () => {
                                 ) : (
                                     <div>
                                         <h2 className="text-2xl font-bold mb-8">My Information</h2>
-                                        <div className="rounded-lg shadow-md p-12 bg-white max-w-4xl mx-auto">
+                                        <div className="rounded-lg shadow-md p-6 sm:p-12 bg-white max-w-4xl mx-auto">
                                         <UserInfo
                                             authUser={authUser}
                                             userEmail={authUser?.userName || "No email available"}
@@ -591,7 +601,7 @@ const Account: React.FC = () => {
                                 )}
                                 <button
                                     onClick={handleSubmit}
-                                    className={`w-full p-2 mb-4 rounded ${
+                                    className={`w-full p-2 sm:p-3 mb-4 rounded ${
                                         isRegistering ? "bg-blue-500" : "bg-green-500"
                                     } text-white hover:bg-opacity-90`}
                                     disabled={authLoading}

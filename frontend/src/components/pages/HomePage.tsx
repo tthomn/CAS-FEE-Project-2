@@ -6,18 +6,18 @@ const HomePage: React.FC = () => {
     return (
         <div className="min-h-screen flex flex-col bg-[#fff8e1]">
         <main className="flex-1 flex flex-col">
-                <div className="flex flex-col md:flex-row items-center justify-end max-w-7xl mx-auto px-10 h-[calc(90vh+2rem)] pt-8">
+            <div className="flex flex-col-reverse md:flex-row items-center justify-between max-w-7xl mx-auto px-6 sm:px-10 gap-6 sm:gap-10 pt-6 sm:pt-8">
 
-                <div className="flex flex-col items-start max-w-lg space-y-4 md:w-1/2 md:h-auto ml-auto transform -translate-y-8 md:translate-x-20">
-                    <h1 className="text-7xl font-serif font-bold text-gray-800 leading-tight">
-                        Honey Hive Treasures
+            <div className="flex flex-col items-start max-w-lg space-y-4 md:w-1/2 md:h-auto ml-auto transform -translate-y-8 md:translate-x-20">
+                <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-bold text-gray-800 leading-snug">
+                Honey Hive Treasures
                     </h1>
-                    <p className="text-xl text-gray-700 leading-relaxed">
-                        Discover the finest natural creations – pure golden honey and delightful bee-made products, all handcrafted with care.
+                <p className="text-lg sm:text-xl md:text-2xl text-gray-700 leading-relaxed">
+                Discover the finest natural creations – pure golden honey and delightful bee-made products, all handcrafted with care.
                     </p>
                     <Link to="/shop">
-                        <button className="bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-10 rounded-lg shadow-lg uppercase tracking-wide transition-all text-lg">
-                            Shop Now
+                        <button className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-6 sm:py-3 sm:px-8 rounded-lg shadow-lg uppercase tracking-wide transition-all text-sm sm:text-lg">
+                        Shop Now
                         </button>
                     </Link>
                 </div>
@@ -26,15 +26,15 @@ const HomePage: React.FC = () => {
                     <img
                         src="/images/main-banner.png"
                         alt="Honey Jar"
-                        className="w-[850px] h-[950px] object-contain"
+                        className="w-full max-w-[600px] sm:max-w-[450px] md:max-w-[550px] lg:max-w-[650px] xl:max-w-[750px] h-auto object-contain"
                     />
                 </div>
             </div>
 
-                <section className="flex-grow py-10">
-                <div className="container mx-auto px-6 text-center">
+            <section className="flex-grow pt-36 sm:pt-44">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
                     <h2 className="text-3xl font-bold text-yellow-700">Why Choose Us?</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 mt-8">
                         <div className="flex flex-col items-center">
                             <img src="/images/icon_purity.png" alt="Purity Icon" className="h-20 mb-4" />
                             <h3 className="text-xl font-bold">100% Pure</h3>

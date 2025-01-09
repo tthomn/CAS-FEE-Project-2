@@ -10,6 +10,7 @@ const Header: React.FC = () => {
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const navigate = useNavigate();
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const handleSearchSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -23,8 +24,41 @@ const Header: React.FC = () => {
     return (
         <div className="relative bg-[#fff8e1]">
             <header className="relative z-10 flex justify-between items-center py-4 px-5 bg-[#fff8e1] mt-4">
-                <div className="text-2xl font-bold"></div>
-                <nav className="flex gap-8 items-center">
+                <div className="flex items-center gap-4">
+                    {/* Hamburger Menu for Mobile */}
+                    <button
+                        className="text-2xl text-gray-800 hover:text-orange-600 sm:hidden"
+                        onClick={() => setIsMenuOpen((prev) => !prev)}
+                    >
+                        <i className="fas fa-bars"></i>
+                    </button>
+                </div>
+
+                {/* Mobile Menu */}
+                {isMenuOpen && (
+                    <div className="absolute top-full left-0 w-full bg-white shadow-md rounded p-4 sm:hidden">
+                        <nav className="flex flex-col gap-4">
+                            {[
+                                { to: "/", label: "Home" },
+                                { to: "/shop", label: "Shop" },
+                                { to: "/recipe", label: "Rezepte" },
+                                { to: "/account", label: "Account" },
+                            ].map(({ to, label }) => (
+                                <NavLink
+                                    key={to}
+                                    to={to}
+                                    className="text-lg font-medium text-gray-800 hover:text-orange-600"
+                                    onClick={() => setIsMenuOpen(false)} // Close menu on tab click
+                                >
+                                    {label}
+                                </NavLink>
+                            ))}
+                        </nav>
+                    </div>
+                )}
+
+                {/* Center Navigation Tabs for Desktop */}
+                <nav className="hidden sm:flex gap-8 items-center">
                     {[
                         { to: "/", label: "Home" },
                         { to: "/shop", label: "Shop" },
@@ -43,15 +77,17 @@ const Header: React.FC = () => {
                             {label}
                         </NavLink>
                     ))}
+
+                    {/* Cart Icon for Desktop */}
                     <div
-                        className="relative flex items-center"
+                        className="relative hidden sm:flex items-center"
                         onMouseEnter={() => setIsHovered(true)}
                         onMouseLeave={() => setIsHovered(false)}
                     >
                         <NavLink to="/cart" className="relative text-2xl text-gray-800 hover:text-orange-600">
                             <i className="fas fa-shopping-basket"></i>
                             <span
-                                className={`absolute top-0 right-0 bg-red-600 text-white rounded-full px-1 text-xs font-bold transform translate-x-2 -translate-y-2`}
+                                className="absolute top-0 right-0 bg-red-600 text-white rounded-full px-1 text-xs font-bold transform translate-x-2 -translate-y-2"
                             >
                                 {totalItems > 0 ? totalItems : 0}
                             </span>
@@ -63,7 +99,22 @@ const Header: React.FC = () => {
                         )}
                     </div>
                 </nav>
-                <div className="flex items-center gap-4">
+
+                {/* Cart Icon for Mobile (Aligned Right) */}
+                <NavLink
+                    to="/cart"
+                    className="sm:hidden relative text-2xl text-gray-800 hover:text-orange-600 absolute right-5"
+                >
+                    <i className="fas fa-shopping-basket"></i>
+                    <span
+                        className="absolute top-0 right-0 bg-red-600 text-white rounded-full px-1 text-xs font-bold transform translate-x-2 -translate-y-2"
+                    >
+                        {totalItems > 0 ? totalItems : 0}
+                    </span>
+                </NavLink>
+
+                {/* Right Section for Desktop (Search and Contact) */}
+                <div className="hidden sm:flex items-center gap-4">
                     <NavLink
                         to="/contact"
                         className="px-4 py-2 bg-[#E47D31] text-white rounded hover:bg-orange-700 transition-colors text-sm"

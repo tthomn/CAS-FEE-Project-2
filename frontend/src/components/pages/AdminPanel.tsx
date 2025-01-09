@@ -4,6 +4,7 @@ import {getFirestore, collection,addDoc, updateDoc,deleteDoc,doc, getDocs,} from
 import { getStorage, ref, uploadBytesResumable, getDownloadURL,} from "firebase/storage";
 import { Product } from "../../types/product"; 
 import {useAuth} from "../../context/AuthContext";
+import Footer from "../layouts/Footer";
 
 interface AdminPanelProps {
      loggedInUser: string;
