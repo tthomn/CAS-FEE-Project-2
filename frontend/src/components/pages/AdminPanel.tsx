@@ -1,179 +1,70 @@
 import React, { useState, useEffect, ReactNode } from "react"; 
-import {getFirestore, collection,addDoc, updateDoc,deleteDoc,doc, getDocs,} from "firebase/firestore"; 
-import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject  } from "firebase/storage";
 import { Product } from "../../types/product"; 
 import {useAuth} from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import Footer from "../layouts/Footer";
 import {Category} from "../../types/category";
 import { FaEdit, FaTrash, FaSave } from "react-icons/fa";
+import "react-toastify/dist/ReactToastify.css";
+import { useAdmin } from "../../context/AdminContext";
+import {getCollectionData} from "../../services/firebase/firestoreService";
+import {db, storage} from "../../services/firebase/firebaseConfig";
+import {orderBy, query, collection, getDocs} from "firebase/firestore";
+
 
 
 const AdminPanel:React.FC<{ }> = ({}) => {
-    const [products, setProducts] = useState<Product[]>([]);
-    const [newProduct, setNewProduct] = useState<Omit<Product, "id">>({
-        name: "",
-        price: 0,
-        weight: 0,
-        imageUrl: "",
-        categoryId: "",
-        stock: 0,
-        description: "",
-        keywords: [],
-    });
+    
+   //From Admin Context
+   const {handleImageUpload, uploadingImage, errorMessage,setNewProduct, newProduct, addProduct, setProducts, products, deleteProduct, updateProduct, addCategory, newCategoryName, setNewCategoryName } = useAdmin();
+   const { authUser} = useAuth();
 
+
+   //TODO: Check what's needed and whats not! 
     const [editingProductId, setEditingProductId] = useState<string | null>(null);
-    const [uploadingImage, setUploadingImage] = useState(false);
-    const [errorMessage, setErrorMessage] = useState("");
-      const { isAuthenticated, authUser} = useAuth();
     const [categories, setCategories] = useState<Category[]>([]);
     const [description, setDescription] = useState("");
     const [keywords, setKeywords] = useState<string[]>([]);
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [priceInput, setPriceInput] = useState<string>("");
     const [isAddingNewCategory, setIsAddingNewCategory] = useState(false);
-    const [newCategoryName, setNewCategoryName] = useState<string>("");
     const navigate = useNavigate();
 
 
-    const db = getFirestore();
-    const storage = getStorage();
 
+    //TODO: Category Handler.... => Use Global State (category) in the Product Context
+    //TODO: WHAT TO DO WITH THIS??????
     useEffect(() => {            
             const fetchProducts = async () => {
                 try {
-                    const querySnapshot = await getDocs(collection(db, "products"));
-                    setProducts(    querySnapshot.docs.map((doc) => ({
-                            id: doc.id,
-                            ...doc.data(),
-                        })) as Product[]
-                    );
+
+                    const products = await getCollectionData<Product>("products", [
+                        orderBy("name", "asc"),                   
+                    ]);                 
+                       setProducts(products);
+
                 } catch (error) {
                     console.error("Error fetching products:", error);
                 }
             };
+            //FIXME: Use Global State (product)
             const fetchCategories = async () => {
-                const querySnapshot = await getDocs(collection(db, "categories"));
-                setCategories(querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as Category[]);
+
+                const products = await getCollectionData<Category>("categories", [
+                    orderBy("name", "asc"),                
+                ]);                 
+
+                setCategories(products);
             };
             fetchProducts();
             fetchCategories();
     }, [db]);
 
-    const handleImageUpload = async (file: File) => {
-        setUploadingImage(true);
-        setErrorMessage("");
-        try {
-            const storage1 = getStorage();
 
-            const storageRef = ref(storage1, `products/${file.name}`);
-            const uploadTask = uploadBytesResumable(storageRef, file);
-
-            const downloadURL = await new Promise<string>((resolve, reject) => {
-                uploadTask.on(
-                    "state_changed",
-                    null,
-                    (error) => reject(error),
-                    async () => {
-                        const url = await getDownloadURL(uploadTask.snapshot.ref);
-                        resolve(url);
-                    }
-                );
-            });
-            setNewProduct({ ...newProduct, imageUrl: downloadURL });
-        } catch (error) {
-            console.error("Error uploading image:", error);
-            setErrorMessage("Image upload failed. Please try again.");
-        } finally {
-            setUploadingImage(false);
-        }
-    };
-
-    const addProduct = async () => {
-        setErrorMessage("");
-
-        if (!newProduct.name || newProduct.price <= 0 || newProduct.stock < 0 || !newProduct.categoryId) {
-            setErrorMessage("Please provide valid product details, including a category.");
-            return;
-        }
-
-        try {
-            await addDoc(collection(db, "products"), newProduct);
-            setNewProduct((prev) => ({
-                ...prev,
-                name: "",
-                price: 0,
-                weight: 0,
-                imageUrl: "",
-                stock: 0,
-                description: "",
-                keywords: [],
-                categoryId: "",  
-            }));
-            const querySnapshot = await getDocs(collection(db, "products"));
-            setProducts(
-                querySnapshot.docs.map((doc) => ({
-                    id: doc.id,
-                    ...doc.data(),
-                })) as Product[]
-            );
-        } catch (error) {
-            console.error("Error adding product:", error);
-            setErrorMessage("Failed to add product. Please try again.");
-        }
-    };
-
-    const addCategory = async (categoryName: string): Promise<string> => {
-        try {
-            const categoryDocRef = await addDoc(collection(db, "categories"), {
-                name: categoryName,
-            });
-            setNewCategoryName("");
-            setErrorMessage("");
-            return categoryDocRef.id;
-        } catch (error) {
-            console.error("Error adding category:", error);
-            setErrorMessage("Failed to add category. Please try again.");
-            return ""; // Return an empty string if there's an error
-        }
-    };
-
-    const updateProduct = async (id: string, updatedData: Partial<Product>) => {
-        try {
-            await updateDoc(doc(db, "products", id), {
-                ...updatedData,
-                price: updatedData.price || 0,
-                stock: updatedData.stock || 0,
-            });
-            const updatedProducts = products.map((product) =>
-                product.id === id ? { ...product, ...updatedData } : product
-            );
-            setProducts(updatedProducts);
-        } catch (error) {
-            console.error("Error updating product:", error);
-        }
-    };
-
-
-    const deleteProduct = async (id: string) => {
-        try {                     
-            await deleteDoc(doc(db, "products", id));
-            setProducts(products.filter((product) => product.id !== id));
-            /* //FIXME: Delete also image from storage
-            const fileRef = ref(storage, product.imageUrl);
-            await deleteObject(fileRef);
-            */                                 
-        } catch (error) {
-            console.error("Error deleting product:", error);
-        }
-    };
 
     if (authUser?.authType !== "admin") {
-        return <p>You do not have access to the Admin Panel.</p>;
+      return <p>You do not have access to the Admin Panel.</p>;
     }
-
-
-
 
     return (
         <div className="p-6 bg-gray-50 min-h-screen">
@@ -282,7 +173,7 @@ const AdminPanel:React.FC<{ }> = ({}) => {
                                     }}
                                     className="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-lg transition"
                                 >
-                                    Add
+                                Add
                                 </button>
                                 <button
                                     onClick={() => {
@@ -501,7 +392,7 @@ const AdminPanel:React.FC<{ }> = ({}) => {
                                         </button>
                                         <button
                                             className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md flex items-center text-sm"
-                                            onClick={() => deleteProduct(product.id)}
+                                            onClick={() => deleteProduct(product.id, product.imageUrl)}
                                         >
                                             <FaTrash className="mr-1" /> Delete
                                         </button>

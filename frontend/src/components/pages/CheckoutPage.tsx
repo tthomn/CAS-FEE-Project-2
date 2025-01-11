@@ -44,15 +44,15 @@ const CheckoutPage: React.FC = () => {
     }, [authUser]);
 
     const fetchUserDetails = async (userId: string) => {
-          try {
+        try {
 
-                setEmail(authUser?.userName || "Keine E-Mail verfügbar");
-                const fullAddress = `${authUser?.street || ""} ${authUser?.houseNumber || ""}, ${authUser?.zip || ""} ${authUser?.city || ""}`;
-                setDeliveryAddress(fullAddress);
-                setBillingAddress(fullAddress);
-                setName(authUser?.name || "");
-                setSurname(authUser?.surname || "");
-                localStorage.setItem("userDetails", JSON.stringify({ name: authUser?.name, surname: authUser?.surname, deliveryAddress: fullAddress }));
+            setEmail(authUser?.userName || "Keine E-Mail verfügbar");
+            const fullAddress = `${authUser?.street || ""} ${authUser?.houseNumber || ""}, ${authUser?.zip || ""} ${authUser?.city || ""}`;
+            setDeliveryAddress(fullAddress);
+            setBillingAddress(fullAddress);
+            setName(authUser?.name || "");
+            setSurname(authUser?.surname || "");
+            localStorage.setItem("userDetails", JSON.stringify({ name: authUser?.name, surname: authUser?.surname, deliveryAddress: fullAddress }));
 
         } catch (error) {
             console.error("Error fetching user details:", error);
