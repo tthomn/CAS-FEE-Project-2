@@ -3,6 +3,7 @@ import {getFirestore, collection,addDoc, updateDoc,deleteDoc,doc, getDocs,} from
 import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject  } from "firebase/storage";
 import { Product } from "../../types/product"; 
 import {useAuth} from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 import Footer from "../layouts/Footer";
 import {Category} from "../../types/category";
 import { FaEdit, FaTrash, FaSave } from "react-icons/fa";
@@ -32,8 +33,9 @@ const AdminPanel:React.FC<{ }> = ({}) => {
     const [priceInput, setPriceInput] = useState<string>("");
     const [isAddingNewCategory, setIsAddingNewCategory] = useState(false);
     const [newCategoryName, setNewCategoryName] = useState<string>("");
+    const navigate = useNavigate();
 
-    
+
     const db = getFirestore();
     const storage = getStorage();
 
@@ -175,6 +177,18 @@ const AdminPanel:React.FC<{ }> = ({}) => {
 
     return (
         <div className="p-6 bg-gray-50 min-h-screen">
+            <div className="relative group">
+                <button
+                    onClick={() => navigate("/account")}
+                    className="text-3xl bg-transparent text-gray-700 hover:text-blue-600 z-50"
+                    aria-label="Back to Account"
+                >
+                    &larr;
+                </button>
+                <span className="absolute opacity-0 group-hover:opacity-100 bg-gray-800 text-white text-sm rounded-lg py-1 px-3 shadow-lg transition-opacity duration-300 -top-8 left-0 z-50">
+        Back to Account
+    </span>
+            </div>
             <h1 className="text-3xl font-extrabold mb-6 text-center text-blue-700">Admin Panel</h1>
 
             {/* Add Product Section */}
