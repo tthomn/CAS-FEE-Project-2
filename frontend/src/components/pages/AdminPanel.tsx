@@ -1,17 +1,14 @@
-import React, { useState, useEffect } from "react"; 
+import React, { useState, useEffect, ReactNode } from "react"; 
 import {getFirestore, collection,addDoc, updateDoc,deleteDoc,doc, getDocs,} from "firebase/firestore"; 
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject  } from "firebase/storage";
 import { Product } from "../../types/product"; 
 import {useAuth} from "../../context/AuthContext";
 import Footer from "../layouts/Footer";
 import {Category} from "../../types/category";
 import { FaEdit, FaTrash, FaSave } from "react-icons/fa";
 
-interface AdminPanelProps {
-     loggedInUser: string;
-}
 
-const AdminPanel: React.FC<AdminPanelProps> = ({ loggedInUser }) => {
+const AdminPanel:React.FC<{ }> = ({}) => {
     const [products, setProducts] = useState<Product[]>([]);
     const [newProduct, setNewProduct] = useState<Omit<Product, "id">>({
         name: "",
@@ -33,20 +30,18 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ loggedInUser }) => {
     const [keywords, setKeywords] = useState<string[]>([]);
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [priceInput, setPriceInput] = useState<string>("");
+    const [isAddingNewCategory, setIsAddingNewCategory] = useState(false);
+    const [newCategoryName, setNewCategoryName] = useState<string>("");
 
-
-    const adminUser = "62xJXdO14EXWMCLS1CpHlI5PPFu1";
+    
     const db = getFirestore();
     const storage = getStorage();
 
-    useEffect(() => {
-        if (loggedInUser === adminUser) {
-            
+    useEffect(() => {            
             const fetchProducts = async () => {
                 try {
                     const querySnapshot = await getDocs(collection(db, "products"));
-                    setProducts(
-                        querySnapshot.docs.map((doc) => ({
+                    setProducts(    querySnapshot.docs.map((doc) => ({
                             id: doc.id,
                             ...doc.data(),
                         })) as Product[]
@@ -61,8 +56,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ loggedInUser }) => {
             };
             fetchProducts();
             fetchCategories();
-        }
-    }, [db, loggedInUser]);
+    }, [db]);
 
     const handleImageUpload = async (file: File) => {
         setUploadingImage(true);
@@ -84,8 +78,6 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ loggedInUser }) => {
                     }
                 );
             });
-            console.log("WHAAHT IS HAPPENEING");
-
             setNewProduct({ ...newProduct, imageUrl: downloadURL });
         } catch (error) {
             console.error("Error uploading image:", error);
@@ -103,19 +95,19 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ loggedInUser }) => {
             return;
         }
 
-
         try {
-            await addDoc(collection(db, "products"), newProduct);  // Saves description and keywords
-            setNewProduct({
+            await addDoc(collection(db, "products"), newProduct);
+            setNewProduct((prev) => ({
+                ...prev,
                 name: "",
                 price: 0,
                 weight: 0,
                 imageUrl: "",
-                categoryId: "",
                 stock: 0,
-                description: "",  // Reset description
-                keywords: [],     // Reset keywords
-            });
+                description: "",
+                keywords: [],
+                categoryId: "",  
+            }));
             const querySnapshot = await getDocs(collection(db, "products"));
             setProducts(
                 querySnapshot.docs.map((doc) => ({
@@ -129,9 +121,28 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ loggedInUser }) => {
         }
     };
 
+    const addCategory = async (categoryName: string): Promise<string> => {
+        try {
+            const categoryDocRef = await addDoc(collection(db, "categories"), {
+                name: categoryName,
+            });
+            setNewCategoryName("");
+            setErrorMessage("");
+            return categoryDocRef.id;
+        } catch (error) {
+            console.error("Error adding category:", error);
+            setErrorMessage("Failed to add category. Please try again.");
+            return ""; // Return an empty string if there's an error
+        }
+    };
+
     const updateProduct = async (id: string, updatedData: Partial<Product>) => {
         try {
-            await updateDoc(doc(db, "products", id), updatedData);
+            await updateDoc(doc(db, "products", id), {
+                ...updatedData,
+                price: updatedData.price || 0,
+                stock: updatedData.stock || 0,
+            });
             const updatedProducts = products.map((product) =>
                 product.id === id ? { ...product, ...updatedData } : product
             );
@@ -141,16 +152,21 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ loggedInUser }) => {
         }
     };
 
+
     const deleteProduct = async (id: string) => {
-        try {
+        try {                     
             await deleteDoc(doc(db, "products", id));
             setProducts(products.filter((product) => product.id !== id));
+            /* //FIXME: Delete also image from storage
+            const fileRef = ref(storage, product.imageUrl);
+            await deleteObject(fileRef);
+            */                                 
         } catch (error) {
             console.error("Error deleting product:", error);
         }
     };
 
-    if (loggedInUser !== adminUser) {
+    if (authUser?.authType !== "admin") {
         return <p>You do not have access to the Admin Panel.</p>;
     }
 
@@ -196,10 +212,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ loggedInUser }) => {
                             onBlur={() => {
                                 // Exit edit mode when the user clicks away
                                 if (!priceInput || isNaN(parseFloat(priceInput))) {
-                                    setPriceInput("0.00");  // Default to 0.00 if empty or invalid
+                                    setPriceInput(newProduct.price.toFixed(2));
+                                    // Default to 0.00 if empty or invalid
                                     setNewProduct({ ...newProduct, price: 0 });
                                 }
-                                setEditingProductId(null);  // Exit edit mode
+                                if (priceInput.trim() !== "") setEditingProductId(null);
                             }}
                             className="border rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
                         />
@@ -221,18 +238,71 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ loggedInUser }) => {
                     </div>
                     <div>
                         <label className="block font-semibold mb-1 text-gray-600">Category</label>
-                        <select
-                            value={newProduct.categoryId}
-                            onChange={(e) => setNewProduct({ ...newProduct, categoryId: e.target.value })}
-                            className="border rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
-                        >
-                            <option value="">Select a category</option>
-                            {categories.map((category) => (
-                                <option key={category.id} value={category.id}>
-                                    {category.name}
+                        {isAddingNewCategory ? (
+                            <div className="flex gap-2 items-center">
+                                <input
+                                    type="text"
+                                    placeholder="Enter new category name"
+                                    value={newCategoryName}
+                                    onChange={(e) => setNewCategoryName(e.target.value)}
+                                    className="border rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
+                                />
+                                <button
+                                    onClick={async () => {
+                                        if (newCategoryName.trim()) {
+                                            const newCategoryId = await addCategory(newCategoryName.trim());
+                                            const newCategory = { id: newCategoryId, name: newCategoryName.trim() };
+
+                                            // Add the new category to the list and set as selected
+                                            setCategories((prevCategories) => {
+                                                if (!prevCategories.some((category) => category.id === newCategory.id)) {
+                                                    return [...prevCategories, newCategory];
+                                                }
+                                                return prevCategories;
+                                            });
+
+                                            setNewProduct({ ...newProduct, categoryId: newCategoryId });
+                                            setNewCategoryName("");
+                                            setIsAddingNewCategory(false);
+                                        }
+                                    }}
+                                    className="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-lg transition"
+                                >
+                                    Add
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        setNewCategoryName("");
+                                        setIsAddingNewCategory(false);
+                                    }}
+                                    className="text-gray-600 hover:text-red-600 text-sm"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        ) : (
+                            <select
+                                value={newProduct.categoryId}
+                                onChange={(e) => {
+                                    if (e.target.value === "add-new-category") {
+                                        setIsAddingNewCategory(true); // Show input for new category
+                                    } else {
+                                        setNewProduct({ ...newProduct, categoryId: e.target.value });
+                                    }
+                                }}
+                                className="border rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
+                            >
+                                <option value="">Select a category</option>
+                                {categories.map((category) => (
+                                    <option key={category.id} value={category.id}>
+                                        {category.name}
+                                    </option>
+                                ))}
+                                <option value="add-new-category" className="text-blue-600">
+                                    + Add New Category
                                 </option>
-                            ))}
-                        </select>
+                            </select>
+                        )}
                     </div>
 
                     <div>
@@ -384,11 +454,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ loggedInUser }) => {
                                             className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md flex items-center text-sm"
                                             onClick={() => {
                                                 updateProduct(product.id, {
-                                                    name: product.name,
-                                                    price: product.price,
-                                                    stock: product.stock,
-                                                    description: product.description,
-                                                    keywords: product.keywords,
+                                                    ...product,
+                                                    categoryId: categories.find((cat) => cat.id === product.categoryId)?.id || "",
                                                 });
                                                 setEditingProductId(null);
                                             }}

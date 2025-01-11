@@ -2,6 +2,9 @@
 import {db} from "./firebaseConfig";
 import {DocumentData, Timestamp } from "firebase/firestore";
 import {collection, getDocs, addDoc, deleteDoc,  query, where, updateDoc, DocumentReference  } from 'firebase/firestore';
+import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject  } from "firebase/storage";
+
+
 
 
 //Query for Doc fields (Cart Items) with 1 condition
@@ -72,7 +75,6 @@ export async function addDocToCollection<T>(collectionName: string, payload: T):
 }
 
 
-
 //Update Document via Documentrefference
 // Updates specific fields in a document. => Requires the document to exist.
 export async function updateDocByRef(docRef: DocumentReference<DocumentData>, fieldsToUpdate: Partial<DocumentData>): Promise<void> {
@@ -83,14 +85,6 @@ export async function updateDocByRef(docRef: DocumentReference<DocumentData>, fi
         throw error;
     }
 }
-
-
-
-
-
-
-
-
 
 //Delete Document via Documentrefference
 export async function deleteDocByRef(docRef: DocumentReference<DocumentData>): Promise<void> {
@@ -105,68 +99,13 @@ export async function deleteDocByRef(docRef: DocumentReference<DocumentData>): P
 
 
 
-/*
 
-//Add Document 
-export async function addDocToCollection<T>(collectionName: string, data: T): Promise<void> {
-    try {
-        await addDoc(collection(db, collectionName), data);
-    } 
-    catch (error) {
-        console.error(`Error adding document to ${collectionName}:`, error);
-        throw error;
-    }
-}*/
+//_____________________________________________________________Storage_______________________________________________________
+
+//[Upload Image to Firebase Storage]
 
 
-//Delete Document
-
-
-
-
-
-
-
-
-//QUERIES //TODO: Check if "Document allready exists? => this funcion is called before any of the CURD
-
-//Check if Doc Exists
-export async function checkIfDocExists(collectionName: string, field: string, operator: any, value: any) 
-{
-    const q = query(collection(db, collectionName), where(field, operator, value));
-    const querySnapshot = await getDocs(q);
-    const data = querySnapshot.docs.map(doc => doc.data());
-    return data;
-}
-
-
-//TODO: Query for Doc with 2 conditions
-
-
-//CARD ITEMS [CRUD]
-
-
-
-
-
-
-//ORDERS per Accounts 
-
-
-
-
-
-
-//FETCH Categories for shop 
-//TODO: Dynamic fetch of Categories on shop Page! 
-
-
-
-
-
-
-//Products SHOP [Admin Panel]
-
+//[Delete Image from Firebase Storage wia Image URL]
 
 
 

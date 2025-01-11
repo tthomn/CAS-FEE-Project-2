@@ -13,17 +13,14 @@ import CheckoutPage from "./components/pages/CheckoutPage";
 import NotFoundPage from "./components/pages/NotFoundPage";
 import SearchResultsPage from "./components/pages/SearchResultsPage";
 import { CartProvider } from "./context/CartContext";
-import { AuthProvider } from "./context/AuthContext";
-import FlyingBees from "./components/layouts/FlyingBees";
 import LoginPage from "./components/pages/LoginPage";
 import RegisterPage from "./components/pages/RegisterPage";
 import AdminPanel from "./components/pages/AdminPanel";
 import ProtectedRoute from "./components/routes/ProtectedRoute";
+import { AuthProvider, } from "./context/AuthContext";
+
 
 const App: React.FC = () => {
-    const [loggedInUser, setLoggedInUser] = useState<string>("62xJXdO14EXWMCLS1CpHlI5PPFu1"); // Simulate logged-in user's UID
-    const adminUser = "62xJXdO14EXWMCLS1CpHlI5PPFu1"; // Real admin user UID //FIXME: Update it with functionality
-
     return (
         <AuthProvider>
           <CartProvider>
@@ -44,10 +41,10 @@ const App: React.FC = () => {
                             <Route path="/register" element={<RegisterPage />} />
                             <Route
                                 path="/admin"
-                                element={
-                                    <ProtectedRoute requiredRole="admin">
-                                        <AdminPanel loggedInUser={loggedInUser} />
-                                    </ProtectedRoute>
+                                element={<ProtectedRoute 
+                                            requiredRole="admin">
+                                          <AdminPanel/>
+                                        </ProtectedRoute>
                                 }
                             />
                             <Route path="*" element={<NotFoundPage />} />

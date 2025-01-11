@@ -109,8 +109,8 @@ const ProductDetail: React.FC = () => {
                 {/* Product Image */}
                 <div className="flex justify-center">
                     <img
-                        src={`/${product.imageUrl}`}
-                        alt={product.name}
+                    src={product.imageUrl}
+                    alt={product.name}
                         className="w-full max-w-sm h-auto object-cover rounded-lg shadow-lg"
                     />
                 </div>
