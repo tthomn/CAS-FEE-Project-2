@@ -63,7 +63,7 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         setUploadingImage(false);
       }
     };
-
+    
         //TODO: Use firestoreService.ts
         const addProduct = async () => {
           setErrorMessage("");
