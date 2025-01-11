@@ -1,6 +1,8 @@
 //path: CAS-FEE-Project-2/frontend/src/types/product.ts
 export interface Product {
     id: string;
+    description?: string;
+    keywords?: string[];
     name: string;
     price: number;
     weight: number;
