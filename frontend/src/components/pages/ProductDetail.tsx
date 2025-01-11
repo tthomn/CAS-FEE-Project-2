@@ -97,12 +97,15 @@ const ProductDetail: React.FC = () => {
                 </div>
             )}
 
-            {/* Back to Shopping Button */}
             <button
                 onClick={() => navigate("/shop")}
-                className="fixed top-24 md:top-32 left-4 md:left-8 bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded shadow z-50"
+                className="fixed top-24 md:top-32 left-4 md:left-8 text-3xl bg-transparent text-gray-700 hover:text-blue-600 z-50 group"
+                aria-label="Back to Shopping"
             >
-                &larr; Back to Shopping
+                &larr;
+                <span className="absolute top-10 left-2 opacity-0 group-hover:opacity-100 bg-gray-800 text-white text-sm rounded-lg py-1 px-3 shadow-lg transition-opacity duration-300">
+        Back to Shopping
+    </span>
             </button>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">

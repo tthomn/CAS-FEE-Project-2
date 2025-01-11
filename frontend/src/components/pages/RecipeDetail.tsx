@@ -1,5 +1,5 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 
 const RecipeDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -20,9 +20,19 @@ const RecipeDetail: React.FC = () => {
     }
 
     return (
-        <div className="min-h-screen bg-[#f8e5a1] pt-6 flex items-start justify-center">
-            <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
-                {}
+        <div className="min-h-screen bg-[#f8e5a1] pt-6 relative">
+            <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md overflow-hidden mt-12 relative">
+                <Link
+                    to="/recipe"
+                    className="absolute top-3 left-3 text-3xl bg-transparent text-gray-700 hover:text-orange-600 z-50 group"
+                    aria-label="Back to Recipes"
+                >
+                    &larr;
+                    <span className="absolute top-10 left-2 opacity-0 group-hover:opacity-100 bg-gray-800 text-white text-sm rounded-lg py-1 px-3 shadow-lg transition-opacity duration-300">
+                        Back to Recipes
+                    </span>
+                </Link>
+
                 <div className="w-full h-[120px] overflow-hidden">
                     <img
                         src="/images/banner.jpg"
@@ -31,17 +41,13 @@ const RecipeDetail: React.FC = () => {
                     />
                 </div>
 
-                {}
                 <div className="p-6 md:p-10">
                     <div className="flex flex-col md:flex-row gap-6 items-start">
-                        {}
                         <img
                             src={recipe.image}
                             alt={recipe.title}
                             className="w-full md:w-[300px] rounded-md object-cover"
                         />
-
-                        {}
                         <div className="flex-1 text-gray-800">
                             <h3 className="text-2xl font-bold mb-4">{recipe.title}</h3>
                             <p className="text-lg leading-relaxed">{recipe.description}</p>
