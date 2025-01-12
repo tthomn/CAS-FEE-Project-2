@@ -38,6 +38,7 @@ const RecipeDetail: React.FC = () => {
                         src="/images/banner.jpg"
                         alt="Rezepte Banner"
                         className="w-full h-full object-cover"
+                        loading="eager"
                     />
                 </div>
 

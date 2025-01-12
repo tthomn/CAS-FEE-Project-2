@@ -21,6 +21,7 @@ const Recipe: React.FC = () => {
                     src="/images/recipes_banner.png"
                     alt="Recipe Banner"
                     className="w-full h-64 object-cover"
+                    loading="eager"
                 />
                 <h1 className="absolute inset-0 flex items-center justify-center text-5xl font-bold text-white bg-black/50">
                     Rezepte

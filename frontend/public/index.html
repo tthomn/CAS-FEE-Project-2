@@ -3,18 +3,20 @@
 <head>
   <meta charset="utf-8" />
 
-  <link rel="icon" href="%PUBLIC_URL%/images/bee_icon.png" type="image/png" />
+  <!-- Preconnect to load fonts faster -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <link rel="icon" href="/images/bee_icon.png" type="image/png" />
+  <link rel="preload" href="/images/banner_account.png" as="image" />
+  <link rel="preload" href="/images/banner_shop.png" as="image" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#E2B007" />
-  <meta
-          name="description"
-          content="HoneyHive - A delightful shopping experience for honey and bee products."
-  />
+  <meta name="description" content="HoneyHive - A delightful shopping experience for honey and bee products." />
+
   <title> HoneyHive - Bee Web Shop</title>
-  <link
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-          rel="stylesheet"
-  />
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" media="print" onload="this.media='all'" />
 
   <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet" />
 </head>

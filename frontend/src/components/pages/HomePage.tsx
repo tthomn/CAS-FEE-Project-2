@@ -27,6 +27,7 @@ const HomePage: React.FC = () => {
                         src="/images/main-banner.png"
                         alt="Honey Jar"
                         className="w-full max-w-[600px] sm:max-w-[450px] md:max-w-[550px] lg:max-w-[650px] xl:max-w-[750px] h-auto object-contain"
+                        loading="eager"
                     />
                 </div>
             </div>

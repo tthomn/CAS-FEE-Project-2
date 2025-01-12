@@ -84,11 +84,15 @@ const ProductGrid: React.FC<ProductGridProps> = ({ categoryId }) => {
                     className="no-underline text-inherit"
                 >
                     <div className="border border-gray-300 rounded-lg shadow hover:shadow-lg transition-shadow p-4 flex flex-col items-center text-center">
-                        <img
-                            src={product.imageUrl}
-                            alt={product.name}
-                            className="w-full h-auto max-h-[150px] object-cover mb-4"
-                        />
+                        <picture>
+                            <source srcSet={`${product.imageUrl}?alt=media&format=webp`} type="image/webp" />
+                            <img
+                                src={`${product.imageUrl}?alt=media&width=300&height=300`}
+                                alt={product.name}
+                                className="w-full h-auto max-h-[150px] object-cover mb-4"
+                                loading="eager"
+                            />
+                        </picture>
                         <h4 className="text-lg font-semibold mb-2">{product.name}</h4>
                         <p className="text-sm text-gray-600">{product.weight} g</p>
                         <p className="text-base font-medium text-gray-800">

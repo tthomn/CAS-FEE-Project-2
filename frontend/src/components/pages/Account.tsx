@@ -211,6 +211,7 @@ const Account: React.FC = () => {
                     src="/images/banner_account.png"
                     alt="Account Banner"
                     className="w-full h-40 sm:h-64 object-cover"
+                    loading="eager"
                 />
                 <h1 className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-2xl sm:text-4xl font-bold">
                     My Account
