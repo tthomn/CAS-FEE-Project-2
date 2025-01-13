@@ -40,7 +40,7 @@ const AdminPanel:React.FC<{ }> = ({}) => {
 
                     const products = await getCollectionData<Product>("products", [
                         orderBy("name", "asc"),                   
-                    ]);                 
+                    ]);                          
                        setProducts(products);
 
                 } catch (error) {
@@ -408,3 +408,7 @@ const AdminPanel:React.FC<{ }> = ({}) => {
 };
 
 export default AdminPanel;
+
+function setCategories(arg0: (prevCategories: any) => any) {
+    throw new Error("Function not implemented.");
+}

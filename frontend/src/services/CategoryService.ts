@@ -19,4 +19,3 @@ export const getCategoryById = async (id: string) => {
     }
 };
 
-//TEST

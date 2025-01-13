@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+export {};
+/*import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getCategoryById } from "../../services/CategoryService";
 
@@ -64,4 +65,4 @@ const CategoryPage: React.FC = () => {
     );
 };
 
-export default CategoryPage;
+export default CategoryPage;*/

@@ -11,7 +11,6 @@ const CartPage: React.FC = () => {
     const [showPopup, setShowPopup] = useState(false);
 
 
-    //TODO: We need somehow a global State for the Login perhaps this is suppose to change
     const [userEmail, setUserEmail] = useState<string | null>(null);
 
 

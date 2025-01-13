@@ -33,11 +33,8 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const [newCategoryName, setNewCategoryName] = useState<string>("");
 
 
-  //FIXME: Will be obsolete bc. we use the firestoreService.ts
   const db = getFirestore();
 
-
-  //FIXME: Use Product Type respective GLOBAL PRODUCT CONETEXT
   const [newProduct, setNewProduct] = useState<Omit<Product, "id">>({
     name: "",
     price: 0,
@@ -47,6 +44,7 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     stock: 0,
     description: "",
     keywords: [],
+    ratings: { totalRating: 0, ratingCount: 0 },
   });
      
     //TODO: Use firestoreService.ts
@@ -142,6 +140,7 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
             const categoryDocRef = await addDoc(collection(db, "categories"), {
                 name: categoryName,
                 description: categoryName,
+                
             });
 
             setNewCategoryName("");

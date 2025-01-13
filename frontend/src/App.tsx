@@ -19,11 +19,14 @@ import AdminPanel from "./components/pages/AdminPanel";
 import ProtectedRoute from "./components/routes/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
 import { AdminProvider } from "./context/AdminContext";
+import { CatalogProvider } from "./context/CatalogContext";  
+
 
 const App: React.FC = () => {
   return (
     <AuthProvider>
       <CartProvider>
+      <CatalogProvider> 
         <Router>
           <div className="relative min-h-screen">
             <Header />
@@ -60,8 +63,10 @@ const App: React.FC = () => {
             </Routes>
           </div>
         </Router>
+        </CatalogProvider> 
       </CartProvider>
     </AuthProvider>
+
   );
 };
 

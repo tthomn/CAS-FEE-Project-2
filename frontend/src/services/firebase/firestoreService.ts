@@ -117,31 +117,39 @@ export async function deleteDocByRef(docRef: DocumentReference<DocumentData>): P
  * @returns {Promise<string>} - Returns the download URL of the uploaded image.
  */
 export async function uploadImageToStorage(file: File, folderPath: string): Promise<string> {
-    try {
-      const storageRef = ref(storage, `${folderPath}/${file.name}`);
-      const uploadTask = uploadBytesResumable(storageRef, file);
-  
-      const downloadURL = await new Promise<string>((resolve, reject) => {
-        uploadTask.on(
-          "state_changed",
-          null, // You can add a progress callback here if needed
-          (error) => {
-            console.error("Error uploading image:", error);
-            reject(error);
-          },
-          async () => {
-            const url = await getDownloadURL(uploadTask.snapshot.ref);
-            resolve(url);
-          }
-        );
-      });  
-      console.log("Image uploaded successfully. URL:", downloadURL);
-      return downloadURL;
-    } catch (error) {
-      console.error("Error in uploadImageToStorage function:", error);
-      throw error;
-    }
+  try {
+    const storageRef = ref(storage, `${folderPath}/${file.name}`);
+
+    // Set Cache-Control metadata for 1 week
+    const metadata = {
+      cacheControl: "public, max-age=31536000", // 1 week in seconds
+    };
+
+    // Pass metadata to uploadBytesResumable
+    const uploadTask = uploadBytesResumable(storageRef, file, metadata);
+
+    const downloadURL = await new Promise<string>((resolve, reject) => {
+      uploadTask.on(
+        "state_changed",
+        null, // Progress callback (if needed)
+        (error) => {
+          console.error("Error uploading image:", error);
+          reject(error);
+        },
+        async () => {
+          const url = await getDownloadURL(uploadTask.snapshot.ref);
+          resolve(url);
+        }
+      );
+    });
+
+    console.log("Image uploaded successfully. URL:", downloadURL);
+    return downloadURL;
+  } catch (error) {
+    console.error("Error in uploadImageToStorage function:", error);
+    throw error;
   }
+}
 
 //[Delete Image from Firebase Storage wia Image URL]
 /**
