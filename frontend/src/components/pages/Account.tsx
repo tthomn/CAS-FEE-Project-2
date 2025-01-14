@@ -267,7 +267,7 @@ const Account: React.FC = () => {
 
                     {/* Login/Account Content */}
                     <div className={`flex-1 ${user ? "p-4 sm:p-6" : ""}`}>
-                        <div className={`mx-auto ${user ? "max-w-full p-6 sm:p-12" : "max-w-md p-6"} text-center`}>
+                        <div className={`mx-auto ${user ? "max-w-full p-4 sm:p-6" : "max-w-md p-4"} text-center`}>
                         {isForgotPassword ? (
                             <>
                                 <h2 className="text-xl font-bold mb-4">Restore Password</h2>
@@ -330,14 +330,15 @@ const Account: React.FC = () => {
                                 ) : (
                                     <div>
                                         <h2 className="text-2xl font-bold mb-8">My Information</h2>
-                                        <div className="rounded-lg shadow-md p-6 sm:p-12 bg-white max-w-4xl mx-auto">
-                                        <UserInfo
-                                            authUser={authUser}
-                                            userEmail={authUser?.userName || "No email available"}
-                                            loading={loading}
-                                            // error={error}
-                                            onLogout={handleLogout}
-                                        />
+                                        <div className="rounded-lg shadow-md bg-white w-full sm:w-[90%] lg:w-[85%] mx-auto overflow-x-auto p-4 sm:p-6">
+                                            <div className="break-words w-full">
+                                                <UserInfo
+                                                    authUser={authUser}
+                                                    userEmail={authUser?.userName || "No email available"}
+                                                    loading={loading}
+                                                    onLogout={handleLogout}
+                                                />
+                                            </div>
                                         </div>
                                         <button
                                             onClick={() => setShowOrders(true)}
@@ -353,18 +354,18 @@ const Account: React.FC = () => {
                                 <h1 className="text-2xl font-bold mb-4">
                                     {isRegistering ? "Register" : "Login"}
                                 </h1>
-                                <div className="mb-4">
+                                <div className="mb-4 px-4 sm:px-0">
                                     <input
                                         type="email"
                                         name="email"
                                         placeholder="Email"
                                         value={formData.email}
                                         onChange={handleInputChange}
-                                        className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
+                                        className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-yellow-500"
                                     />
                                     {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
-
                                 </div>
+
 
                                 <div className="relative mb-4">
                                     <div className="mb-4">

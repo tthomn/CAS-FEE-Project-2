@@ -29,15 +29,17 @@ const OrdersList: React.FC<OrdersListProps> = ({ orders, loading, error }) => {
 
     return (
         <div className="max-w-4xl mx-auto space-y-8 px-4 lg:px-0">
-        {orders.map((order) => (
+            {orders.map((order) => (
                 <div
                     key={order.id}
-                    className="bg-white border border-gray-200 rounded-lg shadow-lg hover:shadow-xl transition-shadow p-6"
+                    className="bg-white border border-gray-200 rounded-lg shadow-lg hover:shadow-xl transition-shadow p-6 overflow-hidden"
                 >
-                    {/* Order Container*/}
-                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
-                        <div className="mb-4 md:mb-0 flex-grow">
-                            <p className="font-medium text-base tracking-wide text-gray-900">Order ID: {order.id}</p>
+                    {/* Order Container */}
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div className="w-full md:w-1/2">
+                            <p className="font-medium text-base tracking-wide text-gray-900 break-words">
+                                Order ID: <span className="block md:inline">{order.id}</span>
+                            </p>
                             <p className="text-sm text-gray-600">
                                 Order Date: {new Date(order.createdAt).toLocaleDateString()}
                             </p>
@@ -49,20 +51,19 @@ const OrdersList: React.FC<OrdersListProps> = ({ orders, loading, error }) => {
                                             ? "text-red-500"
                                             : "text-orange-500"
                                 }`}
-
                             >
                                 Status: {order.status.toUpperCase()}
                             </p>
                         </div>
 
-                        <div className="flex flex-col items-start md:items-center flex-grow mb-4 md:mb-0">
+                        <div className="w-full md:w-1/4 flex flex-col items-start md:items-center">
                             <p className="text-sm">Total Items: {order.cartItems.length}</p>
                             <p className="text-sm font-bold text-gray-800">
                                 {new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(order.totalPrice)}
                             </p>
                         </div>
 
-                        <div className="text-right flex-none">
+                        <div className="w-full md:w-1/4 text-right">
                             <button
                                 onClick={() => toggleOrderDetails(order.id)}
                                 className="text-gray-600 hover:text-blue-600 font-medium transition-colors duration-200"
@@ -75,10 +76,10 @@ const OrdersList: React.FC<OrdersListProps> = ({ orders, loading, error }) => {
                     {/* Order Details */}
                     {expandedOrderId === order.id && (
                         <div className="bg-gray-50 p-6 mt-4 rounded-md">
-                        <p className="text-md font-medium">Items in Order:</p>
+                            <p className="text-md font-medium">Items in Order:</p>
                             <ul className="list-none mt-3 space-y-2">
-                            {order.cartItems.map((item) => (
-                                    <li key={item.cartItemId} className="text-sm">
+                                {order.cartItems.map((item) => (
+                                    <li key={item.cartItemId} className="text-sm break-words">
                                         <Link
                                             to={`/shop/${item.productId}`}
                                             className="text-orange-600 font-medium hover:text-orange-700"
@@ -97,15 +98,14 @@ const OrdersList: React.FC<OrdersListProps> = ({ orders, loading, error }) => {
                                 <div className="flex justify-between items-center">
                                     <span className="font-semibold text-lg text-gray-800">Total Price</span>
                                     <span className="text-green-600 text-lg font-bold">
-            {new Intl.NumberFormat("en-US", {
-                style: "currency",
-                currency: "USD",
-            }).format(order.totalPrice)}
-        </span>
+                                        {new Intl.NumberFormat("en-US", {
+                                            style: "currency",
+                                            currency: "USD",
+                                        }).format(order.totalPrice)}
+                                    </span>
                                 </div>
                                 <p className="text-sm text-gray-500 mt-1 text-right">(Including Delivery)</p>
                             </div>
-
                         </div>
                     )}
                 </div>
@@ -115,4 +115,3 @@ const OrdersList: React.FC<OrdersListProps> = ({ orders, loading, error }) => {
 };
 
 export default OrdersList;
-

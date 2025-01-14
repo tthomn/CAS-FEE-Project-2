@@ -19,28 +19,32 @@ const UserInfo: React.FC<UserInfoProps> = ({ authUser, userEmail, loading }) => 
     }
 
     return (
-        <div className="w-full p-4 bg-white shadow-md rounded-lg">
+        <div className="w-[98%] sm:w-[95%] lg:w-full p-4 bg-white shadow-md rounded-lg mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <div className="flex items-start gap-3 mb-4">
                         <FiMail className="text-3xl text-blue-500 mt-1" />
-                        <div>
+                        <div className="w-full">
                             <p className="text-xs font-medium text-gray-500">Email</p>
-                            <p className="text-sm text-gray-900">{userEmail || "Not provided"}</p>
+                            <p className="text-sm text-gray-900 break-words overflow-hidden">
+                                {userEmail || "Not provided"}
+                            </p>
                         </div>
                     </div>
 
                     <div className="flex items-start gap-3 mb-4">
                         <FiUser className="text-3xl text-green-500 mt-1" />
-                        <div>
+                        <div className="w-full">
                             <p className="text-xs font-medium text-gray-500">Full Name</p>
-                            <p className="text-sm text-gray-900">{`${authUser.name || "N/A"} ${authUser.surname || ""}`}</p>
+                            <p className="text-sm text-gray-900">
+                                {`${authUser.name || "N/A"} ${authUser.surname || ""}`}
+                            </p>
                         </div>
                     </div>
 
                     <div className="flex items-start gap-3 mb-4">
                         <FiCalendar className="text-3xl text-yellow-500 mt-1" />
-                        <div>
+                        <div className="w-full">
                             <p className="text-xs font-medium text-gray-500">Date of Birth</p>
                             <p className="text-sm text-gray-900">{authUser.dob || "Not provided"}</p>
                         </div>
@@ -50,7 +54,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ authUser, userEmail, loading }) => 
                 <div>
                     <div className="flex items-start gap-3">
                         <FiMapPin className="text-3xl text-purple-500 mt-1" />
-                        <div>
+                        <div className="w-full">
                             <p className="text-xs font-medium text-gray-500">Address</p>
                             <p className="text-sm text-gray-900">
                                 {`${authUser.street || "N/A"} ${authUser.houseNumber || ""}, ${authUser.city || "N/A"} ${authUser.zip || ""}`}

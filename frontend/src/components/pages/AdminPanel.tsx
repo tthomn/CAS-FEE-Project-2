@@ -86,9 +86,9 @@ const AdminPanel:React.FC<{ }> = ({}) => {
             <div className="mb-10 bg-white shadow-md rounded-lg p-6">
                 <h2 className="text-2xl font-semibold mb-4 border-b pb-2">Add Product</h2>
                 {errorMessage && <p className="text-red-500 mb-4">{errorMessage}</p>}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label className="block font-semibold mb-1 text-gray-600">Product Name</label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    <div className="flex flex-col">
+                    <label className="block font-semibold mb-1 text-gray-600">Product Name</label>
                         <input
                             type="text"
                             placeholder="Enter the product name"
@@ -126,7 +126,7 @@ const AdminPanel:React.FC<{ }> = ({}) => {
                             className="border rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
                         />
                     </div>
-                    <div>
+                    <div className="sm:col-span-1">
                         <label className="block font-semibold mb-1 text-gray-600">Stock</label>
                         <input
                             type="number"
@@ -210,7 +210,7 @@ const AdminPanel:React.FC<{ }> = ({}) => {
                         )}
                     </div>
 
-                    <div>
+                    <div className="sm:col-span-1">
                         <label className="block font-semibold mb-1 text-gray-600">Upload Image</label>
                         <input
                             type="file"
@@ -224,7 +224,7 @@ const AdminPanel:React.FC<{ }> = ({}) => {
                         />
                         {uploadingImage && <p className="text-blue-500 mt-2">Uploading image...</p>}
                     </div>
-                    <div className="col-span-2">
+                    <div className="col-span-full">
                         <label className="block font-semibold mb-1 text-gray-600">Description</label>
                         <textarea
                             placeholder="Enter the product description"
@@ -235,11 +235,11 @@ const AdminPanel:React.FC<{ }> = ({}) => {
                             className="border rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
                         />
                     </div>
-                    <div className="col-span-2">
+                    <div className="col-span-full">
                         <label className="block font-semibold mb-1 text-gray-600">Keywords (comma-separated)</label>
                         <input
                             type="text"
-                            placeholder="Enter keywords, separated by commas"
+                            placeholder="Keywords, separated by commas"
                             value={newProduct.keywords?.join(", ") || ""}
                             onChange={(e) =>
                                 setNewProduct({
