@@ -18,13 +18,13 @@ const CategorySidebar: React.FC<CategorySidebarProps> = ({
                                                              activeCategory,
                                                          }) => {
     return (
-        <div className="p-4">
-            <h3 className="mb-4 text-lg font-bold">Kategorien</h3>
+        <div className="p-2 sm:p-4">
+            <h3 className="mb-2 sm:mb-4 text-base sm:text-lg font-bold">Kategorien</h3>
             <ul className="list-none p-0">
                 <li className="mb-2">
                     <Link
                         to="/shop"
-                        className={`font-bold text-lg cursor-pointer ${
+                        className={`font-semibold text-base sm:text-lg cursor-pointer ${
                             activeCategory === null ? "text-red-700" : "text-red-500"
                         }`}
                         onClick={() => onSelectCategory(null, "Shop")}

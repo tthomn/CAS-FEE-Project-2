@@ -42,14 +42,14 @@ const ProductGrid: React.FC<ProductGridProps> = ({ categoryId }) => {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 p-2 sm:p-4">
       {products.map((product) => (
         <Link
           to={`/shop/${product.id}`}
           key={product.id}
           className="no-underline text-inherit"
         >
-          <div className="border border-gray-300 rounded-lg shadow hover:shadow-lg transition-shadow p-4 flex flex-col items-center text-center">
+          <div className="border border-gray-300 rounded-lg shadow hover:shadow-lg transition-shadow p-6 flex flex-col items-center text-center">
             <picture>
       
               <source
@@ -64,7 +64,6 @@ const ProductGrid: React.FC<ProductGridProps> = ({ categoryId }) => {
               />
             </picture>
             <h4 className="text-lg font-semibold mb-2">{product.name}</h4>
-            <p className="text-sm text-gray-600">{product.weight} g</p>
             <p className="text-base font-medium text-gray-800">
               CHF {product.price.toFixed(2)}
             </p>
