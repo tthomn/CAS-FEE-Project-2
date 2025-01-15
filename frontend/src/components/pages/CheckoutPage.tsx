@@ -29,8 +29,6 @@ const CheckoutPage: React.FC = () => {
 
     // Load saved data on mount
     useEffect(() => {      
-
-
         const savedDetails = localStorage.getItem("userDetails");
         if (savedDetails) {
             const { name, surname, deliveryAddress } = JSON.parse(savedDetails);

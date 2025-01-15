@@ -1,7 +1,7 @@
 import React, { useState,  createContext, ReactNode, useContext } from "react";
 import { Product } from "../types/product";
-import {getFirestore, collection,addDoc, updateDoc,deleteDoc,doc, getDocs,} from "firebase/firestore"; 
-import {uploadImageToStorage,  deleteFileFromStorage} from "../services/firebase/firestoreService";
+import {getFirestore,doc,} from "firebase/firestore"; 
+import {uploadImageToStorage,  deleteFileFromStorage, addDocToCollection, getCollectionData, deleteDocByRef, getDocRefsBy1Condition, updateDocByRef } from "../services/firebase/firestoreService";
 
 
 interface AdminContextType
@@ -24,14 +24,13 @@ interface AdminContextType
 
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
 
-
 export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =>     {
 
   const [uploadingImage, setUploadingImage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [products, setProducts] = useState<Product[]>([]);
   const [newCategoryName, setNewCategoryName] = useState<string>("");
-
+  const [isImageUploaded, setIsImageUploaded] = useState(false);
 
   const db = getFirestore();
 
@@ -47,24 +46,32 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     ratings: { totalRating: 0, ratingCount: 0 },
   });
      
-    //TODO: Use firestoreService.ts
-    const handleImageUpload = async (file: File) => {
-      setUploadingImage(true);
-      setErrorMessage("");
-      try {
-        const downloadURL = await uploadImageToStorage(file, "products");
-        setNewProduct({ ...newProduct, imageUrl: downloadURL });
-      } catch (error) {
-        console.error("Error uploading image:", error);
-        setErrorMessage("Image upload failed. Please try again.");
-      } finally {
-        setUploadingImage(false);
-      }
-    };
-    
-        //TODO: Use firestoreService.ts
+      const handleImageUpload = async (file: File) => {
+        setUploadingImage(true);
+        setErrorMessage("");
+        try {
+          const downloadURL = await uploadImageToStorage(file, "products");
+          setNewProduct({ ...newProduct, imageUrl: downloadURL });
+          setIsImageUploaded(true);  // Mark image as uploaded
+        } catch (error) {
+          console.error("Error uploading image:", error);
+          setErrorMessage("Image upload failed. Please try again.");
+          setIsImageUploaded(false);  // Reset in case of failure
+        } finally {
+          setUploadingImage(false);
+        }
+      };
+  
+   
+   
         const addProduct = async () => {
           setErrorMessage("");
+
+      
+            if (!isImageUploaded) {
+              setErrorMessage("Please wait until the image is uploaded.");
+              return;
+            }
 
           if ( !newProduct.name ||
             newProduct.price <= 0 ||
@@ -78,7 +85,8 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           }
 
           try {
-            await addDoc(collection(db, "products"), newProduct);
+            
+            await addDocToCollection("products", newProduct);
             setNewProduct((prev) => ({
               ...prev,
               name: "",
@@ -90,13 +98,10 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
               keywords: [],
               categoryId: "",
             }));
-            const querySnapshot = await getDocs(collection(db, "products"));
-            setProducts(
-              querySnapshot.docs.map((doc) => ({
-                id: doc.id,
-                ...doc.data(),
-              })) as Product[]
-            );
+
+            const products = await getCollectionData<Product>("products");
+            setProducts(products); 
+            setIsImageUploaded(false);  
           } catch (error) {
             console.error("Error adding product:", error);
             setErrorMessage("Failed to add product. Please try again.");
@@ -104,10 +109,10 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         };
     
         const deleteProduct = async (id: string, imageUrl: string) => {
-            try {            
-
+            try {           
                 await deleteFileFromStorage(imageUrl);
-                await deleteDoc(doc(db, "products", id)); //TODO:---
+                const productRef = doc(db, "products", id); 
+                await deleteDocByRef(productRef);     
                 setProducts(products.filter((product) => product.id !== id));       
                           
             } catch (error) {
@@ -117,12 +122,10 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
             
         const updateProduct = async (id: string, updatedData: Partial<Product>) => {
-            try {
-                await updateDoc(doc(db, "products", id), {
-                    ...updatedData,
-                    price: updatedData.price || 0,
-                    stock: updatedData.stock || 0,
-                });
+            try {                   
+               const docRefComplete = await getDocRefsBy1Condition("products", "id", "==", id);  
+                await updateDocByRef(docRefComplete[0], updatedData);
+
                 const updatedProducts = products.map((product) =>
                     product.id === id ? { ...product, ...updatedData } : product
                 );
@@ -134,26 +137,20 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
 
 
-            //TODO: 
     const addCategory = async (categoryName: string): Promise<string> => {
         try {
-            const categoryDocRef = await addDoc(collection(db, "categories"), {
-                name: categoryName,
-                description: categoryName,
-                
-            });
-
+            const categoryDocRef = await addDocToCollection("categories", {name: categoryName, description: categoryName});
             setNewCategoryName("");
             setErrorMessage("");
-            return categoryDocRef.id;
+            return categoryDocRef;
+ 
         } catch (error) {
             console.error("Error adding category:", error);
            setErrorMessage("Failed to add category. Please try again.");
-            return ""; // Return an empty string if there's an error
+            return ""; 
         }
     };
 
-    
       return (
         <AdminContext.Provider
           value={{

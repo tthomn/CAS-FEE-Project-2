@@ -43,12 +43,9 @@ const LoginPage: React.FC = () => {
         setErrorMessage("");
 
         try {
-
             await signInWithEmailAndPassword(auth, email, password);
-            setLoading(false);                
-
-            await cartCleaner();                    
-
+            setLoading(false);               
+            await cartCleaner();                   
 
             const fromCart = new URLSearchParams(location.search).get("fromCart");
             if (fromCart) {
@@ -76,7 +73,6 @@ const LoginPage: React.FC = () => {
             setErrorMessage("Please enter your email to reset your password.");
             return;
         }
-
         try {
             await sendPasswordResetEmail(auth, email);
             setResetEmailSent(true);

@@ -191,8 +191,6 @@ const Account: React.FC = () => {
         try {
             await logout();
             localStorage.removeItem("userDetails");
-
-
             setMessage("Logged out successfully!");
         } catch (error: any) {
             setMessage("Failed to log out.");

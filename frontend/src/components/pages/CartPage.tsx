@@ -13,12 +13,7 @@ const CartPage: React.FC = () => {
 
     const [userEmail, setUserEmail] = useState<string | null>(null);
 
-
-   //Listens for changes in the Firebase Authentification state (user Logs in or out)
-   //This is used to check if the user is logged in or not => to check if a popup should be shown
-   // This useeffect is in the right 
-   //TODO: We need a global statemanagement for the user. => Type already created: AuthUser.ts 
-   useEffect(() => {
+      useEffect(() => {
         console.log("useEffect on CartPage called");
         const auth = getAuth();
         const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -30,10 +25,6 @@ const CartPage: React.FC = () => {
         });
         return unsubscribe;
     }, []);
-
-
-
-
     
     const handleProceedToCheckout = () => {
         console.log("handleProceedToCheckout called");

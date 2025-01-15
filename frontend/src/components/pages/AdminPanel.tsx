@@ -8,8 +8,9 @@ import { FaEdit, FaTrash, FaSave } from "react-icons/fa";
 import "react-toastify/dist/ReactToastify.css";
 import { useAdmin } from "../../context/AdminContext";
 import {getCollectionData} from "../../services/firebase/firestoreService";
-import {db, storage} from "../../services/firebase/firebaseConfig";
-import {orderBy, query, collection, getDocs} from "firebase/firestore";
+import {db} from "../../services/firebase/firebaseConfig";
+import {orderBy} from "firebase/firestore";
+
 
 
 
@@ -20,20 +21,13 @@ const AdminPanel:React.FC<{ }> = ({}) => {
    const { authUser} = useAuth();
 
 
-   //TODO: Check what's needed and whats not! 
     const [editingProductId, setEditingProductId] = useState<string | null>(null);
     const [categories, setCategories] = useState<Category[]>([]);
-    const [description, setDescription] = useState("");
-    const [keywords, setKeywords] = useState<string[]>([]);
-    const [isFormOpen, setIsFormOpen] = useState(false);
     const [priceInput, setPriceInput] = useState<string>("");
     const [isAddingNewCategory, setIsAddingNewCategory] = useState(false);
     const navigate = useNavigate();
 
 
-
-    //TODO: Category Handler.... => Use Global State (category) in the Product Context
-    //TODO: WHAT TO DO WITH THIS??????
     useEffect(() => {            
             const fetchProducts = async () => {
                 try {
@@ -47,12 +41,12 @@ const AdminPanel:React.FC<{ }> = ({}) => {
                     console.error("Error fetching products:", error);
                 }
             };
-            //FIXME: Use Global State (product)
-            const fetchCategories = async () => {
+       
+                 const fetchCategories = async () => {
 
                 const products = await getCollectionData<Category>("categories", [
                     orderBy("name", "asc"),                
-                ]);                 
+                ]);               
 
                 setCategories(products);
             };
@@ -408,7 +402,3 @@ const AdminPanel:React.FC<{ }> = ({}) => {
 };
 
 export default AdminPanel;
-
-function setCategories(arg0: (prevCategories: any) => any) {
-    throw new Error("Function not implemented.");
-}
