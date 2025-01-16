@@ -2,9 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import Modal from "../shared/Modal";
-import { collection, addDoc, doc, getDoc } from "firebase/firestore";
-import { auth, db } from "../../services/firebase/firebaseConfig";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { collection, addDoc } from "firebase/firestore";
+import { db } from "../../services/firebase/firebaseConfig";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
@@ -42,8 +41,7 @@ const CheckoutPage: React.FC = () => {
     }, [authUser]);
 
     const fetchUserDetails = async (userId: string) => {
-        try {
-
+        try {            
             setEmail(authUser?.userName || "Keine E-Mail verfügbar");
             const fullAddress = `${authUser?.street || ""} ${authUser?.houseNumber || ""}, ${authUser?.zip || ""} ${authUser?.city || ""}`;
             setDeliveryAddress(fullAddress);
@@ -51,7 +49,6 @@ const CheckoutPage: React.FC = () => {
             setName(authUser?.name || "");
             setSurname(authUser?.surname || "");
             localStorage.setItem("userDetails", JSON.stringify({ name: authUser?.name, surname: authUser?.surname, deliveryAddress: fullAddress }));
-
         } catch (error) {
             console.error("Error fetching user details:", error);
         }
@@ -90,7 +87,11 @@ const CheckoutPage: React.FC = () => {
                 userId: authUser?.id || "guest",
             };
 
+            
             await addDoc(collection(db, "orders"), order);
+
+
+
             await clearCart();
             localStorage.removeItem("userDetails");
 

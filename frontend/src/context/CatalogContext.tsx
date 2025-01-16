@@ -13,18 +13,26 @@ import React, {createContext, useContext, useState, useCallback, ReactNode,} fro
     productsLoading: boolean;
     categoriesError: string | null;
     productsError: string | null;  
-    fetchCategories: () => void;
-    fetchProducts: (categoryId: string | null) => void;
+    fetchCategories: () =>  Promise<void>;
+    fetchProducts: (categoryId: string | null) => Promise<void>;
+    setProducts: React.Dispatch<React.SetStateAction<Product[]>>; 
+    setCategories: React.Dispatch<React.SetStateAction<Category[]>>; 
+
+
   }
   
   const CatalogContext = createContext<CatalogContextType | undefined>(undefined);
   
   export const CatalogProvider: React.FC<{ children: ReactNode }> = ({ children,}) => {
  
+
+
+    //_________________________________________Categories______________________________________________//
     const [categories, setCategories] = useState<Category[]>([]);
     const [categoriesLoading, setCategoriesLoading] = useState<boolean>(false);
     const [categoriesError, setCategoriesError] = useState<string | null>(null);
-  
+
+
     const fetchCategories = useCallback(async () => {
       setCategoriesLoading(true);
       setCategoriesError(null);
@@ -38,19 +46,20 @@ import React, {createContext, useContext, useState, useCallback, ReactNode,} fro
       } finally {
         setCategoriesLoading(false);
       }
-    }, []);
+    }, []); //TODO: ON what should my function depend? 
   
-
+    //_________________________________________Product______________________________________________//
+  
     const [products, setProducts] = useState<Product[]>([]);
     const [productsLoading, setProductsLoading] = useState<boolean>(false);
-    const [productsError, setProductsError] = useState<string | null>(null);
-  
+    const [productsError, setProductsError] = useState<string | null>(null); 
+
+
     const fetchProducts = useCallback(async (categoryId: string | null) => {
       setProductsLoading(true);
       setProductsError(null);
   
       try {
-        // If categoryId is given, apply a Firestore where constraint
         const constraints = categoryId ? [where("categoryId", "==", categoryId)] : []; 
         const fetchedProducts = await getCollectionData<Product>(
           "products",
@@ -64,7 +73,31 @@ import React, {createContext, useContext, useState, useCallback, ReactNode,} fro
       } finally {
         setProductsLoading(false);
       }
-    }, []);
+    }, []); //TODO: ON what should my function depend? 
+
+    /* OLD
+    const fetchProducts = useCallback(async (categoryId: string | null) => {
+      setProductsLoading(true);
+      setProductsError(null);
+  
+      try {
+        console.log("Fetching products for category:", categoryId);
+        const constraints = categoryId ? [where("categoryId", "==", categoryId)] : []; 
+        const fetchedProducts = await getCollectionData<Product>(
+          "products",
+          constraints
+        );
+  
+        setProducts(fetchedProducts);
+      } catch (error: any) {
+        console.error("Error fetching products:", error);
+        setProductsError("Failed to load products. Please try again.");
+      } finally {
+        setProductsLoading(false);
+      }
+    }, []); //TODO: ON what should my function depend? */
+
+   
   
   
     return (
@@ -72,7 +105,9 @@ import React, {createContext, useContext, useState, useCallback, ReactNode,} fro
         categoriesError,
         productsError,    
         fetchCategories,
-        fetchProducts,}}>
+        fetchProducts,
+        setProducts,
+        setCategories,}}>
         {children}
       </CatalogContext.Provider>
     );

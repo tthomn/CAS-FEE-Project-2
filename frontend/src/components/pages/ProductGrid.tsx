@@ -10,7 +10,11 @@ const ProductGrid: React.FC<ProductGridProps> = ({ categoryId }) => {
   const {fetchProducts, products,productsLoading,productsError,} = useCatalog();
 
   // Fetch products whenever categoryId changes
+  //TODO: When??
+  // 
+  
   useEffect(() => {
+    console.log("Fetching products: PRODUCT GRID", categoryId);
     fetchProducts(categoryId);
   }, [categoryId, fetchProducts]);
 
@@ -50,8 +54,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({ categoryId }) => {
           className="no-underline text-inherit"
         >
           <div className="border border-gray-300 rounded-lg shadow hover:shadow-lg transition-shadow p-6 flex flex-col items-center text-center">
-            <picture>
-      
+            <picture>      
               <source
                 srcSet={`${product.imageUrl}?alt=media&format=webp`}
                 type="image/webp"

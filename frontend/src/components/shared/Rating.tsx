@@ -24,6 +24,8 @@ const Rating: React.FC<RatingProps> = ({ productId, initialRating, ratingCount }
             if (!user) return;
 
             try {
+                
+                
                 const ratingsQuery = query(
                     collection(db, "ratings"),
                     where("userId", "==", user.uid),
@@ -55,6 +57,7 @@ const Rating: React.FC<RatingProps> = ({ productId, initialRating, ratingCount }
         if (!user || selectedRating === 0) return;
 
         try {
+            
             const productRef = doc(db, "products", productId);
             const productDoc = await getDoc(productRef);
 

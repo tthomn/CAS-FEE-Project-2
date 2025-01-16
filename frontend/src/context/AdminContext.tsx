@@ -1,8 +1,8 @@
 import React, { useState,  createContext, ReactNode, useContext } from "react";
 import { Product } from "../types/product";
 import {getFirestore,doc,} from "firebase/firestore"; 
-import {uploadImageToStorage,  deleteFileFromStorage, addDocToCollection, getCollectionData, deleteDocByRef, getDocRefsBy1Condition, updateDocByRef } from "../services/firebase/firestoreService";
-
+import {uploadImageToStorage,  deleteFileFromStorage, addDocToCollection, deleteDocByRef, getDocRefsBy1Condition, updateDocByRef } from "../services/firebase/firestoreService";
+import {useCatalog} from "./CatalogContext";
 
 interface AdminContextType
 {
@@ -12,8 +12,6 @@ interface AdminContextType
     errorMessage: string; 
     setNewProduct: React.Dispatch<React.SetStateAction<Omit<Product, "id">>>;
     newProduct: Omit<Product, "id">;
-    setProducts: React.Dispatch<React.SetStateAction<Product[]>>;
-    products: Product[];
     deleteProduct: (id: string, imageUrl: string) => void;
     updateProduct: (id: string, updatedData: Partial<Product>) => void;
     addCategory: (categoryName: string) => Promise<string>;
@@ -28,12 +26,13 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   const [uploadingImage, setUploadingImage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [products, setProducts] = useState<Product[]>([]);
   const [newCategoryName, setNewCategoryName] = useState<string>("");
   const [isImageUploaded, setIsImageUploaded] = useState(false);
+  const { fetchProducts} = useCatalog();
 
   const db = getFirestore();
 
+  //FIXME: Is this correct here? 
   const [newProduct, setNewProduct] = useState<Omit<Product, "id">>({
     name: "",
     price: 0,
@@ -46,6 +45,7 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     ratings: { totalRating: 0, ratingCount: 0 },
   });
      
+
       const handleImageUpload = async (file: File) => {
         setUploadingImage(true);
         setErrorMessage("");
@@ -61,13 +61,10 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           setUploadingImage(false);
         }
       };
-  
-   
+     
    
         const addProduct = async () => {
-          setErrorMessage("");
-
-      
+          setErrorMessage("");      
             if (!isImageUploaded) {
               setErrorMessage("Please wait until the image is uploaded.");
               return;
@@ -85,8 +82,7 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           }
 
           try {
-            
-            await addDocToCollection("products", newProduct);
+              await addDocToCollection("products", newProduct);
             setNewProduct((prev) => ({
               ...prev,
               name: "",
@@ -97,11 +93,10 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
               description: "",
               keywords: [],
               categoryId: "",
-            }));
-
-            const products = await getCollectionData<Product>("products");
-            setProducts(products); 
+            }));    
             setIsImageUploaded(false);  
+            await fetchProducts(null);             
+            
           } catch (error) {
             console.error("Error adding product:", error);
             setErrorMessage("Failed to add product. Please try again.");
@@ -113,7 +108,7 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
                 await deleteFileFromStorage(imageUrl);
                 const productRef = doc(db, "products", id); 
                 await deleteDocByRef(productRef);     
-                setProducts(products.filter((product) => product.id !== id));       
+               await fetchProducts(null);   
                           
             } catch (error) {
                 console.error("Error deleting product:", error);
@@ -124,17 +119,12 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         const updateProduct = async (id: string, updatedData: Partial<Product>) => {
             try {                   
                const docRefComplete = await getDocRefsBy1Condition("products", "id", "==", id);  
-                await updateDocByRef(docRefComplete[0], updatedData);
-
-                const updatedProducts = products.map((product) =>
-                    product.id === id ? { ...product, ...updatedData } : product
-                );
-                setProducts(updatedProducts);
+                await updateDocByRef(docRefComplete[0], updatedData);      
+               await fetchProducts(null); 
             } catch (error) {
                 console.error("Error updating product:", error);
             }
         };
-
 
 
     const addCategory = async (categoryName: string): Promise<string> => {
@@ -142,6 +132,7 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
             const categoryDocRef = await addDocToCollection("categories", {name: categoryName, description: categoryName});
             setNewCategoryName("");
             setErrorMessage("");
+
             return categoryDocRef;
  
         } catch (error) {
@@ -160,8 +151,6 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
             setNewProduct,
             newProduct,
             addProduct,
-            setProducts,
-            products,
             deleteProduct,
             updateProduct,
             addCategory,

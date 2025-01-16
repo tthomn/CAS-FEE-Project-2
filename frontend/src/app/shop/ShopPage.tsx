@@ -15,7 +15,7 @@ const ShopPage: React.FC = () => {
   // Fetch categories once when the page loads TODO:??
   useEffect(() => {
     fetchCategories();
-  }, [fetchCategories]);
+  }, [fetchCategories, ]);
 
   if (categoriesLoading) {
     return <p className="text-center">Loading categories...</p>;

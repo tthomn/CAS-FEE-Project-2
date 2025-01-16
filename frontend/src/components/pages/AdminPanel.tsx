@@ -10,50 +10,30 @@ import { useAdmin } from "../../context/AdminContext";
 import {getCollectionData} from "../../services/firebase/firestoreService";
 import {db} from "../../services/firebase/firebaseConfig";
 import {orderBy} from "firebase/firestore";
+import { useCatalog } from "../../context/CatalogContext";
 
-
-
-
-const AdminPanel:React.FC<{ }> = ({}) => {
+const AdminPanel:React.FC<{}> = ({}) => {
     
    //From Admin Context
-   const {handleImageUpload, uploadingImage, errorMessage,setNewProduct, newProduct, addProduct, setProducts, products, deleteProduct, updateProduct, addCategory, newCategoryName, setNewCategoryName } = useAdmin();
+   const {handleImageUpload, uploadingImage, errorMessage,setNewProduct, newProduct, addProduct,  deleteProduct, updateProduct, addCategory, newCategoryName, setNewCategoryName } = useAdmin();
    const { authUser} = useAuth();
+   const {products, categories, fetchProducts, fetchCategories, setProducts, setCategories} = useCatalog();
+   const [editingProductId, setEditingProductId] = useState<string | null>(null);
+   const [priceInput, setPriceInput] = useState<string>("");
+   const [isAddingNewCategory, setIsAddingNewCategory] = useState(false);
+   const navigate = useNavigate();
 
-
-    const [editingProductId, setEditingProductId] = useState<string | null>(null);
-    const [categories, setCategories] = useState<Category[]>([]);
-    const [priceInput, setPriceInput] = useState<string>("");
-    const [isAddingNewCategory, setIsAddingNewCategory] = useState(false);
-    const navigate = useNavigate();
-
-
-    useEffect(() => {            
-            const fetchProducts = async () => {
-                try {
-
-                    const products = await getCollectionData<Product>("products", [
-                        orderBy("name", "asc"),                   
-                    ]);                          
-                       setProducts(products);
-
-                } catch (error) {
-                    console.error("Error fetching products:", error);
-                }
-            };
-       
-                 const fetchCategories = async () => {
-
-                const products = await getCollectionData<Category>("categories", [
-                    orderBy("name", "asc"),                
-                ]);               
-
-                setCategories(products);
-            };
-            fetchProducts();
-            fetchCategories();
-    }, [db]);
-
+   useEffect(() => {
+    console.log("AdminPanel: useEffect: fetchProducts, fetchCategories");
+    if (products.length === 0)
+    {
+       fetchProducts(null);
+    }
+    if (categories.length === 0)
+    {
+       fetchCategories();
+    }
+    }, [fetchProducts, fetchCategories]);
 
 
     if (authUser?.authType !== "admin") {
