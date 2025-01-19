@@ -3,6 +3,7 @@ import { Product } from "../types/product";
 import {getFirestore,doc,} from "firebase/firestore"; 
 import {uploadImageToStorage,  deleteFileFromStorage, addDocToCollection, deleteDocByRef, getDocRefsBy1Condition, updateDocByRef } from "../services/firebase/firestoreService";
 import {useProduct} from "./ProductContext";
+import {toast} from "react-toastify";
 
 interface AdminContextType
 {
@@ -93,8 +94,9 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
               categoryId: "",
             }));    
             setIsImageUploaded(false);  
-            await fetchProducts(null);             
-            
+            await fetchProducts(null);
+
+            toast.success("Product added successfully!");
           } catch (error) {
             console.error("Error adding product:", error);
             setErrorMessage("Failed to add product. Please try again.");

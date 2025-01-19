@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useAdmin } from "../../context/AdminContext";
 import { useProduct} from "../../context/ProductContext";
 import {useCategories} from "../../context/CategoryContext";
+import {toast} from "react-toastify";
 
 
 const AdminPanel:React.FC<{}> = ({}) => {
@@ -18,6 +19,8 @@ const AdminPanel:React.FC<{}> = ({}) => {
    const [priceInput, setPriceInput] = useState<string>("");
    const [isAddingNewCategory, setIsAddingNewCategory] = useState(false);
    const navigate = useNavigate();
+   const [validationErrors, setValidationErrors] = useState<{ [key: string]: string }>({});
+   const [isAdding, setIsAdding] = useState(false);
    
    
    const {categories, setCategories, fetchCategories} = useCategories();
@@ -29,6 +32,42 @@ const AdminPanel:React.FC<{}> = ({}) => {
        fetchCategories();
 
     }, [fetchProducts, fetchCategories]);
+
+    const validateNewProduct = () => {
+        const errors: { [key: string]: string } = {};
+
+        if (!newProduct.name.trim()) {
+            errors.name = "Product name is required.";
+        }
+        if (!newProduct.price || newProduct.price <= 0) {
+            errors.price = "Price must be greater than 0.";
+        }
+        if (newProduct.stock < 0) {
+            errors.stock = "Stock cannot be negative.";
+        }
+        if (!newProduct.categoryId) {
+            errors.categoryId = "Category is required.";
+        }
+
+        setValidationErrors(errors);
+
+        return Object.keys(errors).length === 0;
+    };
+
+    const handleAddProduct = async () => {
+        if (validateNewProduct()) {
+            setIsAdding(true);
+            try {
+                await addProduct();
+                setValidationErrors({});
+            } catch (error) {
+                console.error("Error adding product:", error);
+                toast.error("Failed to add product. Please try again.");
+            } finally {
+                setIsAdding(false);
+            }
+        }
+    };
 
 
     if (authUser?.authType !== "admin") {
@@ -62,18 +101,28 @@ const AdminPanel:React.FC<{}> = ({}) => {
                             type="text"
                             placeholder="Enter the product name"
                             value={newProduct.name}
-                            onChange={(e) =>
-                                setNewProduct({ ...newProduct, name: e.target.value })
-                            }
+                            onChange={(e) => {
+                                setNewProduct({ ...newProduct, name: e.target.value });
+                                // Clear the error if the input is no longer empty
+                                if (e.target.value.trim()) {
+                                    setValidationErrors((prev) => {
+                                        const { name, ...rest } = prev;
+                                        return rest;
+                                    });
+                                }
+                            }}
                             className="border rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
                         />
+                        {validationErrors.name && (
+                            <p className="text-red-500 text-sm mt-1">{validationErrors.name}</p>
+                        )}
                     </div>
                     <div>
                         <label className="block font-semibold mb-1 text-gray-600">Price (CHF)</label>
                         <input
                             type="text"
                             placeholder="Enter the price"
-                            value={priceInput}
+                            value={newProduct.price !== undefined ? newProduct.price : ""}
                             onChange={(e) => {
                                 const value = e.target.value;
 
@@ -81,6 +130,13 @@ const AdminPanel:React.FC<{}> = ({}) => {
                                 if (/^\d*\.?\d{0,2}$/.test(value)) {
                                     setPriceInput(value);  // Set as string during typing
                                     setNewProduct({ ...newProduct, price: parseFloat(value) || 0 });
+                                }
+
+                                if (parseFloat(value) > 0) {
+                                    setValidationErrors((prev) => {
+                                        const { price, ...rest } = prev;
+                                        return rest;
+                                    });
                                 }
                             }}
                             onBlur={() => {
@@ -94,6 +150,9 @@ const AdminPanel:React.FC<{}> = ({}) => {
                             }}
                             className="border rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
                         />
+                        {validationErrors.price && (
+                            <p className="text-red-500 text-sm mt-1">{validationErrors.price}</p>
+                        )}
                     </div>
                     <div className="sm:col-span-1">
                         <label className="block font-semibold mb-1 text-gray-600">Stock</label>
@@ -123,6 +182,11 @@ const AdminPanel:React.FC<{}> = ({}) => {
                                 />
                                 <button
                                     onClick={async () => {
+                                        if (categories.some((cat) => cat.name.toLowerCase() === newCategoryName.trim().toLowerCase())) {
+                                            toast.error("Category already exists!", { autoClose: 2000 });
+                                            return;
+                                        }
+
                                         if (newCategoryName.trim()) {
                                             const newCategoryId = await addCategory(newCategoryName.trim());
                                             const newCategory = { id: newCategoryId, name: newCategoryName.trim() };
@@ -136,6 +200,12 @@ const AdminPanel:React.FC<{}> = ({}) => {
                                             });
 
                                             setNewProduct({ ...newProduct, categoryId: newCategoryId });
+
+                                            setValidationErrors((prev) => {
+                                                const { categoryId, ...rest } = prev;
+                                                return rest;
+                                            });
+
                                             setNewCategoryName("");
                                             setIsAddingNewCategory(false);
                                         }
@@ -158,10 +228,21 @@ const AdminPanel:React.FC<{}> = ({}) => {
                             <select
                                 value={newProduct.categoryId}
                                 onChange={(e) => {
-                                    if (e.target.value === "add-new-category") {
+                                    const selectedValue = e.target.value;
+
+                                    if (selectedValue === "add-new-category") {
                                         setIsAddingNewCategory(true); // Show input for new category
                                     } else {
-                                        setNewProduct({ ...newProduct, categoryId: e.target.value });
+                                        // Update the newProduct state with the selected category ID
+                                        setNewProduct({ ...newProduct, categoryId: selectedValue });
+
+                                        // Clear the error if a valid category is selected
+                                        if (selectedValue) {
+                                            setValidationErrors((prev) => {
+                                                const { categoryId, ...rest } = prev; // Remove the 'categoryId' error
+                                                return rest;
+                                            });
+                                        }
                                     }
                                 }}
                                 className="border rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
@@ -176,6 +257,9 @@ const AdminPanel:React.FC<{}> = ({}) => {
                                     + Add New Category
                                 </option>
                             </select>
+                        )}
+                        {validationErrors.categoryId && (
+                            <p className="text-red-500 text-sm mt-1">{validationErrors.categoryId}</p>
                         )}
                     </div>
 
@@ -220,9 +304,16 @@ const AdminPanel:React.FC<{}> = ({}) => {
                         />
                     </div>
                 </div>
-                <button onClick={addProduct} className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg px-6 py-2 mt-6 transition duration-300">
-                    Add Product
+                <button
+                    onClick={handleAddProduct}
+                    disabled={isAdding}
+                    className={`bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg px-6 py-2 mt-6 transition duration-300 ${
+                        isAdding ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                >
+                    {isAdding ? "Adding Product..." : "Add Product"}
                 </button>
+
             </div>
 
             {/* Product List */}

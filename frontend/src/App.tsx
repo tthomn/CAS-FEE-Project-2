@@ -21,6 +21,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { AdminProvider } from "./context/AdminContext";
 import { ProductProvider } from "./context/ProductContext";  
 import {CategoriesProvider} from "./context/CategoryContext";
+import {ToastContainer} from "react-toastify";
 
 
 const App: React.FC = () => {
@@ -33,6 +34,7 @@ const App: React.FC = () => {
       <ProductProvider> 
         <Router>
           <div className="relative min-h-screen">
+            <ToastContainer />
             <Header />
             <Routes>
               <Route
