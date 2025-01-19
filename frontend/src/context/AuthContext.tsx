@@ -1,11 +1,8 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut,createUserWithEmailAndPassword,sendEmailVerification,sendPasswordResetEmail,User, Auth} from "firebase/auth";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
-
-
 import {AuthUser} from "../types/authUser";
 import { getDocRefsBy1Condition,getDocDataBy1Condition } from "../services/firebase/firestoreService";
-
 
 
 //FIXME: i think this is not needed anymore! 
@@ -143,9 +140,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
-            //TODO: Here i need update my DB with the user data inclusive the aditionalData 
-            //TODO: Define User Role (Admin?) ==> Default User is the Standard 
-
             if (additionalData) {
              
                 await setDoc(doc(db, "users", user.uid), {

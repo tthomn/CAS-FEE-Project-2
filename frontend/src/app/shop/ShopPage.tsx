@@ -8,8 +8,6 @@ import {useCategories} from "../../context/CategoryContext";
 const ShopPage: React.FC = () => {
 
   console.log("Shoppage rendered");
-
-
    const {categories,fetchCategories } = useCategories();
 
   const [categoriesLoading, setCategoriesLoading] = useState<boolean>(false);

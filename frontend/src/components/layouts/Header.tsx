@@ -41,7 +41,7 @@ const Header: React.FC = () => {
                             {[
                                 { to: "/", label: "Home" },
                                 { to: "/shop", label: "Shop" },
-                                { to: "/recipe", label: "Rezepte" },
+                                { to: "/recipe", label: "Recipes" },
                                 { to: "/account", label: "Account" },
                             ].map(({ to, label }) => (
                                 <NavLink
@@ -62,7 +62,7 @@ const Header: React.FC = () => {
                     {[
                         { to: "/", label: "Home" },
                         { to: "/shop", label: "Shop" },
-                        { to: "/recipe", label: "Rezepte" },
+                        { to: "/recipe", label: "Recipes" },
                         { to: "/account", label: "Account" },
                     ].map(({ to, label }) => (
                         <NavLink

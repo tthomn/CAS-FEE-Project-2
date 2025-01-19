@@ -5,6 +5,8 @@ import Modal from "../shared/Modal";
 import {addDocToCollection} from "../../services/firebase/firestoreService";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import emailjs from "@emailjs/browser";
+
 
 const CheckoutPage: React.FC = () => {
     const { cartItems, clearCart } = useCart();
@@ -67,6 +69,36 @@ const CheckoutPage: React.FC = () => {
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
+    const sendInvoiceEmail = async (order: any, orderId: string) => {
+        const emailParams = {
+            to_name: email,
+            to_email: email,
+            order_id: orderId,
+            delivery_address: order.deliveryAddress,
+            billing_address: order.billingAddress,
+            total_price: order.totalPrice.toFixed(2),
+            items: order.cartItems
+                .map(
+                    (item: any) =>
+                        `${item.productName} (x${item.quantity}): CHF ${(item.price * item.quantity).toFixed(2)}`
+                )
+                .join("\n"),
+        };
+        console.log("Email parameters being sent to EmailJS:", JSON.stringify(emailParams, null, 2));
+        try {
+            await emailjs.send(
+                "service_ua1imoh",
+                "template_qdffusf",
+                emailParams,
+                "LhmWwd3pEmYkAMNKW"
+            );
+            console.log("Invoice email sent successfully!");
+        } catch (error: any) {
+            console.error("Error sending invoice email:", error?.text || error);
+            throw new Error("Failed to send email. Please check the logs for details.");
+        }
+    };
+
 
     const handlePlaceOrder = async () => {
         if (!validateForm()) return;
@@ -87,8 +119,8 @@ const CheckoutPage: React.FC = () => {
             };
 
             
-           // await addDoc(collection(db, "orders"), order);
-            await addDocToCollection("orders", order);
+            const docRef = await addDocToCollection("orders", order);
+            await sendInvoiceEmail(order, docRef);
 
             await clearCart();
             localStorage.removeItem("userDetails");
@@ -116,14 +148,14 @@ const CheckoutPage: React.FC = () => {
 
     return (
         <div className="px-4 py-6 max-w-4xl mx-auto">
-            <h1 className="text-2xl font-bold text-gray-800 text-center mb-6">Versand und Rechnung</h1>
+            <h1 className="text-2xl font-bold text-gray-800 text-center mb-6">Shipping and invoice</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <h2 className="text-lg font-bold mb-4">Persönliche Daten</h2>
+                    <h2 className="text-lg font-bold mb-4">Personal Data</h2>
                     <div className="block mb-4">
-                        <strong>Vorname:</strong>
+                        <strong>First name:</strong>
                         {!isEditing ? (
-                            <p>{name || "Keine Angabe"}</p>
+                            <p>{name || "Not specified"}</p>
                         ) : (
                             <input
                                 type="text"
@@ -136,9 +168,9 @@ const CheckoutPage: React.FC = () => {
                         {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
                     </div>
                     <div className="block mb-4">
-                        <strong>Nachname:</strong>
+                        <strong>Last name:</strong>
                         {!isEditing ? (
-                            <p>{surname || "Keine Angabe"}</p>
+                            <p>{surname || "Not specified"}</p>
                         ) : (
                             <input
                                 type="text"
@@ -155,7 +187,7 @@ const CheckoutPage: React.FC = () => {
                     {/*    <p>{email || "Keine E-Mail verfügbar"}</p>*/}
                     {/*</div>*/}
                     <div className="block mb-4">
-                        <strong>Lieferadresse:</strong>
+                        <strong>Delivery address:</strong>
                         {!isEditing ? (
                             <p>{deliveryAddress || "Keine Angabe"}</p>
                         ) : (
@@ -178,7 +210,7 @@ const CheckoutPage: React.FC = () => {
                                 }}
                                 className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
                             >
-                                Daten bearbeiten
+                            Edit data
                             </button>
                         ) : (
                             <>
@@ -199,7 +231,7 @@ const CheckoutPage: React.FC = () => {
                     </div>
                 </div>
                 <div>
-                    <h2 className="text-lg font-bold mb-4">Zusammenfassung</h2>
+                    <h2 className="text-lg font-bold mb-4">Summary</h2>
                     <ul className="mb-4">
                         {cartItems.map((item) => (
                             <li key={item.id} className="flex justify-between mb-4">
@@ -212,11 +244,11 @@ const CheckoutPage: React.FC = () => {
                     </ul>
                     <div className="flex flex-col gap-4">
                         <div className="flex justify-between">
-                            <span>Zwischensumme</span>
+                            <span>Cost without shipping</span>
                             <span>CHF {totalPrice.toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between">
-                            <span>Versand</span>
+                            <span>Shipment</span>
                             <span>CHF {shippingFee.toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between font-bold">
@@ -231,7 +263,7 @@ const CheckoutPage: React.FC = () => {
                     to="/cart"
                     className="px-6 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition"
                 >
-                    Zurück zum Warenkorb
+                Back to the shopping cart
                 </Link>
                 <button
                     className={`px-6 py-2 bg-red-500 text-white rounded ${
@@ -240,7 +272,7 @@ const CheckoutPage: React.FC = () => {
                     onClick={handlePlaceOrder}
                     disabled={isLoading}
                 >
-                    {isLoading ? "Processing..." : "Bestellung abschliessen"}
+                    {isLoading ? "Processing..." : "Complete order"}
                 </button>
             </div>
 

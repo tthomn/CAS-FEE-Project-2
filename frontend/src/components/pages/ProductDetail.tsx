@@ -165,7 +165,7 @@ const ProductDetail: React.FC = () => {
                         onClick={handleAddToCart}
                         className="bg-blue-600 text-white px-8 py-3 text-lg font-semibold rounded hover:bg-blue-700 transition duration-200 shadow-md"
                     >
-                        In den Warenkorb
+                    Add to Cart
                     </button>
                 </div>
             </div>

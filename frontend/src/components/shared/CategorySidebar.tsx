@@ -19,7 +19,7 @@ const CategorySidebar: React.FC<CategorySidebarProps> = ({
                                                          }) => {
     return (
         <div className="p-2 sm:p-4">
-            <h3 className="mb-2 sm:mb-4 text-base sm:text-lg font-bold">Kategorien</h3>
+            <h3 className="mb-2 sm:mb-4 text-base sm:text-lg font-bold">Categories</h3>
             <ul className="list-none p-0">
                 <li className="mb-2">
                     <Link
@@ -29,7 +29,7 @@ const CategorySidebar: React.FC<CategorySidebarProps> = ({
                         }`}
                         onClick={() => onSelectCategory(null, "Shop")}
                     >
-                        Alle Kategorien
+                    All categories
                     </Link>
                 </li>
                 {categories.map((category) => (

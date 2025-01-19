@@ -1,7 +1,8 @@
 import { initializeApp } from "firebase/app";
-import { initializeFirestore, persistentLocalCache, } from "firebase/firestore";
+import { initializeFirestore,persistentLocalCache } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 import { getAuth } from "firebase/auth";
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyCP9lOYtFmXN4uVAyk11JkkOaBqWO0pklo",
@@ -14,9 +15,8 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-// Enable persistent cache for Firestore
 const db = initializeFirestore(app, {
-  localCache: persistentLocalCache(), // IndexedDB for offline caching
+  localCache: persistentLocalCache()
 });
 
 const storage = getStorage(app);

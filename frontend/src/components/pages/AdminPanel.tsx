@@ -20,12 +20,15 @@ const AdminPanel:React.FC<{}> = ({}) => {
    const navigate = useNavigate();
    
    
-   const {categories, setCategories,} = useCategories();
+   const {categories, setCategories, fetchCategories} = useCategories();
    
 
    useEffect(() => {
+    console.log("!!!!!!!!!!!!!!!!!!AdminPanel:useEffect:fetchProducts!!!!!!!!!!!!!!!");
        fetchProducts(null);  
-    }, [fetchProducts]);
+       fetchCategories();
+
+    }, [fetchProducts, fetchCategories]);
 
 
     if (authUser?.authType !== "admin") {

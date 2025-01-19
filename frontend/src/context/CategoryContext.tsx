@@ -12,13 +12,18 @@ const CategoriesContext = createContext<CategoriesContextType | undefined>(undef
 
 export const CategoriesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [categories, setCategories] = useState<Category[]>([]);
-
-
      
-   const fetchCategories = useCallback(async () => {
-    const fetchedCategories = await getCollectionData<Category>("categories");
-    setCategories(fetchedCategories);
-  }, []);
+
+
+  const fetchCategories = useCallback(async () => {
+    try {
+        const fetchedCategories = await getCollectionData<Category>("categories");
+        setCategories(fetchedCategories);
+    } catch (error) {
+        console.error('Error fetching categories:', error);
+        setCategories([]); // Optionally, reset categories to an empty array.
+    }
+}, []);
 
   const value = useMemo(() => ({
     categories,

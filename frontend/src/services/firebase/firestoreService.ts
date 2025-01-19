@@ -1,4 +1,3 @@
-// src/services/firebase/firestoreService.ts
 import {db, storage} from "./firebaseConfig";
 import {collection, getDocs, addDoc, deleteDoc,  query, where, updateDoc, DocumentReference,DocumentData, Timestamp , QueryConstraint, orderBy } from 'firebase/firestore';
 import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject  } from "firebase/storage";
@@ -75,11 +74,12 @@ export async function getCollectionData<T>( collectionName: string, constraints:
  */
 export async function addDocToCollection<T>(collectionName: string, payload: T): Promise<string> {
     try {
-        // Add a timestamp to the payload for consistency if needed
         const enrichedPayload = {
             ...payload,
             addedAt: Timestamp.now(),
         };
+        console.log("Enriched payload =>", enrichedPayload); // Add this line
+
         const docRef = await addDoc(collection(db, collectionName), enrichedPayload);
         return docRef.id; 
     } catch (error) {

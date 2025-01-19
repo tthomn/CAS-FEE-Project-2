@@ -27,7 +27,7 @@ const App: React.FC = () => {
   return (
 
     <AuthProvider>
-          <CartProvider>
+       <CartProvider>
     <CategoriesProvider> 
 
       <ProductProvider> 

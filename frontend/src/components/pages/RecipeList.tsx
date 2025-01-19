@@ -24,7 +24,7 @@ const RecipeList: React.FC = () => {
                     loading="eager"
                 />
                 <h2 className="absolute inset-0 flex items-center justify-center text-4xl font-bold text-white uppercase">
-                    REZEPTE
+                   Recipes
                 </h2>
             </div>
 
