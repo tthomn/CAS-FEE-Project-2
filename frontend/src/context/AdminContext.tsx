@@ -2,7 +2,7 @@ import React, { useState,  createContext, ReactNode, useContext } from "react";
 import { Product } from "../types/product";
 import {getFirestore,doc,} from "firebase/firestore"; 
 import {uploadImageToStorage,  deleteFileFromStorage, addDocToCollection, deleteDocByRef, getDocRefsBy1Condition, updateDocByRef } from "../services/firebase/firestoreService";
-import {useCatalog} from "./CatalogContext";
+import {useProduct} from "./ProductContext";
 
 interface AdminContextType
 {
@@ -28,11 +28,10 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const [errorMessage, setErrorMessage] = useState("");
   const [newCategoryName, setNewCategoryName] = useState<string>("");
   const [isImageUploaded, setIsImageUploaded] = useState(false);
-  const { fetchProducts} = useCatalog();
+  const { fetchProducts} = useProduct();
 
   const db = getFirestore();
 
-  //FIXME: Is this correct here? 
   const [newProduct, setNewProduct] = useState<Omit<Product, "id">>({
     name: "",
     price: 0,
@@ -61,8 +60,7 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           setUploadingImage(false);
         }
       };
-     
-   
+        
         const addProduct = async () => {
           setErrorMessage("");      
             if (!isImageUploaded) {

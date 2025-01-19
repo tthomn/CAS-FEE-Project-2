@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import Modal from "../shared/Modal";
-import { collection, addDoc } from "firebase/firestore";
-import { db } from "../../services/firebase/firebaseConfig";
+import {addDocToCollection} from "../../services/firebase/firestoreService";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
@@ -88,13 +87,11 @@ const CheckoutPage: React.FC = () => {
             };
 
             
-            await addDoc(collection(db, "orders"), order);
-
-
+           // await addDoc(collection(db, "orders"), order);
+            await addDocToCollection("orders", order);
 
             await clearCart();
             localStorage.removeItem("userDetails");
-
 
             setIsModalOpen(true);
         } catch (error) {

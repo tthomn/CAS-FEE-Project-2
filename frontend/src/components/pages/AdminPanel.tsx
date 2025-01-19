@@ -1,39 +1,31 @@
-import React, { useState, useEffect, ReactNode } from "react"; 
-import { Product } from "../../types/product"; 
+import React, { useState, useEffect } from "react"; 
 import {useAuth} from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import Footer from "../layouts/Footer";
-import {Category} from "../../types/category";
 import { FaEdit, FaTrash, FaSave } from "react-icons/fa";
 import "react-toastify/dist/ReactToastify.css";
 import { useAdmin } from "../../context/AdminContext";
-import {getCollectionData} from "../../services/firebase/firestoreService";
-import {db} from "../../services/firebase/firebaseConfig";
-import {orderBy} from "firebase/firestore";
-import { useCatalog } from "../../context/CatalogContext";
+import { useProduct} from "../../context/ProductContext";
+import {useCategories} from "../../context/CategoryContext";
+
 
 const AdminPanel:React.FC<{}> = ({}) => {
     
    //From Admin Context
    const {handleImageUpload, uploadingImage, errorMessage,setNewProduct, newProduct, addProduct,  deleteProduct, updateProduct, addCategory, newCategoryName, setNewCategoryName } = useAdmin();
    const { authUser} = useAuth();
-   const {products, categories, fetchProducts, fetchCategories, setProducts, setCategories} = useCatalog();
+   const {products,   setProducts, fetchProducts} = useProduct();
    const [editingProductId, setEditingProductId] = useState<string | null>(null);
    const [priceInput, setPriceInput] = useState<string>("");
    const [isAddingNewCategory, setIsAddingNewCategory] = useState(false);
    const navigate = useNavigate();
+   
+   
+   const {categories, setCategories,} = useCategories();
+   
 
    useEffect(() => {
-    console.log("AdminPanel: useEffect: fetchProducts, fetchCategories");
-    if (products.length === 0)
-    {
-       fetchProducts(null);
-    }
-    if (categories.length === 0)
-    {
-       fetchCategories();
-    }
-    }, [fetchProducts, fetchCategories]);
+       fetchProducts(null);  
+    }, [fetchProducts]);
 
 
     if (authUser?.authType !== "admin") {

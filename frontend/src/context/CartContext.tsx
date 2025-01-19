@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { CartItem } from '../types/cartItem';
 import { v4 as uuidv4 } from 'uuid';
 import { db } from '../services/firebase/firebaseConfig';
-import { collection, addDoc, doc, setDoc,DocumentData} from 'firebase/firestore';
+import { collection, doc, setDoc,DocumentData} from 'firebase/firestore';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { Timestamp } from "firebase/firestore";
 import {getDocDataBy1Condition, addDocToCollection, getDocRefsBy1Condition,getDocRefsBy2Condition, deleteDocByRef, updateDocByRef} from "../services/firebase/firestoreService";
@@ -29,6 +29,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
     let totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
     const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
         useEffect(() => {
             const auth = getAuth();
             const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -36,7 +37,9 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 if (!user) syncLocalToFirestore(getGuestId());        
             });
             return unsubscribe;
-        }, [isAuthenticated]);        
+        }, [isAuthenticated]);      
+        
+        
 
         const fetchCartItems = async () => {
             try {
@@ -77,7 +80,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         const guestId = localStorage.getItem("guestId");
         const localCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
         let userId  = getAuth().currentUser?.uid;  
-        firestoreItems = await getDocDataBy1Condition("cart", "userId", "==", userId) ;          
+        firestoreItems = await getDocDataBy1Condition("cart", "userId", "==", getAuth().currentUser?.uid) ;          
 
         if(localCart.length === 0)
         { return; }
@@ -123,9 +126,8 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 }                 
             }               
         }
-            localStorage.removeItem("guestCart");   
-              
-            //FIXME: Could be done in a better way 
+            localStorage.removeItem("guestCart");                 
+     
             firestoreItems = await getDocDataBy1Condition("cart", "userId", "==", userId) ;
             setCartItems(firestoreItems);
 
@@ -146,16 +148,13 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         return guestId;
     };
  
-  
+
     /**
-     *TODO: Implementation of Firebase Clean-Up
-     *TODO: Check if setDoc is better than addDoc
      * Comes in handy when: Cart DB is cleaned up: and All unsuded items added by Guest Users are removed from the Firestore DB
      * (Items are only removed from Firestore but not from LocalStorage) => If user returns to the site, the items are added back to the Firestore DB
      * If this is not done: Will lead to follup-up problems...    
      */
-    const syncLocalToFirestore = async (guestId: string) => {
-        console.log("syncLocalToFirestore Called");
+    const syncLocalToFirestore = async (guestId: string) => { 
         
        const localCart: CartItem[] = JSON.parse(localStorage.getItem("guestCart") || "[]");
         try {
@@ -199,8 +198,8 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 }
               else
               {
-                payload = { ...newItem, userId: authUser?.id };
-                await addDoc(collection(db, "cart"), payload);
+                const payload = { ...newItem, userId: authUser?.id };
+                await addDocToCollection("cart", payload);     
               }       
                   
             } 

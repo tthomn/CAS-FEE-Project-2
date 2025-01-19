@@ -1,20 +1,18 @@
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { useCatalog } from "../../context/CatalogContext";
+import { useProduct } from "../../context/ProductContext";
 
 interface ProductGridProps {
   categoryId: string | null;
 }
 
 const ProductGrid: React.FC<ProductGridProps> = ({ categoryId }) => {
-  const {fetchProducts, products,productsLoading,productsError,} = useCatalog();
 
-  // Fetch products whenever categoryId changes
-  //TODO: When??
-  // 
-  
+
+  const {fetchProducts, products,productsLoading,productsError,} = useProduct();
+  console.log("ProductGrid rendered");
+
   useEffect(() => {
-    console.log("Fetching products: PRODUCT GRID", categoryId);
     fetchProducts(categoryId);
   }, [categoryId, fetchProducts]);
 
@@ -63,7 +61,9 @@ const ProductGrid: React.FC<ProductGridProps> = ({ categoryId }) => {
                 src={`${product.imageUrl}?alt=media&width=300&height=300`}
                 alt={product.name}
                 className="w-full h-auto max-h-[150px] object-cover mb-4"
-                loading="eager"
+                loading="lazy"
+                decoding="async" 
+                //loading="eager"
               />
             </picture>
             <h4 className="text-lg font-semibold mb-2">{product.name}</h4>

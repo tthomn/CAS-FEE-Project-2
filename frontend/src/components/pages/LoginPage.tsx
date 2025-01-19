@@ -21,8 +21,7 @@ const LoginPage: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { cartCleaner } = useCart();
-    
-    
+       
 
     const auth = getAuth();
 

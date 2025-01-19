@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut,createUserWithEmailAndPassword,sendEmailVerification,sendPasswordResetEmail,User, Auth} from "firebase/auth";
-import { getFirestore, doc, setDoc, Timestamp } from "firebase/firestore";
+import { getFirestore, doc, setDoc } from "firebase/firestore";
 
 
 import {AuthUser} from "../types/authUser";
@@ -25,7 +25,7 @@ interface AdditionalData {
 }
 
 interface AuthContextType {
-    user: User | null; //This is the User from the Firebase Authentification //TODO: Check if i need it
+    user: User | null; 
     authUser: AuthUser | null; 
     loading: boolean;
     login: (email: string, password: string) => Promise<void>;
@@ -40,20 +40,14 @@ const AuthContext =  createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
-
-
     //[Is Authentiaced Global State]
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     //[USER]
     const [user, setUser] = useState<User | null>(null); 
-    const [authUser, setAuthUser] = useState<AuthUser | null>(null); //User which I've created for from type used to save all information about the user in the DB
-
-
-   //TODO: For what is loading used => can possible be deleted 
+    const [authUser, setAuthUser] = useState<AuthUser | null>(null); 
     const [loading, setLoading] = useState(true); 
 
-    //TODO: DO i need this? 
     const auth = getAuth();
     const db = getFirestore();
 
