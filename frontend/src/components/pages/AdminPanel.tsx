@@ -27,7 +27,6 @@ const AdminPanel:React.FC<{}> = ({}) => {
    
 
    useEffect(() => {
-    console.log("!!!!!!!!!!!!!!!!!!AdminPanel:useEffect:fetchProducts!!!!!!!!!!!!!!!");
        fetchProducts(null);  
        fetchCategories();
 

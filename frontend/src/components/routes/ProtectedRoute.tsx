@@ -1,5 +1,5 @@
 import React from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate,  } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 interface ProtectedRouteProps {
@@ -11,8 +11,10 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole 
     const { authUser } = useAuth(); // Get the authenticated user
 
     if (!authUser) {
-        // Redirect to login page if not authenticated
+
+
         return <Navigate to="/login" replace />;
+       
     }
 
     if (requiredRole && authUser.authType !== requiredRole) {

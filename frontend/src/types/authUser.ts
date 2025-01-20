@@ -5,7 +5,7 @@ export type AuthUser = {
     id: string;                 // uid of logged-in user
     userName: string;           // email address of logged-in user
     userId: string;             // id of related user in firebase db 'users'
-    authType?: AuthType;        // permissions of related user in firebase db 'users': admin | user
+    authType: AuthType;        // permissions of related user in firebase db 'users': admin | user
     city: string;               // city of related user in firebase db 'users'
     country?: string;           // country of related user in firebase db 'users'
     dob: string;                // date of birth of related user in firebase db 'users'

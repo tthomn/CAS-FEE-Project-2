@@ -160,6 +160,7 @@ const Account: React.FC = () => {
                     country: countryName,
                     authType: formData.authType,
                     addedAt: new Date(),
+                    email: formData.email,
                 });
 
                 setMessage("Registration successful! Please verify your email.");
@@ -245,14 +246,16 @@ const Account: React.FC = () => {
                                     onClick={() => setShowOrders(true)}
                                 >
                                     Orders
-                                </li>
-                                {authUser?.authType === "admin" && (
+                                </li>                     
+                            
+                               {authUser?.authType === "admin" && (
                                     <li className="cursor-pointer text-gray-600 hover:text-blue-500">
                                         <Link to="/admin" className="block">
                                             Admin Page
                                         </Link>
                                     </li>
                                 )}
+
                                 <li
                                     className="text-gray-600 cursor-pointer hover:text-blue-500"
                                     onClick={handleLogout}

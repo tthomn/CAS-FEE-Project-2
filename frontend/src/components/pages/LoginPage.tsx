@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 
 
+
 import {
     getAuth,
     signInWithEmailAndPassword,
@@ -36,6 +37,7 @@ const LoginPage: React.FC = () => {
         return unsubscribe;
     }, [auth]);
 
+    //Here we're coming from the cart
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
@@ -43,15 +45,20 @@ const LoginPage: React.FC = () => {
 
         try {
             await signInWithEmailAndPassword(auth, email, password);
-            setLoading(false);               
-            await cartCleaner();                   
 
+
+
+
+            setLoading(false);               
+            await cartCleaner();   
+  
             const fromCart = new URLSearchParams(location.search).get("fromCart");
             if (fromCart) {
                 navigate("/checkout");
             } else {
                 navigate("/");
             }
+            
         } catch (error: any) {
             setLoading(false);
             if (error.code === "auth/user-not-found") {

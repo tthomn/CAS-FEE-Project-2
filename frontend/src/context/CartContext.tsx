@@ -169,7 +169,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 await setDoc(docRef, { ...item, guestId }); 
             }    
             if (newItems.length > 0) {
-                console.log("Local cart synced to Firestore.");
             }
         } catch (error) {
             console.error("Error syncing local cart:", error);

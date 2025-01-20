@@ -1,6 +1,6 @@
 import {db, storage} from "./firebaseConfig";
 import {collection, getDocs, addDoc, deleteDoc,  query, where, updateDoc, DocumentReference,DocumentData, Timestamp , QueryConstraint, orderBy } from 'firebase/firestore';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject  } from "firebase/storage";
+import { ref, uploadBytesResumable, getDownloadURL, deleteObject  } from "firebase/storage";
 
 
 //Query for Doc fields (Cart Items) with 1 condition
@@ -78,7 +78,6 @@ export async function addDocToCollection<T>(collectionName: string, payload: T):
             ...payload,
             addedAt: Timestamp.now(),
         };
-        console.log("Enriched payload =>", enrichedPayload); // Add this line
 
         const docRef = await addDoc(collection(db, collectionName), enrichedPayload);
         return docRef.id; 
@@ -142,8 +141,6 @@ export async function uploadImageToStorage(file: File, folderPath: string): Prom
         }
       );
     });
-
-    console.log("Image uploaded successfully. URL:", downloadURL);
     return downloadURL;
   } catch (error) {
     console.error("Error in uploadImageToStorage function:", error);
@@ -173,7 +170,6 @@ export async function deleteFileFromStorage(fileURL: string): Promise<void> {
       const fileRef = ref(storage, filePath);  
       // Delete the file
       await deleteObject(fileRef);
-      console.log(`File deleted successfully from path: ${filePath}`);
     } catch (error) {
       console.error("Error deleting file from storage:", error);
       throw error;

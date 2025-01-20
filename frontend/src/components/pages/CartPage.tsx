@@ -14,7 +14,6 @@ const CartPage: React.FC = () => {
     const [userEmail, setUserEmail] = useState<string | null>(null);
 
       useEffect(() => {
-        console.log("useEffect on CartPage called");
         const auth = getAuth();
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (user && user.email) { //Checks if user && user.email is NOT null
@@ -27,7 +26,6 @@ const CartPage: React.FC = () => {
     }, []);
     
     const handleProceedToCheckout = () => {
-        console.log("handleProceedToCheckout called");
                 const isUserLoggedIn = userEmail;
         if (!isUserLoggedIn) {
             setShowPopup(true);

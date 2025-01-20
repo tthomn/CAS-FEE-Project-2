@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "outDir": "lib",
+    "sourceMap": true,
+    "strict": true,
+    "target": "ES2020",
+    "typeRoots": ["./node_modules/@types"],
+    "types": ["node"], 
+    "skipLibCheck": true
+
+  },
+  "compileOnSave": true,
+  "include": ["src"]
+}
+
+
+//    "module": "NodeNext",
