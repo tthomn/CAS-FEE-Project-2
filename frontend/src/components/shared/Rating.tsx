@@ -6,26 +6,25 @@ import { useAuth } from "../../context/AuthContext";
 interface RatingProps {
     productId: string;
     initialRating: number;
-    ratingCount: number;
+    initialRatingCount: number;
 }
 
-const Rating: React.FC<RatingProps> = ({ productId, initialRating, ratingCount }) => {
+const Rating: React.FC<RatingProps> = ({ productId, initialRating, initialRatingCount }) => {
     const { user } = useAuth();
     const [averageRating, setAverageRating] = useState<number>(
-        ratingCount > 0 ? initialRating / ratingCount : 0
+        initialRatingCount > 0 ? initialRating / initialRatingCount : 0
     );
+    const [ratingCount, setRatingCount] = useState<number>(initialRatingCount);
     const [userRating, setUserRating] = useState<number | null>(null);
     const [showPopup, setShowPopup] = useState<boolean>(false);
     const [selectedRating, setSelectedRating] = useState<number>(0);
     const [alreadyRatedMessageVisible, setAlreadyRatedMessageVisible] = useState(false);
 
     useEffect(() => {
-        const fetchUserRating = async () => {
-            if (!user) return;
+        if (!user) return;
 
+        const fetchUserRating = async () => {
             try {
-                
-                
                 const ratingsQuery = query(
                     collection(db, "ratings"),
                     where("userId", "==", user.uid),
@@ -47,7 +46,7 @@ const Rating: React.FC<RatingProps> = ({ productId, initialRating, ratingCount }
 
     const handleOpenPopup = () => {
         if (userRating !== null) {
-            setAlreadyRatedMessageVisible((prev) => !prev);
+            setAlreadyRatedMessageVisible(true);
             return;
         }
         setShowPopup(true);
@@ -57,7 +56,6 @@ const Rating: React.FC<RatingProps> = ({ productId, initialRating, ratingCount }
         if (!user || selectedRating === 0) return;
 
         try {
-            
             const productRef = doc(db, "products", productId);
             const productDoc = await getDoc(productRef);
 
@@ -66,9 +64,12 @@ const Rating: React.FC<RatingProps> = ({ productId, initialRating, ratingCount }
                 const currentTotal = productData.ratings?.totalRating || 0;
                 const currentCount = productData.ratings?.ratingCount || 0;
 
+                const newRatingCount = currentCount + 1;
+                const newAverageRating = (currentTotal + selectedRating) / newRatingCount;
+
                 await updateDoc(productRef, {
                     "ratings.totalRating": currentTotal + selectedRating,
-                    "ratings.ratingCount": currentCount + 1,
+                    "ratings.ratingCount": newRatingCount,
                 });
 
                 const ratingRef = doc(collection(db, "ratings"));
@@ -78,7 +79,8 @@ const Rating: React.FC<RatingProps> = ({ productId, initialRating, ratingCount }
                     rating: selectedRating,
                 });
 
-                setAverageRating((currentTotal + selectedRating) / (currentCount + 1));
+                setAverageRating(newAverageRating);
+                setRatingCount(newRatingCount);
                 setUserRating(selectedRating);
                 setShowPopup(false);
             }
@@ -98,14 +100,11 @@ const Rating: React.FC<RatingProps> = ({ productId, initialRating, ratingCount }
                     <div key={index} className="relative">
                         <i className="fas fa-star text-gray-400 text-xl"></i>
                         {index < filledStars && (
-                            <i
-                                className="fas fa-star absolute inset-0 text-yellow-500 text-xl"
-                                style={{ clipPath: "inset(0 0 0 0)" }}
-                            ></i>
+                            <i className="fas fa-star text-yellow-500 text-xl absolute inset-0"></i>
                         )}
                         {index === filledStars && partialStarWidth > 0 && (
                             <i
-                                className="fas fa-star absolute inset-0 text-yellow-500 text-xl"
+                                className="fas fa-star text-yellow-500 text-xl absolute inset-0"
                                 style={{
                                     clipPath: `inset(0 ${100 - partialStarWidth}% 0 0)`,
                                 }}
@@ -121,7 +120,7 @@ const Rating: React.FC<RatingProps> = ({ productId, initialRating, ratingCount }
         <div className="flex flex-col items-center gap-2">
             {renderStars()}
             <span className="ml-2 text-sm text-gray-600">
-                {averageRating.toFixed(1)} ({ratingCount} ratings)
+              {averageRating.toFixed(1)} ({ratingCount} {ratingCount === 1 ? "review" : "reviews"})
             </span>
 
             {user ? (

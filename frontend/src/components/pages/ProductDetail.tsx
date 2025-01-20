@@ -133,12 +133,9 @@ const ProductDetail: React.FC = () => {
                         <div className="mb-4 flex items-center">
                             <Rating
                                 productId={product.id}
-                                initialRating={averageRating}
-                                ratingCount={product.ratings.ratingCount}
+                                initialRating={product.ratings?.totalRating || 0}
+                                initialRatingCount={product.ratings?.ratingCount || 0}
                             />
-                            <p className="ml-4 text-sm text-gray-500">
-                                {product.ratings.ratingCount} reviews
-                            </p>
                         </div>
                     )}
 
