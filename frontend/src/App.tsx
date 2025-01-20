@@ -21,6 +21,7 @@ import { AdminProvider } from "./context/AdminContext";
 import { ProductProvider } from "./context/ProductContext";  
 import {CategoriesProvider} from "./context/CategoryContext";
 import {ToastContainer} from "react-toastify";
+import ContactPage from "./components/pages/ContactPage";
 
 
 const App: React.FC = () => {
@@ -54,6 +55,7 @@ const App: React.FC = () => {
               <Route path="/search" element={<SearchResultsPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
+              <Route path="/contact" element={<ContactPage />} />
               <Route
                 path="/admin"
                 element={

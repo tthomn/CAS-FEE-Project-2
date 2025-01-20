@@ -355,14 +355,15 @@ const Account: React.FC = () => {
                                 <h1 className="text-2xl font-bold mb-4">
                                     {isRegistering ? "Register" : "Login"}
                                 </h1>
-                                <div className="mb-4 px-4 sm:px-0">
+                                <div className="relative mb-4">
                                     <input
                                         type="email"
                                         name="email"
                                         placeholder="Email"
                                         value={formData.email}
                                         onChange={handleInputChange}
-                                        className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-yellow-500"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded text-base focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                        style={{ height: "44px" }}
                                     />
                                     {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
                                 </div>
@@ -376,7 +377,7 @@ const Account: React.FC = () => {
                                             placeholder="Password"
                                             value={formData.password}
                                             onChange={handleInputChange}
-                                            className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500 pr-10"
+                                            className="w-full px-4 py-2 border border-gray-300 rounded text-base focus:outline-none focus:ring-2 focus:ring-yellow-500"
                                         />
                                         {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
 
