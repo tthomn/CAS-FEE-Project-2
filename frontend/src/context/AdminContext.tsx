@@ -1,7 +1,7 @@
 import React, { useState,  createContext, ReactNode, useContext } from "react";
 import { Product } from "../types/product";
-import {getFirestore,doc,} from "firebase/firestore"; 
-import {uploadImageToStorage,  deleteFileFromStorage, addDocToCollection, deleteDocByRef, getDocRefsBy1Condition, updateDocByRef } from "../services/firebase/firestoreService";
+import {getFirestore,doc, collection } from "firebase/firestore"; 
+import {uploadImageToStorage,  deleteFileFromStorage, addDocToCollection, deleteDocByRef, updateDocByRef } from "../services/firebase/firestoreService";
 import {useProduct} from "./ProductContext";
 import {toast} from "react-toastify";
 
@@ -91,7 +91,7 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
               stock: 0,
               description: "",
               keywords: [],
-              categoryId: "",
+              categoryId: "",              
             }));    
             setIsImageUploaded(false);  
             await fetchProducts(null);
@@ -117,9 +117,9 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
             
         const updateProduct = async (id: string, updatedData: Partial<Product>) => {
-            try {                   
-               const docRefComplete = await getDocRefsBy1Condition("products", "id", "==", id);  
-                await updateDocByRef(docRefComplete[0], updatedData);      
+            try {      
+                 const docRefComplete = doc(collection(db, "products"), id);      
+                await updateDocByRef(docRefComplete, updatedData);      
                await fetchProducts(null); 
             } catch (error) {
                 console.error("Error updating product:", error);

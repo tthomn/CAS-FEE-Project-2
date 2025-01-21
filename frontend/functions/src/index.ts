@@ -1,6 +1,7 @@
 import * as functions from "firebase-functions/v2";
 import admin from "firebase-admin";
 
+
 if (!admin.apps.length) {
   admin.initializeApp();
 }
@@ -47,14 +48,24 @@ export const setAdditionalUserData = functions.https.onCall(async (context) => {
 
 export const setAdmin = functions.https.onCall(async (request) => {
   try {
-    const {uid, authType} = request.data;
+    const uid = request.auth?.uid;
+    let authType = "";
 
     if (!uid) {
       throw new Error("User is not authenticated");
     }
+    await db.collection("users").doc(uid).get().then((doc) => {
+      if (doc.exists) {
+        console.log("Document data:", doc.data());
+        authType = doc.data()?.authType;
+      } else {
+        authType = "user";
+        console.log("No such document!");
+      }
+    });
 
     if (authType !== "admin") {
-      return {message: `User ${uid} is not allowed to be admin.`};
+      return {message: `User ${uid} is not allowed to be admin`};
     } else {
       admin.auth().setCustomUserClaims(uid, {admin: true});
 

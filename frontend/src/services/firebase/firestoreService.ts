@@ -78,7 +78,6 @@ export async function addDocToCollection<T>(collectionName: string, payload: T):
             ...payload,
             addedAt: Timestamp.now(),
         };
-
         const docRef = await addDoc(collection(db, collectionName), enrichedPayload);
         return docRef.id; 
     } catch (error) {
@@ -147,6 +146,7 @@ export async function uploadImageToStorage(file: File, folderPath: string): Prom
     throw error;
   }
 }
+
 
 //[Delete Image from Firebase Storage wia Image URL]
 /**

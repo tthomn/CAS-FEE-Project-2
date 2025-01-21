@@ -3,6 +3,8 @@ import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut,createUser
 import {AuthUser} from "../types/authUser";
 import { getDocRefsBy1Condition,getDocDataBy1Condition } from "../services/firebase/firestoreService";
 import { getFunctions, httpsCallable } from "firebase/functions";
+import { doc, collection, getDoc } from "firebase/firestore";
+import {db} from "../services/firebase/firebaseConfig"
 
 interface AdditionalData {
     title: string;
@@ -17,6 +19,7 @@ interface AdditionalData {
     addedAt: Date;
     authType: string;
     email: string;
+
 
 }
 
@@ -52,7 +55,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
             if (user) {
                                  
-                const fetchedUser = await fetchAuthUser(user?.email);
+                const fetchedUser = await fetchAuthUser(user?.uid);
                 if (fetchedUser) {
                     setAuthUser(fetchedUser);
                } else {
@@ -67,7 +70,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }, [auth]);
 
     
-    const assignAdminRole = async (authType:string ,uid:string) => {
+    const assignAdminRole = async () => {
       const functions = getFunctions();        
       const setAdmin = httpsCallable(functions, "setAdmin");
     
@@ -77,14 +80,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 console.error("No user is logged in.");
                 return;
             }              
-           const response = await setAdmin({uid: uid, authType: authType});
+           const response = await setAdmin();
            console.log("Response from the function:", response);
             const idTokenResult = await user.getIdTokenResult();
 
             // Check if the admin claim is present
            if (idTokenResult.claims.admin) {
                 console.log("User is an admin.");
-                // Set admin state in your app
+            
             } else {
              console.log("User is not an admin.");
             }
@@ -94,22 +97,22 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
     };
 
-        const fetchAuthUser = async (email: any) => {        
+        const fetchAuthUser = async (uid: any) => {        
             try
             {            
-               const user1 = await getDocRefsBy1Condition("users", "email", "==", email);
-               const user2 = await getDocDataBy1Condition<AuthUser>("users", "email", "==", email); 
-
-               if (!user1 || user1.length === 0 || !user2 || user2.length === 0) {
-                console.warn("User not found in Firestore for email:", email)                
+                       const docRefComplete = doc(collection(db, "users"), uid);      
+                 const docSnap = await getDoc(docRefComplete);
+                 let data =  docSnap.data();
+          
+             if (!data || data.length === 0) {
                 return null; }
                
-                const userDoc = user2[0];                 
+                const userDoc = data;            
                 const authUser: AuthUser = {
-                id: user1[0].id ,  
-                userName: email,
+                id: uid ,  
+                userName: userDoc?.email,
                 userId: userDoc.id,              
-                authType: userDoc.authType || "user", // Just in Case => Default is User 
+                authType: userDoc.authType,
                 city: userDoc?.city,
                 country: userDoc?.country || "",
                 dob: userDoc?.dob || "",
@@ -120,8 +123,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 street: userDoc?.street,
                 gender: userDoc?.gender || "",
                 addedAt: userDoc?.addedAt || undefined , // Date of user creation   
+           
                 };
-                assignAdminRole(authUser.authType, user1[0].id); 
+                assignAdminRole();
+
              return authUser; // Return the constructed AuthUser object            
             }
             catch (error) {
@@ -170,7 +175,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 ...additionalData,
                 });
 
-                const registeredUser = await fetchAuthUser(user.email);
+                const registeredUser = await fetchAuthUser(user.uid);
                 if (registeredUser) {
                     setAuthUser(registeredUser);
                 }
