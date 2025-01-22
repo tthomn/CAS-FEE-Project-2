@@ -92,7 +92,7 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
               description: "",
               keywords: [],
               categoryId: "",              
-            }));    
+            }));
             setIsImageUploaded(false);  
             await fetchProducts(null);
 
@@ -108,8 +108,8 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
                 await deleteFileFromStorage(imageUrl);
                 const productRef = doc(db, "products", id); 
                 await deleteDocByRef(productRef);     
-               await fetchProducts(null);   
-                          
+                await fetchProducts(null);
+                toast.success("Product deleted successfully!");
             } catch (error) {
                 console.error("Error deleting product:", error);
             }

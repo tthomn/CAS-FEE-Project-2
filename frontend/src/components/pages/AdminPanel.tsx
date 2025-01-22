@@ -59,6 +59,7 @@ const AdminPanel:React.FC<{}> = ({}) => {
             try {
                 await addProduct();
                 setValidationErrors({});
+                setPriceInput("0.00");
             } catch (error) {
                 console.error("Error adding product:", error);
                 toast.error("Failed to add product. Please try again.");
@@ -125,11 +126,19 @@ const AdminPanel:React.FC<{}> = ({}) => {
                             placeholder="Enter the price"
                             value={priceInput}
                             onChange={(e) => {
-                                let value = e.target.value.replace(",", ".");
+                                const value = e.target.value.replace(",", ".");
                                 if (/^\d*\.?\d*$/.test(value)) {
                                     setPriceInput(value);
                                     const numericValue = parseFloat(value);
+
                                     setNewProduct({ ...newProduct, price: isNaN(numericValue) ? 0 : numericValue });
+
+                                    if (!isNaN(numericValue) && numericValue > 0) {
+                                        setValidationErrors((prev) => {
+                                            const { price, ...rest } = prev;
+                                            return rest;
+                                        });
+                                    }
                                 }
                             }}
                             onBlur={() => {
