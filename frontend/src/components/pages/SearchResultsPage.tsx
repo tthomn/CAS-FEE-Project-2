@@ -13,9 +13,8 @@ interface SearchResult {
 const SearchResultsPage: React.FC = () => {
     const location = useLocation();
     const queryParam = new URLSearchParams(location.search).get("query") || "";
-    const [results, setResults] = useState<{ products: SearchResult[]; recipes: SearchResult[] }>({
+    const [results, setResults] = useState<{ products: SearchResult[]; }>({
         products: [],
-        recipes: [],
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -23,6 +22,9 @@ const SearchResultsPage: React.FC = () => {
     useEffect(() => {
         const fetchResults = async () => {
             if (!queryParam) {
+                setResults({ products: [] });
+                setLoading(false);
+                setError("");
                 return;
             }
 
@@ -30,32 +32,28 @@ const SearchResultsPage: React.FC = () => {
             setError("");
 
             try {
+                // Normalize query to lowercase
                 const normalizedQuery = queryParam.trim().toLowerCase();
+                console.log("Normalized query:", normalizedQuery);
 
+                // Firestore query for exact matches
                 const productsQuery = query(
                     collection(db, "products"),
-                    where("keywords", "array-contains", normalizedQuery)
+                    where("keywords", "array-contains", normalizedQuery) // Exact match
                 );
 
-                const recipesQuery = query(
-                    collection(db, "recipes"),
-                    where("keywords", "array-contains", normalizedQuery)
-                );
+                // Fetch results
+                const productsSnapshot = await getDocs(productsQuery);
 
-                const [productsSnapshot, recipesSnapshot] = await Promise.all([
-                    getDocs(productsQuery),
-                    getDocs(recipesQuery),
-                ]);
+                // Map Firestore results
+                const products = productsSnapshot.docs.map((doc) => ({
+                    id: doc.id,
+                    ...doc.data(),
+                }));
 
-                const products = productsSnapshot.docs.map((doc) => {
-                    return { id: doc.id, ...doc.data() };
-                });
+                console.log("Fetched products:", products);
 
-                const recipes = recipesSnapshot.docs.map((doc) => {
-                    return { id: doc.id, ...doc.data() };
-                });
-
-                setResults({ products, recipes });
+                setResults({ products });
             } catch (err) {
                 console.error("Error fetching search results:", err);
                 setError("An error occurred while fetching search results. Please try again.");
@@ -107,9 +105,8 @@ const SearchResultsPage: React.FC = () => {
             {!loading && !error && (
                 <>
                     {results.products.length > 0 && renderResults("Products", results.products, "shop")}
-                    {results.recipes.length > 0 && renderResults("Recipes", results.recipes, "recipe")}
 
-                    {results.products.length === 0 && results.recipes.length === 0 && (
+                    {results.products.length === 0 && (
                         <p>
                             No results found for "{queryParam}".
                             <br />

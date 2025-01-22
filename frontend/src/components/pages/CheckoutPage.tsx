@@ -135,7 +135,6 @@ const CheckoutPage: React.FC = () => {
 
     const handleSaveDetails = () => {
         localStorage.setItem("userDetails", JSON.stringify({ name, surname, deliveryAddress }));
-        alert("Daten wurden erfolgreich gespeichert!");
         setIsEditing(false);
     };
 
@@ -218,13 +217,13 @@ const CheckoutPage: React.FC = () => {
                                     onClick={handleSaveDetails}
                                     className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
                                 >
-                                    Speichern
+                                    Save
                                 </button>
                                 <button
                                     onClick={handleCancelEdit}
                                     className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
                                 >
-                                    Abbrechen
+                                    Cancel
                                 </button>
                             </>
                         )}
@@ -283,7 +282,7 @@ const CheckoutPage: React.FC = () => {
                         setIsModalOpen(false);
                         navigate("/shop");
                     }}
-                    message="Ihre Bestellung wurde erfolgreich abgeschlossen! Eine Rechnung wurde per E-Mail gesendet."
+                    message="Your order has been completed successfully! An invoice has been sent via email."
                 />
             )}
         </div>

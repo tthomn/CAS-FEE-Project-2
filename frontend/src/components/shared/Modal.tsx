@@ -36,14 +36,14 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, message }) => {
                     id="modal-title"
                     className="text-xl font-bold text-gray-800 mb-4"
                 >
-                    Bestellung bestätigt
+                    Order confirmed
                 </h2>
                 <p className="text-gray-600 mb-6">{message}</p>
                 <button
                     onClick={onClose}
                     className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
                 >
-                    Schliessen
+                    Close
                 </button>
             </div>
         </div>

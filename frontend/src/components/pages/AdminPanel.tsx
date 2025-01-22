@@ -119,33 +119,24 @@ const AdminPanel:React.FC<{}> = ({}) => {
                     <div>
                         <label className="block font-semibold mb-1 text-gray-600">Price (CHF)</label>
                         <input
-                            type="text"
+                            type="number"
+                            step="0.01"
+                            min="0"
                             placeholder="Enter the price"
-                            value={newProduct.price !== undefined ? newProduct.price : ""}
+                            value={priceInput}
                             onChange={(e) => {
-                                const value = e.target.value;
-
-                                // Allow only valid numeric characters (including . for decimals)
-                                if (/^\d*\.?\d{0,2}$/.test(value)) {
-                                    setPriceInput(value);  // Set as string during typing
-                                    setNewProduct({ ...newProduct, price: parseFloat(value) || 0 });
-                                }
-
-                                if (parseFloat(value) > 0) {
-                                    setValidationErrors((prev) => {
-                                        const { price, ...rest } = prev;
-                                        return rest;
-                                    });
+                                let value = e.target.value.replace(",", ".");
+                                if (/^\d*\.?\d*$/.test(value)) {
+                                    setPriceInput(value);
+                                    const numericValue = parseFloat(value);
+                                    setNewProduct({ ...newProduct, price: isNaN(numericValue) ? 0 : numericValue });
                                 }
                             }}
                             onBlur={() => {
-                                // Exit edit mode when the user clicks away
-                                if (!priceInput || isNaN(parseFloat(priceInput))) {
-                                    setPriceInput(newProduct.price.toFixed(2));
-                                    // Default to 0.00 if empty or invalid
-                                    setNewProduct({ ...newProduct, price: 0 });
-                                }
-                                if (priceInput.trim() !== "") setEditingProductId(null);
+                                const numericValue = parseFloat(priceInput);
+                                const formattedValue = isNaN(numericValue) ? "0.00" : numericValue.toFixed(2);
+                                setPriceInput(formattedValue);
+                                setNewProduct({ ...newProduct, price: parseFloat(formattedValue) });
                             }}
                             className="border rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
                         />

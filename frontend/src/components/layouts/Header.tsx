@@ -162,7 +162,7 @@ const Header: React.FC = () => {
                             onClick={logout}
                             className="bg-red-500 text-white px-3 py-1 text-base rounded hover:bg-red-700"
                         >
-                            Abmelden
+                            Log out
                         </button>
                     )}
                 </div>
