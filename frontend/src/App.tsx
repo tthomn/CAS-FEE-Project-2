@@ -13,7 +13,6 @@ import NotFoundPage from "./components/pages/NotFoundPage";
 import SearchResultsPage from "./components/pages/SearchResultsPage";
 import { CartProvider } from "./context/CartContext";
 import LoginPage from "./components/pages/LoginPage";
-import RegisterPage from "./components/pages/RegisterPage";
 import AdminPanel from "./components/pages/AdminPanel";
 import ProtectedRoute from "./components/routes/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
@@ -54,7 +53,6 @@ const App: React.FC = () => {
               <Route path="/checkout" element={<CheckoutPage />} />
               <Route path="/search" element={<SearchResultsPage />} />
               <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route
                 path="/admin"

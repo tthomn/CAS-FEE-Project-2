@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { doc, updateDoc, getDoc, collection, query, where, getDocs, setDoc } from "firebase/firestore";
-import { db } from "../../services/firebase/firebaseConfig";
+import { where,  } from "firebase/firestore";
 import { useAuth } from "../../context/AuthContext";
+import {getCollectionData, updateDocByRef,createDocRef, getData,  setDocByRef, createCollectionRef } from "../../services/firebase/firestoreService";
+
 
 interface RatingProps {
     productId: string;
@@ -25,16 +26,15 @@ const Rating: React.FC<RatingProps> = ({ productId, initialRating, initialRating
 
         const fetchUserRating = async () => {
             try {
-                const ratingsQuery = query(
-                    collection(db, "ratings"),
-                    where("userId", "==", user.uid),
-                    where("productId", "==", productId)
-                );
-                const ratingsSnapshot = await getDocs(ratingsQuery);
+    
+                const constraints =   [where("userId", "==", user.uid), where("productId", "==", productId)];
+                const ratingsSnapshot = await getCollectionData("ratings", constraints);
 
-                if (!ratingsSnapshot.empty) {
-                    const userRatingData = ratingsSnapshot.docs[0].data();
-                    setUserRating(userRatingData.rating);
+                if (ratingsSnapshot.length > 0) {
+              
+                   const userRatingData = ratingsSnapshot[0];                  
+                    setUserRating((userRatingData as { rating: number }).rating);
+
                 }
             } catch (error) {
                 console.error("Error fetching user rating:", error);
@@ -56,28 +56,31 @@ const Rating: React.FC<RatingProps> = ({ productId, initialRating, initialRating
         if (!user || selectedRating === 0) return;
 
         try {
-            const productRef = doc(db, "products", productId);
-            const productDoc = await getDoc(productRef);
 
-            if (productDoc.exists()) {
-                const productData = productDoc.data();
-                const currentTotal = productData.ratings?.totalRating || 0;
-                const currentCount = productData.ratings?.ratingCount || 0;
+            const productRef = await createDocRef("products", productId);
+            const productDoc = await getData(productRef);
+                  
+               if (productDoc.exists()) {
+                   const productData = productDoc.data();
+                   const currentTotal = productData.ratings?.totalRating || 0;
+                   const currentCount = productData.ratings?.ratingCount || 0;
+   
+                   const newRatingCount = currentCount + 1;
+                   const newAverageRating = (currentTotal + selectedRating) / newRatingCount;
+   
+                   await  updateDocByRef(productRef, {
+                       "ratings.totalRating": currentTotal + selectedRating,
+                       "ratings.ratingCount": newRatingCount,
+                   });
+                          
 
-                const newRatingCount = currentCount + 1;
-                const newAverageRating = (currentTotal + selectedRating) / newRatingCount;
+               const ratingRef = await createCollectionRef("ratings");
+               await setDocByRef(ratingRef, {
+                     userId: user.uid,
+                     productId,
+                     rating: selectedRating,
+               });
 
-                await updateDoc(productRef, {
-                    "ratings.totalRating": currentTotal + selectedRating,
-                    "ratings.ratingCount": newRatingCount,
-                });
-
-                const ratingRef = doc(collection(db, "ratings"));
-                await setDoc(ratingRef, {
-                    userId: user.uid,
-                    productId,
-                    rating: selectedRating,
-                });
 
                 setAverageRating(newAverageRating);
                 setRatingCount(newRatingCount);

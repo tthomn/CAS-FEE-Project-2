@@ -9,7 +9,7 @@ import {useCategories} from "../../context/CategoryContext";
 import {toast} from "react-toastify";
 
 
-const AdminPanel:React.FC<{}> = ({}) => {
+const AdminPanel:React.FC<{}> = () => {
     
    //From Admin Context
    const {handleImageUpload, uploadingImage, errorMessage,setNewProduct, newProduct, addProduct,  deleteProduct, updateProduct, addCategory, newCategoryName, setNewCategoryName } = useAdmin();

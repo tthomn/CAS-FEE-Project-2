@@ -1,12 +1,11 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { CartItem } from '../types/cartItem';
 import { v4 as uuidv4 } from 'uuid';
-import { db } from '../services/firebase/firebaseConfig';
-import { collection, doc, setDoc,DocumentData} from 'firebase/firestore';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { DocumentData, } from 'firebase/firestore';
 import { Timestamp } from "firebase/firestore";
-import {getDocDataBy1Condition, addDocToCollection, getDocRefsBy1Condition,getDocRefsBy2Condition, deleteDocByRef, updateDocByRef} from "../services/firebase/firestoreService";
+import {getDocDataBy1Condition, addDocToCollection, getDocRefsBy1Condition,getDocRefsBy2Condition, deleteDocByRef, updateDocByRef, setDocByRef,createDocRef} from "../services/firebase/firestoreService";
 import {useAuth} from "./AuthContext";
+import {getAuth} from "firebase/auth";
 
 
 
@@ -31,17 +30,16 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     let totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
     const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-        useEffect(() => {
-            const auth = getAuth();
-            const unsubscribe = onAuthStateChanged(auth, (user) => {
-                fetchCartItems();
-                if (!user) syncLocalToFirestore(getGuestId());        
-            });
-            return unsubscribe;
-        }, [isAuthenticated]);      
-        
-        
 
+        useEffect(() => {            
+             fetchCartItems();
+            if (isAuthenticated === false)
+                { syncLocalToFirestore(getGuestId()); }    
+        }, [isAuthenticated]);      
+
+        
+        
+ 
         const fetchCartItems = async () => {
             try {
                 
@@ -77,8 +75,11 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
         const guestId = localStorage.getItem("guestId");
         const localCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
-        let userId  = getAuth().currentUser?.uid;  
-        firestoreItems = await getDocDataBy1Condition("cart", "userId", "==", getAuth().currentUser?.uid) ;          
+       // let userId = authUser?.id;
+        const auth = getAuth();
+        let userId = auth?.currentUser?.uid;
+        
+        firestoreItems = await getDocDataBy1Condition("cart", "userId", "==", userId) ;          
 
         if(localCart.length === 0)
         { return; }
@@ -136,8 +137,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
        }         
 
 
-        const getGuestId = (): string => {
-        
+        const getGuestId = (): string => {        
         let guestId = localStorage.getItem("guestId");
         if (!guestId) {
             guestId = uuidv4();
@@ -164,9 +164,13 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             const newItems = localCart.filter(
                 (localItem: CartItem) => !firestoreItems.some((firestoreItem) => firestoreItem.cartItemId === localItem.cartItemId)
             );   
-            for (const item of newItems)  {            
-                const docRef = doc(collection(db, "cart"), item.cartItemId);
-                await setDoc(docRef, { ...item, guestId }); 
+            for (const item of newItems)  {         
+
+                //const docRef = doc(collection(db, "cart"), item.cartItemId);
+                const docRef = await createDocRef("cart", item.cartItemId);
+                await  setDocByRef(docRef, { ...item, guestId });
+               // await setDoc(docRef, { ...item, guestId }); 
+
             }    
             if (newItems.length > 0) {
             }
@@ -181,7 +185,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         const newItem = { ...item, cartItemId: uuidv4(), addedAt: Timestamp.now() };   
          try 
         {
-            let payload;
             if (authUser?.id)      
             {       
                 const [docRef] = await getDocRefsBy2Condition("cart", "userId", "==", authUser.id, "productId", "==", item.productId);
@@ -244,8 +247,9 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     
    //Removes an Item from the Cart (UI and FireStore)
     const removeFromCart = async (cartItemId: string) => {       
-        const docRefComplete = await getDocRefsBy1Condition("cart", "cartItemId", "==", cartItemId);      
         try {
+            const docRefComplete = await getDocRefsBy1Condition("cart", "cartItemId", "==", cartItemId);    
+
             await deleteDocByRef(docRefComplete[0]);
             setCartItems((prev) => prev.filter((item) => item.cartItemId !== cartItemId));
             const localCart = JSON.parse(localStorage.getItem("guestCart") || "[]");            

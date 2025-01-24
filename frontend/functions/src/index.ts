@@ -56,11 +56,9 @@ export const setAdmin = functions.https.onCall(async (request) => {
     }
     await db.collection("users").doc(uid).get().then((doc) => {
       if (doc.exists) {
-        console.log("Document data:", doc.data());
         authType = doc.data()?.authType;
       } else {
         authType = "user";
-        console.log("No such document!");
       }
     });
 

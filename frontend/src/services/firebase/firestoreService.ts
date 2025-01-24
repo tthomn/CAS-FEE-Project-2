@@ -1,5 +1,5 @@
 import {db, storage} from "./firebaseConfig";
-import {collection, getDocs, addDoc, deleteDoc,  query, where, updateDoc, DocumentReference,DocumentData, Timestamp , QueryConstraint, orderBy } from 'firebase/firestore';
+import {doc,collection, getDocs, addDoc, deleteDoc,  query, where, updateDoc, DocumentReference,DocumentData, Timestamp , QueryConstraint,getDoc, setDoc } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL, deleteObject  } from "firebase/storage";
 
 
@@ -7,6 +7,7 @@ import { ref, uploadBytesResumable, getDownloadURL, deleteObject  } from "fireba
 //Gets the Contens (the fields) 
 export async function getDocDataBy1Condition<T>(collectionName: string, field: string,operator: any,value: any): Promise<T[]> {
     try {    
+
     const q = query(collection(db, collectionName), where(field, operator, value));
     const querySnapshot = await getDocs(q);
     const data = querySnapshot.docs.map((doc) => ({
@@ -66,6 +67,62 @@ export async function getCollectionData<T>( collectionName: string, constraints:
     }
   }
 
+
+export async function createDocRef(collectionName:string, documentId:string)
+{
+  try
+  {
+    return doc(db, collectionName, documentId);
+  }
+  catch(error)
+  {
+    console.error(`Error creating document reference for ${collectionName}/${documentId}:`, error);
+    throw error;
+  }
+
+}
+
+
+export async function createCollectionRef(collectionName:string)
+{
+  try
+  {
+    return doc(collection(db, collectionName));
+  }
+  catch(error)
+  {
+    console.error(`Error creating document reference for ${collectionName}`, error);
+    throw error;
+  }
+
+}
+export async function getData(docRef: DocumentReference<DocumentData>): Promise<DocumentData> {
+    try {
+      const docSnap = await getDoc(docRef);
+      return docSnap; 
+    } catch (error) {
+      console.error("Error fetching document data:", error);
+      throw error;
+    }
+  }
+
+export async function setDocByRef(docRef: DocumentReference<DocumentData>, data: DocumentData): Promise<void> {
+  try
+  {
+    await setDoc(docRef, data);
+
+  }
+  catch(error)
+  {
+    console.error(`Error setting document data:`, error);
+    throw error;
+  }
+
+}
+  
+
+
+
 /**
  * Add a document to a Firestore collection.
  * @param {string} collectionName - The name of the Firestore collection.
@@ -105,7 +162,7 @@ export async function deleteDocByRef(docRef: DocumentReference<DocumentData>): P
         throw error;
     }
 }
-//_____________________________________________________________Storage_______________________________________________________
+
 
 //[Upload Image to Firebase Storage]
 /**

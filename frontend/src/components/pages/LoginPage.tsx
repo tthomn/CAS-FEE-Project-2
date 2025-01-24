@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
-
-
+import {useAuth} from "../../context/AuthContext";
 
 import {
     getAuth,
@@ -12,6 +11,8 @@ import {
     sendPasswordResetEmail,
 } from "firebase/auth";
 
+
+//ONLY CALLED WHEN LOGIN IN FROM CART!
 const LoginPage: React.FC = () => {
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
@@ -22,10 +23,11 @@ const LoginPage: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { cartCleaner } = useCart();
-       
+    const { login, resetPassword, logout } = useAuth();   
 
-    const auth = getAuth();
 
+    //const auth = getAuth();
+/*
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (user) {
@@ -35,7 +37,7 @@ const LoginPage: React.FC = () => {
             }
         });
         return unsubscribe;
-    }, [auth]);
+    }, [auth]);*/
 
     //Here we're coming from the cart
     const handleLogin = async (e: React.FormEvent) => {
@@ -44,12 +46,10 @@ const LoginPage: React.FC = () => {
         setErrorMessage("");
 
         try {
-            await signInWithEmailAndPassword(auth, email, password);
+            await login(email, password);
+           // await signInWithEmailAndPassword(auth, email, password);
+           // setLoading(false);         
 
-
-
-
-            setLoading(false);               
             await cartCleaner();   
   
             const fromCart = new URLSearchParams(location.search).get("fromCart");
@@ -80,7 +80,10 @@ const LoginPage: React.FC = () => {
             return;
         }
         try {
-            await sendPasswordResetEmail(auth, email);
+
+           // await sendPasswordResetEmail(auth, email);
+            await resetPassword(email);
+
             setResetEmailSent(true);
         } catch (error: any) {
             if (error.code === "auth/user-not-found") {
@@ -93,7 +96,8 @@ const LoginPage: React.FC = () => {
 
     const handleLogout = async () => {
         try {
-            await signOut(auth);
+            await logout();
+           // await signOut(auth);
             setUser(null);
         } catch (error) {
             console.error("Error logging out:", error);

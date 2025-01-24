@@ -1,41 +1,29 @@
-import React, { useState, useEffect } from "react";
+import React, { useState,  } from "react";
 import { useCart } from "../../context/CartContext";
 import { useNavigate } from "react-router-dom";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
 import "react-toastify/dist/ReactToastify.css";
+import {useAuth, } from "../../context/AuthContext";
+
+
 
 const CartPage: React.FC = () => {
     const { cartItems, removeFromCart, updateQuantity } = useCart();
     const { totalPrice } = useCart();    
     const navigate = useNavigate();
     const [showPopup, setShowPopup] = useState(false);
-
-
-    const [userEmail, setUserEmail] = useState<string | null>(null);
-
-      useEffect(() => {
-        const auth = getAuth();
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            if (user && user.email) { //Checks if user && user.email is NOT null
-                setUserEmail(user.email);
-            } else {
-                setUserEmail(null);
-            }
-        });
-        return unsubscribe;
-    }, []);
+   const { isAuthenticated, authUser} = useAuth(); 
     
+
+
     const handleProceedToCheckout = () => {
-                const isUserLoggedIn = userEmail;
-        if (!isUserLoggedIn) {
+        if (!isAuthenticated) {
             setShowPopup(true);
         } else {
-            navigate("/checkout", { state: { email: userEmail } });
+            navigate("/checkout", { state: { email: authUser?.userId } });
         }
-    };
+        };
 
     const closePopup = () => {
-        console.log("closePopup called");
         setShowPopup(false);
     };
 

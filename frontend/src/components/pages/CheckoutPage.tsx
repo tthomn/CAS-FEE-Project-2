@@ -84,7 +84,6 @@ const CheckoutPage: React.FC = () => {
                 )
                 .join("\n"),
         };
-        console.log("Email parameters being sent to EmailJS:", JSON.stringify(emailParams, null, 2));
         try {
             await emailjs.send(
                 "service_ua1imoh",
@@ -92,7 +91,6 @@ const CheckoutPage: React.FC = () => {
                 emailParams,
                 "LhmWwd3pEmYkAMNKW"
             );
-            console.log("Invoice email sent successfully!");
         } catch (error: any) {
             console.error("Error sending invoice email:", error?.text || error);
             throw new Error("Failed to send email. Please check the logs for details.");

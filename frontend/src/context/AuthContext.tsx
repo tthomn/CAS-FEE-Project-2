@@ -1,10 +1,8 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut,createUserWithEmailAndPassword,sendEmailVerification,sendPasswordResetEmail,User,} from "firebase/auth";
 import {AuthUser} from "../types/authUser";
-import { getDocRefsBy1Condition,getDocDataBy1Condition } from "../services/firebase/firestoreService";
+import {createDocRef,getData} from "../services/firebase/firestoreService";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { doc, collection, getDoc } from "firebase/firestore";
-import {db} from "../services/firebase/firebaseConfig"
 
 interface AdditionalData {
     title: string;
@@ -47,27 +45,26 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const [loading, setLoading] = useState(true); 
     const auth = getAuth();
      
+
     useEffect(() =>{
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
-
             setUser(user);     
             setLoading(false);    
 
-            if (user) {
-                                 
+            if (user) {                                 
                 const fetchedUser = await fetchAuthUser(user?.uid);
-                if (fetchedUser) {
-                    setAuthUser(fetchedUser);
-               } else {
-               }
-               setIsAuthenticated(true);    
+                if (fetchedUser) 
+                 {  setAuthUser(fetchedUser);
+                    setIsAuthenticated(true);  
+                  }            
+        
               } 
               else {
                 setIsAuthenticated(false);
               }
         });
         return unsubscribe;
-    }, [auth]);
+    }, []);
 
     
     const assignAdminRole = async () => {
@@ -76,22 +73,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     
         try {
             const user = auth.currentUser;    
-            if (!user) {
-                console.error("No user is logged in.");
+            if (!user) {         
                 return;
             }              
-           const response = await setAdmin();
-           console.log("Response from the function:", response);
-            const idTokenResult = await user.getIdTokenResult();
-
-            // Check if the admin claim is present
-           if (idTokenResult.claims.admin) {
-                console.log("User is an admin.");
-            
-            } else {
-             console.log("User is not an admin.");
-            }
-   
+           await setAdmin();
+       
         } catch (error) {
             console.error("Error assigning admin role:", error);
         }
@@ -100,8 +86,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         const fetchAuthUser = async (uid: any) => {        
             try
             {            
-                       const docRefComplete = doc(collection(db, "users"), uid);      
-                 const docSnap = await getDoc(docRefComplete);
+                 //const docRefComplete = doc(collection(db, "users"), uid);     
+                const docRefComplete = await createDocRef("users", uid);
+                // const docSnap = await getDoc(docRefComplete);
+                 const docSnap = await getData(docRefComplete);
                  let data =  docSnap.data();
           
              if (!data || data.length === 0) {
@@ -122,8 +110,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 zip: userDoc?.zip || "",
                 street: userDoc?.street,
                 gender: userDoc?.gender || "",
-                addedAt: userDoc?.addedAt || undefined , // Date of user creation   
-           
+                addedAt: userDoc?.addedAt || undefined , // Date of user creation              
                 };
                 assignAdminRole();
 

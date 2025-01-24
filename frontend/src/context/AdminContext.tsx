@@ -1,7 +1,6 @@
 import React, { useState,  createContext, ReactNode, useContext } from "react";
 import { Product } from "../types/product";
-import {getFirestore,doc, collection } from "firebase/firestore"; 
-import {uploadImageToStorage,  deleteFileFromStorage, addDocToCollection, deleteDocByRef, updateDocByRef } from "../services/firebase/firestoreService";
+import {uploadImageToStorage,  deleteFileFromStorage, addDocToCollection, deleteDocByRef, updateDocByRef, createDocRef,  } from "../services/firebase/firestoreService";
 import {useProduct} from "./ProductContext";
 import {toast} from "react-toastify";
 
@@ -30,8 +29,6 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const [newCategoryName, setNewCategoryName] = useState<string>("");
   const [isImageUploaded, setIsImageUploaded] = useState(false);
   const { fetchProducts} = useProduct();
-
-  const db = getFirestore();
 
   const [newProduct, setNewProduct] = useState<Omit<Product, "id">>({
     name: "",
@@ -106,7 +103,8 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         const deleteProduct = async (id: string, imageUrl: string) => {
             try {           
                 await deleteFileFromStorage(imageUrl);
-                const productRef = doc(db, "products", id); 
+
+                const productRef = await createDocRef("products", id);
                 await deleteDocByRef(productRef);     
                 await fetchProducts(null);
                 toast.success("Product deleted successfully!");
@@ -118,7 +116,8 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
             
         const updateProduct = async (id: string, updatedData: Partial<Product>) => {
             try {      
-                 const docRefComplete = doc(collection(db, "products"), id);      
+                // const docRefComplete = doc(collection(db, "products"), id);
+                 const docRefComplete = await createDocRef("products", id);
                 await updateDocByRef(docRefComplete, updatedData);      
                await fetchProducts(null); 
             } catch (error) {

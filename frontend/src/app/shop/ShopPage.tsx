@@ -7,7 +7,6 @@ import {useCategories} from "../../context/CategoryContext";
 
 const ShopPage: React.FC = () => {
 
-  console.log("Shoppage rendered");
    const {categories,fetchCategories } = useCategories();
 
   const [categoriesLoading, setCategoriesLoading] = useState<boolean>(false);
@@ -16,7 +15,7 @@ const ShopPage: React.FC = () => {
   
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
   const [selectedCategoryName, setSelectedCategoryName] = useState<string>("Shop");
-
+console.log("SHOP PAGE");
      useEffect(() => {
 
        fetchCategories();

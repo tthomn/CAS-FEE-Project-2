@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { db } from "../../services/firebase/firebaseConfig";
-import { doc, getDoc } from "firebase/firestore";
 import { useCart } from "../../context/CartContext";
 import Rating from "../shared/Rating";
+import {getData, createDocRef} from "../../services/firebase/firestoreService";
+
 
 interface Product {
     id: string;
@@ -25,11 +25,15 @@ const ProductDetail: React.FC = () => {
     const { addToCart } = useCart();
     const navigate = useNavigate();
 
+
     useEffect(() => {
         const fetchProduct = async () => {
             if (!productId) return;
             try {
-                const productDoc = await getDoc(doc(db, "products", productId));
+
+             const productDocRef  = await createDocRef("products", productId);
+             const productDoc = await getData(productDocRef);
+
                 if (productDoc.exists()) {
                     setProduct({ id: productDoc.id, ...productDoc.data() } as Product);
                 }

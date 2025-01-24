@@ -10,7 +10,6 @@ const ProductGrid: React.FC<ProductGridProps> = ({ categoryId }) => {
 
 
   const {fetchProducts, products,productsLoading,productsError,} = useProduct();
-  console.log("ProductGrid rendered");
 
   useEffect(() => {
     fetchProducts(categoryId);
