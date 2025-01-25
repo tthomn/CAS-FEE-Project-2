@@ -132,7 +132,7 @@ describe('firestoreService', () => {
   // ------------------------------------------------------
   describe('getDocDataBy1Condition', () => {
     it('should fetch documents matching one condition', async () => {
-      const result = await getDocDataBy1Condition('users', 'age', '==', 30);
+      const result = await getDocDataBy1Condition('users', 'age', '==', '30');
       // Check that Firestore was called correctly
       expect(collection).toHaveBeenCalledWith(expect.anything(), 'users');
       expect(where).toHaveBeenCalledWith('age', '==', 30);
@@ -150,7 +150,7 @@ describe('firestoreService', () => {
         new Error('Firestore error'),
       );
       await expect(
-        getDocDataBy1Condition('users', 'age', '==', 30),
+        getDocDataBy1Condition('users', 'age', '==', '30'),
       ).rejects.toThrow('Firestore error');
     });
   });

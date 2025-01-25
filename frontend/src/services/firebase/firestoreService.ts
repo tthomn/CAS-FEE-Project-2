@@ -1,4 +1,3 @@
-import { db, storage } from './firebaseConfig';
 import {
   doc,
   collection,
@@ -14,6 +13,7 @@ import {
   QueryConstraint,
   getDoc,
   setDoc,
+  WhereFilterOp,
 } from 'firebase/firestore';
 import {
   ref,
@@ -21,14 +21,15 @@ import {
   getDownloadURL,
   deleteObject,
 } from 'firebase/storage';
+import { db, storage } from './firebaseConfig';
 
 //Query for Doc fields (Cart Items) with 1 condition
 //Gets the Contens (the fields)
 export async function getDocDataBy1Condition<T>(
   collectionName: string,
   field: string,
-  operator: any,
-  value: any,
+  operator: WhereFilterOp,
+  value: string,
 ): Promise<T[]> {
   try {
     const q = query(
@@ -54,8 +55,8 @@ export async function getDocDataBy1Condition<T>(
 export async function getDocRefsBy1Condition(
   collectionName: string,
   field1: string,
-  operator1: any,
-  value1: any,
+  operator1: WhereFilterOp,
+  value1: string,
 ): Promise<DocumentReference<DocumentData>[]> {
   try {
     const q = query(
@@ -82,7 +83,7 @@ export async function getDocRefsBy2Condition(
   value1: any,
   field2: string,
   operator2: any,
-  value2: any,
+  value2: string,
 ): Promise<DocumentReference<DocumentData>[]> {
   try {
     const q = query(
@@ -287,6 +288,26 @@ export async function deleteFileFromStorage(fileURL: string): Promise<void> {
     await deleteObject(fileRef);
   } catch (error) {
     console.error('Error deleting file from storage:', error);
+    throw error;
+  }
+}
+/**
+ * Update stock for a product in the Firestore database.
+ * @param {string} productId - The ID of the product.
+ * @param {number} quantity - The quantity to subtract from the stock.
+ * @returns {Promise<void>} - Resolves when the stock is updated.
+ */
+export async function decrementStock(
+  productId: string,
+  quantity: number,
+): Promise<void> {
+  try {
+    const productRef = doc(db, 'products', productId);
+    await updateDoc(productRef, {
+      stock: (await getDoc(productRef)).data()?.stock - quantity,
+    });
+  } catch (error) {
+    console.error(`Error decrementing stock for product ${productId}:`, error);
     throw error;
   }
 }

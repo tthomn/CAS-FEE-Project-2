@@ -6,6 +6,7 @@ import {
   getData,
   createDocRef,
 } from '../../services/firebase/firestoreService';
+import { toast } from 'react-toastify';
 
 interface Product {
   id: string;
@@ -13,6 +14,7 @@ interface Product {
   price: number | string;
   imageUrl: string;
   description: string;
+  stock: number;
   ratings?: {
     totalRating: number;
     ratingCount: number;
@@ -35,7 +37,12 @@ const ProductDetail: React.FC = () => {
         const productDoc = await getData(productDocRef);
 
         if (productDoc.exists()) {
-          setProduct({ id: productDoc.id, ...productDoc.data() } as Product);
+          const productData = productDoc.data();
+          setProduct({
+            id: productDoc.id,
+            ...productData,
+            stock: productData.stock || 0,
+          } as Product);
         }
       } catch (error) {
         console.error('Error fetching product:', error);
@@ -47,6 +54,22 @@ const ProductDetail: React.FC = () => {
 
   const handleAddToCart = () => {
     if (!product) return;
+
+    if (product.stock < quantity) {
+      toast.error(
+        `${product.name} has insufficient stock. Available: ${product.stock}, Requested: ${quantity}`,
+        {
+          position: 'top-right',
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          theme: 'colored',
+        },
+      );
+      return;
+    }
 
     addToCart({
       id: product.id,
@@ -152,28 +175,37 @@ const ProductDetail: React.FC = () => {
           {/* Description */}
           <p className="text-lg text-gray-700 mb-8">{product.description}</p>
 
-          {/* Quantity Selector */}
-          <div className="flex items-center gap-4 mb-6">
-            <label htmlFor="quantity" className="text-lg font-semibold">
-              Quantity:
-            </label>
-            <input
-              type="number"
-              id="quantity"
-              value={quantity}
-              onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))}
-              min="1"
-              className="w-16 px-2 py-1 border border-gray-300 rounded text-center text-lg"
-            />
-          </div>
+          {/* Stock Check */}
+          {product.stock > 0 ? (
+            <>
+              {/* Quantity Selector */}
+              <div className="flex items-center gap-4 mb-6">
+                <label htmlFor="quantity" className="text-lg font-semibold">
+                  Quantity:
+                </label>
+                <input
+                  type="number"
+                  id="quantity"
+                  value={quantity}
+                  onChange={(e) =>
+                    setQuantity(Math.max(1, Number(e.target.value)))
+                  }
+                  min="1"
+                  className="w-16 px-2 py-1 border border-gray-300 rounded text-center text-lg"
+                />
+              </div>
 
-          {/* Add to Cart Button */}
-          <button
-            onClick={handleAddToCart}
-            className="bg-blue-600 text-white px-8 py-3 text-lg font-semibold rounded hover:bg-blue-700 transition duration-200 shadow-md"
-          >
-            Add to Cart
-          </button>
+              {/* Add to Cart Button */}
+              <button
+                onClick={handleAddToCart}
+                className="bg-blue-600 text-white px-8 py-3 text-lg font-semibold rounded hover:bg-blue-700 transition duration-200 shadow-md"
+              >
+                Add to Cart
+              </button>
+            </>
+          ) : (
+            <p className="text-red-500 font-semibold text-lg">Out of Stock</p>
+          )}
         </div>
       </div>
     </div>

@@ -83,6 +83,10 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
 
   useEffect(() => {
     fetchCartItems();
+    if (isAuthenticated === true) {
+      cartCleaner();
+    }
+
     if (isAuthenticated === false) {
       syncLocalToFirestore(getGuestId());
     }
@@ -101,7 +105,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
         'cart',
         'userId',
         '==',
-        userId,
+        userId!,
       );
 
       if (localCart.length === 0) {
@@ -187,7 +191,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
         'cart',
         'userId',
         '==',
-        userId,
+        userId!,
       );
       setCartItems(firestoreItems);
     } catch (error) {

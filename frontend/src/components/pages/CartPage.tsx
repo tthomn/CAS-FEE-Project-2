@@ -3,6 +3,12 @@ import { useCart } from '../../context/CartContext';
 import { useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import { useAuth } from '../../context/AuthContext';
+import { toast } from 'react-toastify';
+import {
+  createDocRef,
+  decrementStock,
+  getData,
+} from '../../services/firebase/firestoreService';
 
 const CartPage: React.FC = () => {
   const { cartItems, removeFromCart, updateQuantity } = useCart();
@@ -11,14 +17,50 @@ const CartPage: React.FC = () => {
   const [showPopup, setShowPopup] = useState(false);
   const { isAuthenticated, authUser } = useAuth();
 
-  const handleProceedToCheckout = () => {
-    if (!isAuthenticated) {
-      setShowPopup(true);
-    } else {
+  const handleProceedToCheckout = async () => {
+    try {
+      const stockValidationAndUpdatePromises = cartItems.map(async (item) => {
+        const productDocRef = await createDocRef('products', item.productId);
+        const productDoc = await getData(productDocRef);
+
+        if (productDoc.exists()) {
+          const productData = productDoc.data();
+          const updatedStock = productData.stock - item.quantity;
+
+          if (updatedStock < 0) {
+            throw new Error(
+              `${item.productName} has insufficient stock. Available: ${productData.stock}, Requested: ${item.quantity}`,
+            );
+          }
+
+          await decrementStock(item.productId, item.quantity);
+        } else {
+          throw new Error(`Product ${item.productName} does not exist.`);
+        }
+      });
+
+      await Promise.all(stockValidationAndUpdatePromises);
+
+      if (!isAuthenticated) {
+        setShowPopup(true);
+        return;
+      }
       navigate('/checkout', { state: { email: authUser?.userId } });
+    } catch (error: any) {
+      toast.error(
+        error.message || 'Stock validation or update failed. Please try again.',
+        {
+          position: 'top-right',
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          theme: 'colored',
+        },
+      );
     }
   };
-
   const closePopup = () => {
     setShowPopup(false);
   };

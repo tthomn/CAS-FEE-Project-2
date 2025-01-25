@@ -1,26 +1,26 @@
 import './index.css';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import HomePage from './components/pages/HomePage';
+import { ToastContainer } from 'react-toastify';
 import ShopPage from './app/shop/ShopPage';
+import Header from './components/layouts/Header';
+import Account from './components/pages/Account';
+import AdminPanel from './components/pages/AdminPanel';
+import CartPage from './components/pages/CartPage';
+import CheckoutPage from './components/pages/CheckoutPage';
+import ContactPage from './components/pages/ContactPage';
+import HomePage from './components/pages/HomePage';
+import LoginPage from './components/pages/LoginPage';
+import NotFoundPage from './components/pages/NotFoundPage';
 import ProductDetail from './components/pages/ProductDetail';
 import Recipe from './components/pages/Recipe';
 import RecipeDetail from './components/pages/RecipeDetail';
-import Account from './components/pages/Account';
-import Header from './components/layouts/Header';
-import CartPage from './components/pages/CartPage';
-import CheckoutPage from './components/pages/CheckoutPage';
-import NotFoundPage from './components/pages/NotFoundPage';
 import SearchResultsPage from './components/pages/SearchResultsPage';
-import { CartProvider } from './context/CartContext';
-import LoginPage from './components/pages/LoginPage';
-import AdminPanel from './components/pages/AdminPanel';
 import ProtectedRoute from './components/routes/ProtectedRoute';
-import { AuthProvider } from './context/AuthContext';
 import { AdminProvider } from './context/AdminContext';
-import { ProductProvider } from './context/ProductContext';
+import { AuthProvider } from './context/AuthContext';
+import { CartProvider } from './context/CartContext';
 import { CategoriesProvider } from './context/CategoryContext';
-import { ToastContainer } from 'react-toastify';
-import ContactPage from './components/pages/ContactPage';
+import { ProductProvider } from './context/ProductContext';
 
 const App: React.FC = () => {
   return (

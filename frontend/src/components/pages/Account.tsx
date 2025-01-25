@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import CountryDropdown from '../shared/CountryDropdown';
-import { useCart } from '../../context/CartContext';
 import { getDocDataBy1Condition } from '../../services/firebase/firestoreService';
 import UserInfo from '../shared/UserInfo';
 import OrdersList from '../shared/OrdersList';
@@ -47,7 +46,6 @@ const Account: React.FC = () => {
   const [authLoading, setAuthLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const { cartCleaner } = useCart();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [showOrders, setShowOrders] = useState(false);
 
@@ -171,7 +169,6 @@ const Account: React.FC = () => {
         setMessage('Registration successful! Please verify your email.');
       } else {
         await login(formData.email, formData.password);
-        await cartCleaner();
         setMessage('Login successful!');
       }
     } catch (error: any) {

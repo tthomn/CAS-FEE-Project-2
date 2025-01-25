@@ -67,6 +67,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const fetchAuthUser = useCallback(
     async (uid: any) => {
       try {
+        console.log('fetchAuthUser', uid);
         const docRefComplete = await createDocRef('users', uid);
         const docSnap = await getData(docRefComplete);
         let data = docSnap.data();

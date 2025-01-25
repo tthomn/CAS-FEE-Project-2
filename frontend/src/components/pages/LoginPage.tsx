@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 
 //ONLY CALLED WHEN LOGIN IN FROM CART!
@@ -13,7 +12,6 @@ const LoginPage: React.FC = () => {
   const [resetEmailSent, setResetEmailSent] = useState<boolean>(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { cartCleaner } = useCart();
   const { login, resetPassword, logout } = useAuth();
 
   //Here we're coming from the cart
@@ -24,7 +22,6 @@ const LoginPage: React.FC = () => {
 
     try {
       await login(email, password);
-      await cartCleaner();
 
       const fromCart = new URLSearchParams(location.search).get('fromCart');
       if (fromCart) {
