@@ -7,84 +7,88 @@ import { Category } from '../types/category';
 jest.mock('../services/firebase/firestoreService');
 
 const mockCategories: Category[] = [
-    { id: '1', name: 'Category 1' },
-    { id: '2', name: 'Category 2' },
+  { id: '1', name: 'Category 1' },
+  { id: '2', name: 'Category 2' },
 ];
 
 describe('CategoryContext', () => {
-    beforeEach(() => {
-        jest.clearAllMocks();
-        (getCollectionData as jest.Mock).mockResolvedValue(mockCategories);
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (getCollectionData as jest.Mock).mockResolvedValue(mockCategories);
+  });
+
+  it('fetches and sets categories', async () => {
+    const TestComponent: React.FC = () => {
+      const { categories, fetchCategories } = useCategories();
+
+      return (
+        <div>
+          <button onClick={fetchCategories}>Fetch Categories</button>
+          {categories.map((category) => (
+            <div key={category.id}>{category.name}</div>
+          ))}
+        </div>
+      );
+    };
+
+    render(
+      <CategoriesProvider>
+        <TestComponent />
+      </CategoriesProvider>,
+    );
+
+    screen.getByText('Fetch Categories').click();
+
+    await waitFor(() => {
+      expect(screen.getByText('Category 1')).toBeInTheDocument();
+      expect(screen.getByText('Category 2')).toBeInTheDocument();
     });
+  });
 
-    it('fetches and sets categories', async () => {
-        const TestComponent: React.FC = () => {
-            const { categories, fetchCategories } = useCategories();
+  it('handles fetch error', async () => {
+    (getCollectionData as jest.Mock).mockRejectedValue(
+      new Error('Failed to fetch categories'),
+    );
 
-            return (
-                <div>
-                    <button onClick={fetchCategories}>Fetch Categories</button>
-                    {categories.map((category) => (
-                        <div key={category.id}>{category.name}</div>
-                    ))}
-                </div>
-            );
-        };
+    const TestComponent: React.FC = () => {
+      const { categories, fetchCategories } = useCategories();
 
-        render(
-            <CategoriesProvider>
-                <TestComponent />
-            </CategoriesProvider>
-        );
+      React.useEffect(() => {
+        fetchCategories();
+      }, [fetchCategories]);
 
-        screen.getByText('Fetch Categories').click();
+      return (
+        <div>
+          {categories.length === 0 ? <p>No categories available</p> : null}
+        </div>
+      );
+    };
 
-        await waitFor(() => {
-            expect(screen.getByText('Category 1')).toBeInTheDocument();
-            expect(screen.getByText('Category 2')).toBeInTheDocument();
-        });
+    render(
+      <CategoriesProvider>
+        <TestComponent />
+      </CategoriesProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('No categories available')).toBeInTheDocument();
     });
+  });
 
-    it('handles fetch error', async () => {
-        (getCollectionData as jest.Mock).mockRejectedValue(new Error('Failed to fetch categories'));
+  it('throws error when useCategories is used outside of CategoriesProvider', () => {
+    const TestComponent: React.FC = () => {
+      useCategories();
+      return <div />;
+    };
 
-        const TestComponent: React.FC = () => {
-            const { categories, fetchCategories } = useCategories();
+    const consoleErrorSpy = jest
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
 
-            React.useEffect(() => {
-                fetchCategories();
-            }, [fetchCategories]);
+    expect(() => render(<TestComponent />)).toThrow(
+      'useCategories must be used within a CategoriesProvider',
+    );
 
-            return (
-                <div>
-                    {categories.length === 0 ? <p>No categories available</p> : null}
-                </div>
-            );
-        };
-
-        render(
-            <CategoriesProvider>
-                <TestComponent />
-            </CategoriesProvider>
-        );
-
-        await waitFor(() => {
-            expect(screen.getByText('No categories available')).toBeInTheDocument();
-        });
-    });
-
-    it('throws error when useCategories is used outside of CategoriesProvider', () => {
-        const TestComponent: React.FC = () => {
-            useCategories();
-            return <div />;
-        };
-
-        const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-
-        expect(() => render(<TestComponent />)).toThrow(
-            'useCategories must be used within a CategoriesProvider'
-        );
-
-        consoleErrorSpy.mockRestore();
-    });
+    consoleErrorSpy.mockRestore();
+  });
 });

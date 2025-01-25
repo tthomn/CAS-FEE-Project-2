@@ -1,15 +1,14 @@
-import React, { useEffect } from "react";
-import { Link } from "react-router-dom";
-import { useProduct } from "../../context/ProductContext";
+import React, { useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { useProduct } from '../../context/ProductContext';
 
 interface ProductGridProps {
   categoryId: string | null;
 }
 
 const ProductGrid: React.FC<ProductGridProps> = ({ categoryId }) => {
-
-
-  const {fetchProducts, products,productsLoading,productsError,} = useProduct();
+  const { fetchProducts, products, productsLoading, productsError } =
+    useProduct();
 
   useEffect(() => {
     fetchProducts(categoryId);
@@ -43,7 +42,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({ categoryId }) => {
   }
 
   return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 p-2 sm:p-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 p-2 sm:p-4">
       {products.map((product) => (
         <Link
           to={`/shop/${product.id}`}
@@ -51,7 +50,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({ categoryId }) => {
           className="no-underline text-inherit"
         >
           <div className="border border-gray-300 rounded-lg shadow hover:shadow-lg transition-shadow p-6 flex flex-col items-center text-center">
-            <picture>      
+            <picture>
               <source
                 srcSet={`${product.imageUrl}?alt=media&format=webp`}
                 type="image/webp"
@@ -61,7 +60,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({ categoryId }) => {
                 alt={product.name}
                 className="w-full h-auto max-h-[150px] object-cover mb-4"
                 loading="lazy"
-                decoding="async" 
+                decoding="async"
                 //loading="eager"
               />
             </picture>

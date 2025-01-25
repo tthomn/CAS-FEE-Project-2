@@ -1,173 +1,177 @@
-import React, { useState,  createContext, ReactNode, useContext } from "react";
-import { Product } from "../types/product";
-import {uploadImageToStorage,  deleteFileFromStorage, addDocToCollection, deleteDocByRef, updateDocByRef, createDocRef,  } from "../services/firebase/firestoreService";
-import {useProduct} from "./ProductContext";
-import {toast} from "react-toastify";
+import React, { useState, createContext, ReactNode, useContext } from 'react';
+import { Product } from '../types/product';
+import {
+  uploadImageToStorage,
+  deleteFileFromStorage,
+  addDocToCollection,
+  deleteDocByRef,
+  updateDocByRef,
+  createDocRef,
+} from '../services/firebase/firestoreService';
+import { useProduct } from './ProductContext';
+import { toast } from 'react-toastify';
 
-interface AdminContextType
-{
-    handleImageUpload: (file: File) => void;
-    addProduct: () => void;
-    uploadingImage: boolean;
-    errorMessage: string; 
-    setNewProduct: React.Dispatch<React.SetStateAction<Omit<Product, "id">>>;
-    newProduct: Omit<Product, "id">;
-    deleteProduct: (id: string, imageUrl: string) => void;
-    updateProduct: (id: string, updatedData: Partial<Product>) => void;
-    addCategory: (categoryName: string) => Promise<string>;
-    newCategoryName : string;
-    setNewCategoryName : React.Dispatch<React.SetStateAction<string>>;
- 
+interface AdminContextType {
+  handleImageUpload: (file: File) => void;
+  addProduct: () => void;
+  uploadingImage: boolean;
+  errorMessage: string;
+  setNewProduct: React.Dispatch<React.SetStateAction<Omit<Product, 'id'>>>;
+  newProduct: Omit<Product, 'id'>;
+  deleteProduct: (id: string, imageUrl: string) => void;
+  updateProduct: (id: string, updatedData: Partial<Product>) => void;
+  addCategory: (categoryName: string) => Promise<string>;
+  newCategoryName: string;
+  setNewCategoryName: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
 
-export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =>     {
-
+export const AdminProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [uploadingImage, setUploadingImage] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [newCategoryName, setNewCategoryName] = useState<string>("");
+  const [errorMessage, setErrorMessage] = useState('');
+  const [newCategoryName, setNewCategoryName] = useState<string>('');
   const [isImageUploaded, setIsImageUploaded] = useState(false);
-  const { fetchProducts} = useProduct();
+  const { fetchProducts } = useProduct();
 
-  const [newProduct, setNewProduct] = useState<Omit<Product, "id">>({
-    name: "",
+  const [newProduct, setNewProduct] = useState<Omit<Product, 'id'>>({
+    name: '',
     price: 0,
     weight: 0,
-    imageUrl: "",
-    categoryId: "",
+    imageUrl: '',
+    categoryId: '',
     stock: 0,
-    description: "",
+    description: '',
     keywords: [],
     ratings: { totalRating: 0, ratingCount: 0 },
   });
-     
 
-      const handleImageUpload = async (file: File) => {
-        setUploadingImage(true);
-        setErrorMessage("");
-        try {
-          const downloadURL = await uploadImageToStorage(file, "products");
-          setNewProduct({ ...newProduct, imageUrl: downloadURL });
-          setIsImageUploaded(true);  // Mark image as uploaded
-        } catch (error) {
-          console.error("Error uploading image:", error);
-          setErrorMessage("Image upload failed. Please try again.");
-          setIsImageUploaded(false);  // Reset in case of failure
-        } finally {
-          setUploadingImage(false);
-        }
-      };
-        
-        const addProduct = async () => {
-          setErrorMessage("");      
-            if (!isImageUploaded) {
-              setErrorMessage("Please wait until the image is uploaded.");
-              return;
-            }
+  const handleImageUpload = async (file: File) => {
+    setUploadingImage(true);
+    setErrorMessage('');
+    try {
+      const downloadURL = await uploadImageToStorage(file, 'products');
+      setNewProduct({ ...newProduct, imageUrl: downloadURL });
+      setIsImageUploaded(true); // Mark image as uploaded
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      setErrorMessage('Image upload failed. Please try again.');
+      setIsImageUploaded(false); // Reset in case of failure
+    } finally {
+      setUploadingImage(false);
+    }
+  };
 
-          if ( !newProduct.name ||
-            newProduct.price <= 0 ||
-            newProduct.stock < 0 ||
-            !newProduct.categoryId
-          ) {
-            setErrorMessage(
-              "Please provide valid product details, including a category."
-            );
-            return;
-          }
+  const addProduct = async () => {
+    setErrorMessage('');
+    if (!isImageUploaded) {
+      setErrorMessage('Please wait until the image is uploaded.');
+      return;
+    }
 
-          try {
-              await addDocToCollection("products", newProduct);
-            setNewProduct((prev) => ({
-              ...prev,
-              name: "",
-              price: 0,
-              weight: 0,
-              imageUrl: "",
-              stock: 0,
-              description: "",
-              keywords: [],
-              categoryId: "",              
-            }));
-            setIsImageUploaded(false);  
-            await fetchProducts(null);
+    if (
+      !newProduct.name ||
+      newProduct.price <= 0 ||
+      newProduct.stock < 0 ||
+      !newProduct.categoryId
+    ) {
+      setErrorMessage(
+        'Please provide valid product details, including a category.',
+      );
+      return;
+    }
 
-            toast.success("Product added successfully!");
-          } catch (error) {
-            console.error("Error adding product:", error);
-            setErrorMessage("Failed to add product. Please try again.");
-          }
-        };
-    
-        const deleteProduct = async (id: string, imageUrl: string) => {
-            try {           
-                await deleteFileFromStorage(imageUrl);
+    try {
+      await addDocToCollection('products', newProduct);
+      setNewProduct((prev) => ({
+        ...prev,
+        name: '',
+        price: 0,
+        weight: 0,
+        imageUrl: '',
+        stock: 0,
+        description: '',
+        keywords: [],
+        categoryId: '',
+      }));
+      setIsImageUploaded(false);
+      await fetchProducts(null);
 
-                const productRef = await createDocRef("products", id);
-                await deleteDocByRef(productRef);     
-                await fetchProducts(null);
-                toast.success("Product deleted successfully!");
-            } catch (error) {
-                console.error("Error deleting product:", error);
-            }
-        };
+      toast.success('Product added successfully!');
+    } catch (error) {
+      console.error('Error adding product:', error);
+      setErrorMessage('Failed to add product. Please try again.');
+    }
+  };
 
-            
-        const updateProduct = async (id: string, updatedData: Partial<Product>) => {
-            try {      
-                // const docRefComplete = doc(collection(db, "products"), id);
-                 const docRefComplete = await createDocRef("products", id);
-                await updateDocByRef(docRefComplete, updatedData);      
-               await fetchProducts(null); 
-            } catch (error) {
-                console.error("Error updating product:", error);
-            }
-        };
+  const deleteProduct = async (id: string, imageUrl: string) => {
+    try {
+      await deleteFileFromStorage(imageUrl);
 
+      const productRef = await createDocRef('products', id);
+      await deleteDocByRef(productRef);
+      await fetchProducts(null);
+      toast.success('Product deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting product:', error);
+    }
+  };
 
-    const addCategory = async (categoryName: string): Promise<string> => {
-        try {
-            const categoryDocRef = await addDocToCollection("categories", {name: categoryName, description: categoryName});
-            setNewCategoryName("");
-            setErrorMessage("");
+  const updateProduct = async (id: string, updatedData: Partial<Product>) => {
+    try {
+      // const docRefComplete = doc(collection(db, "products"), id);
+      const docRefComplete = await createDocRef('products', id);
+      await updateDocByRef(docRefComplete, updatedData);
+      await fetchProducts(null);
+    } catch (error) {
+      console.error('Error updating product:', error);
+    }
+  };
 
-            return categoryDocRef;
- 
-        } catch (error) {
-            console.error("Error adding category:", error);
-           setErrorMessage("Failed to add category. Please try again.");
-            return ""; 
-        }
-    };
+  const addCategory = async (categoryName: string): Promise<string> => {
+    try {
+      const categoryDocRef = await addDocToCollection('categories', {
+        name: categoryName,
+        description: categoryName,
+      });
+      setNewCategoryName('');
+      setErrorMessage('');
 
-      return (
-        <AdminContext.Provider
-          value={{
-            handleImageUpload,
-            uploadingImage,
-            errorMessage,
-            setNewProduct,
-            newProduct,
-            addProduct,
-            deleteProduct,
-            updateProduct,
-            addCategory,
-            newCategoryName,
-            setNewCategoryName,
-          }}
-        >
-          {children}
-        </AdminContext.Provider>
-      ); 
+      return categoryDocRef;
+    } catch (error) {
+      console.error('Error adding category:', error);
+      setErrorMessage('Failed to add category. Please try again.');
+      return '';
+    }
+  };
 
+  return (
+    <AdminContext.Provider
+      value={{
+        handleImageUpload,
+        uploadingImage,
+        errorMessage,
+        setNewProduct,
+        newProduct,
+        addProduct,
+        deleteProduct,
+        updateProduct,
+        addCategory,
+        newCategoryName,
+        setNewCategoryName,
+      }}
+    >
+      {children}
+    </AdminContext.Provider>
+  );
 };
 
-
 export const useAdmin = () => {
-    const context = useContext(AdminContext);
-    if (!context) {
-        throw new Error("useAdmin must be used within a AdminProvider");
-    }
-    return context;
+  const context = useContext(AdminContext);
+  if (!context) {
+    throw new Error('useAdmin must be used within a AdminProvider');
+  }
+  return context;
 };
