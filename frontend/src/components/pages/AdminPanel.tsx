@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
 import { FaEdit, FaTrash, FaSave } from 'react-icons/fa';
-import 'react-toastify/dist/ReactToastify.css';
-import { useAdmin } from '../../context/AdminContext';
-import { useProduct } from '../../context/ProductContext';
-import { useCategories } from '../../context/CategoryContext';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { useAdmin } from '../../context/AdminContext';
+import 'react-toastify/dist/ReactToastify.css';
+import { useAuth } from '../../context/AuthContext';
+import { useCategories } from '../../context/CategoryContext';
+import { useProduct } from '../../context/ProductContext';
 
 const AdminPanel: React.FC<{}> = () => {
   //From Admin Context

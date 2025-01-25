@@ -1,21 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import Footer from '../../components/layouts/Footer';
-import CategorySidebar from '../../components/shared/CategorySidebar';
 import ProductGrid from '../../components/pages/ProductGrid';
+import CategorySidebar from '../../components/shared/CategorySidebar';
 import { useCategories } from '../../context/CategoryContext';
 
 const ShopPage: React.FC = () => {
-  const { categories, fetchCategories } = useCategories();
-
-  const [categoriesLoading, setCategoriesLoading] = useState<boolean>(false);
-  const [categoriesError, setCategoriesError] = useState<string | null>(null);
+  const { categories, fetchCategories, categoriesLoading, categoriesError } =
+    useCategories();
 
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(
     null,
   );
   const [selectedCategoryName, setSelectedCategoryName] =
     useState<string>('Shop');
-  console.log('SHOP PAGE');
   useEffect(() => {
     fetchCategories();
   }, [fetchCategories]);

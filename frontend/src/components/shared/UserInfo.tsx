@@ -1,6 +1,6 @@
 import React from 'react';
-import { AuthUser } from '../../types/authUser';
 import { FiMail, FiUser, FiMapPin, FiCalendar } from 'react-icons/fi';
+import { AuthUser } from '../../types/authUser';
 
 interface UserInfoProps {
   authUser: AuthUser | null;

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { useCart } from '../../context/CartContext';
 import { useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
-import { useAuth } from '../../context/AuthContext';
 import { toast } from 'react-toastify';
+import { useAuth } from '../../context/AuthContext';
+import { useCart } from '../../context/CartContext';
 import {
   createDocRef,
   decrementStock,
@@ -46,10 +46,9 @@ const CartPage: React.FC = () => {
         return;
       }
       navigate('/checkout', { state: { email: authUser?.userId } });
-    } catch (error: any) {
-      toast.error(
-        error.message || 'Stock validation or update failed. Please try again.',
-        {
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message, {
           position: 'top-right',
           autoClose: 3000,
           hideProgressBar: true,
@@ -57,8 +56,18 @@ const CartPage: React.FC = () => {
           pauseOnHover: true,
           draggable: true,
           theme: 'colored',
-        },
-      );
+        });
+      } else {
+        toast.error('Stock validation or update failed. Please try again.', {
+          position: 'top-right',
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          theme: 'colored',
+        });
+      }
     }
   };
   const closePopup = () => {

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Order } from '../../types/order';
 import { Link } from 'react-router-dom';
+import { Order } from '../../types/order';
 
 interface OrdersListProps {
   orders: Order[];

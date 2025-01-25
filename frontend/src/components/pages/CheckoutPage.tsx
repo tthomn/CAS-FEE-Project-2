@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
-import { useCart } from '../../context/CartContext';
-import Modal from '../shared/Modal';
-import { addDocToCollection } from '../../services/firebase/firestoreService';
-import { useAuth } from '../../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
 import emailjs from '@emailjs/browser';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import { useCart } from '../../context/CartContext';
+import { addDocToCollection } from '../../services/firebase/firestoreService';
+import { CartItem } from '../../types/cartItem';
+import Modal from '../shared/Modal';
 
 const CheckoutPage: React.FC = () => {
   const { cartItems, clearCart } = useCart();
@@ -33,29 +33,26 @@ const CheckoutPage: React.FC = () => {
   });
   const navigate = useNavigate();
 
-  const fetchUserDetails = useCallback(
-    async (userId: string) => {
-      try {
-        setEmail(authUser?.userName || 'Keine E-Mail verfügbar');
-        const fullAddress = `${authUser?.street || ''} ${authUser?.houseNumber || ''}, ${authUser?.zip || ''} ${authUser?.city || ''}`;
-        setDeliveryAddress(fullAddress);
-        setBillingAddress(fullAddress);
-        setName(authUser?.name || '');
-        setSurname(authUser?.surname || '');
-        localStorage.setItem(
-          'userDetails',
-          JSON.stringify({
-            name: authUser?.name,
-            surname: authUser?.surname,
-            deliveryAddress: fullAddress,
-          }),
-        );
-      } catch (error) {
-        console.error('Error fetching user details:', error);
-      }
-    },
-    [authUser],
-  );
+  const fetchUserDetails = useCallback(async () => {
+    try {
+      setEmail(authUser?.userName || 'Keine E-Mail verfügbar');
+      const fullAddress = `${authUser?.street || ''} ${authUser?.houseNumber || ''}, ${authUser?.zip || ''} ${authUser?.city || ''}`;
+      setDeliveryAddress(fullAddress);
+      setBillingAddress(fullAddress);
+      setName(authUser?.name || '');
+      setSurname(authUser?.surname || '');
+      localStorage.setItem(
+        'userDetails',
+        JSON.stringify({
+          name: authUser?.name,
+          surname: authUser?.surname,
+          deliveryAddress: fullAddress,
+        }),
+      );
+    } catch (error) {
+      console.error('Error fetching user details:', error);
+    }
+  }, [authUser]);
 
   // Load saved data on mount
   useEffect(() => {
@@ -66,7 +63,7 @@ const CheckoutPage: React.FC = () => {
       setSurname(surname || '');
       setDeliveryAddress(deliveryAddress || '');
     } else if (authUser?.id) {
-      fetchUserDetails(authUser.id);
+      fetchUserDetails();
     }
   }, [authUser, fetchUserDetails]);
 
@@ -94,7 +91,7 @@ const CheckoutPage: React.FC = () => {
       total_price: order.totalPrice.toFixed(2),
       items: order.cartItems
         .map(
-          (item: any) =>
+          (item: CartItem) =>
             `${item.productName} (x${item.quantity}): CHF ${(item.price * item.quantity).toFixed(2)}`,
         )
         .join('\n'),
@@ -106,8 +103,12 @@ const CheckoutPage: React.FC = () => {
         emailParams,
         'LhmWwd3pEmYkAMNKW',
       );
-    } catch (error: any) {
-      console.error('Error sending invoice email:', error?.text || error);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error('Error sending invoice email:', error.message);
+      } else {
+        console.error('Error sending invoice email');
+      }
       throw new Error(
         'Failed to send email. Please check the logs for details.',
       );

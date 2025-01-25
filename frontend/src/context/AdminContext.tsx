@@ -1,5 +1,5 @@
 import React, { useState, createContext, ReactNode, useContext } from 'react';
-import { Product } from '../types/product';
+import { toast } from 'react-toastify';
 import {
   uploadImageToStorage,
   deleteFileFromStorage,
@@ -8,8 +8,8 @@ import {
   updateDocByRef,
   createDocRef,
 } from '../services/firebase/firestoreService';
+import { Product } from '../types/product';
 import { useProduct } from './ProductContext';
-import { toast } from 'react-toastify';
 
 interface AdminContextType {
   handleImageUpload: (file: File) => void;

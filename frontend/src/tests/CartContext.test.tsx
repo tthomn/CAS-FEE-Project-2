@@ -1,8 +1,8 @@
-import React from 'react';
 import { render, screen, act, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
+import { useAuth } from '../context/AuthContext';
 import { CartProvider, useCart } from '../context/CartContext';
-
 import {
   getDocDataBy1Condition,
   getDocRefsBy1Condition,
@@ -10,7 +10,6 @@ import {
   updateDocByRef,
   deleteDocByRef,
 } from '../services/firebase/firestoreService';
-import { useAuth } from '../context/AuthContext';
 
 /*
  * Mock: Firestore service functions

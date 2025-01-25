@@ -1,5 +1,4 @@
 import * as firestore from 'firebase/firestore';
-import * as storage from 'firebase/storage';
 import {
   collection,
   getDocs,
@@ -74,17 +73,21 @@ jest.mock('../services/firebase/firebaseConfig', () => ({
     },
   },
 }));
+interface FirestoreDocument {
+  id: string;
+  data: () => Record<string, unknown>; // Or more specific types based on your data structure
+}
 
 const mockCollectionRef = {} as firestore.CollectionReference;
 const mockDocRef = { id: 'mockDocRefID' } as DocumentReference;
 
 const mockDocsData = [
-  { id: 'doc1', data: () => ({ name: 'John', age: 30 }) },
-  { id: 'doc2', data: () => ({ name: 'Jane', age: 25 }) },
+  { id: 'doc1', data: () => ({ name: 'John', age: '30' }) },
+  { id: 'doc2', data: () => ({ name: 'Jane', age: '25' }) },
 ];
 
 // A helper to simulate a Firestore querySnapshot
-function createQuerySnapshot(docs: any[]) {
+function createQuerySnapshot(docs: FirestoreDocument[]) {
   return {
     docs,
     size: docs.length,
@@ -135,13 +138,13 @@ describe('firestoreService', () => {
       const result = await getDocDataBy1Condition('users', 'age', '==', '30');
       // Check that Firestore was called correctly
       expect(collection).toHaveBeenCalledWith(expect.anything(), 'users');
-      expect(where).toHaveBeenCalledWith('age', '==', 30);
+      expect(where).toHaveBeenCalledWith('age', '==', '30');
       expect(getDocs).toHaveBeenCalledWith('mockedQuery');
 
       // Check the result
       expect(result).toEqual([
-        { id: 'doc1', name: 'John', age: 30 },
-        { id: 'doc2', name: 'Jane', age: 25 },
+        { id: 'doc1', name: 'John', age: '30' },
+        { id: 'doc2', name: 'Jane', age: '25' },
       ]);
     });
 
@@ -243,8 +246,8 @@ describe('firestoreService', () => {
       expect(query).toHaveBeenCalledWith(mockCollectionRef);
       expect(getDocs).toHaveBeenCalledWith('mockedQuery');
       expect(data).toEqual([
-        { id: 'doc1', name: 'John', age: 30 },
-        { id: 'doc2', name: 'Jane', age: 25 },
+        { id: 'doc1', name: 'John', age: '30' },
+        { id: 'doc2', name: 'Jane', age: '25' },
       ]);
     });
 
@@ -357,7 +360,7 @@ describe('firestoreService', () => {
       (uploadBytesResumable as jest.Mock).mockReturnValue({
         on: (
           _event: string,
-          _progress: any,
+          _progress: null,
           errorCb: (e: Error) => void,
           _completeCb: () => void,
         ) => {

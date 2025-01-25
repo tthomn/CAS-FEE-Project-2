@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import CountryDropdown from '../shared/CountryDropdown';
 import { getDocDataBy1Condition } from '../../services/firebase/firestoreService';
-import UserInfo from '../shared/UserInfo';
-import OrdersList from '../shared/OrdersList';
 import { Order } from '../../types/order';
 import Footer from '../layouts/Footer';
+import CountryDropdown from '../shared/CountryDropdown';
+import OrdersList from '../shared/OrdersList';
+import UserInfo from '../shared/UserInfo';
 
 const Account: React.FC = () => {
   const { user, login, register, resetPassword, logout, loading } = useAuth();
@@ -49,7 +49,7 @@ const Account: React.FC = () => {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [showOrders, setShowOrders] = useState(false);
 
-  const { isAuthenticated, authUser } = useAuth();
+  const { authUser } = useAuth();
 
   const [orders, setOrders] = useState<Order[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
@@ -68,8 +68,12 @@ const Account: React.FC = () => {
           user.uid,
         );
         setOrders(fetchedOrders);
-      } catch (error: any) {
-        setOrdersError('Failed to fetch orders: ' + error.message);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          setOrdersError('Failed to fetch orders: ' + error.message);
+        } else {
+          console.error('Non-standard error:');
+        }
       } finally {
         setOrdersLoading(false);
       }
@@ -106,12 +110,11 @@ const Account: React.FC = () => {
       if (formData.password !== formData.confirmPassword) {
         newErrors.confirmPassword = 'Passwords do not match';
       }
-
       ['name', 'surname', 'street', 'houseNumber', 'zip', 'city'].forEach(
         (field) => {
-          const fieldValue = (formData as any)[field];
+          const fieldValue = formData[field as keyof typeof formData]; // Type-safe lookup
           const fieldError = isRequired(
-            fieldValue,
+            fieldValue as string,
             field.charAt(0).toUpperCase() + field.slice(1),
           );
           if (fieldError) newErrors[field] = fieldError;
@@ -123,10 +126,7 @@ const Account: React.FC = () => {
       }
     }
 
-    console.log('Validation errors full object:', newErrors);
-
     setErrors(newErrors);
-
     return Object.keys(newErrors).length === 0;
   };
 
@@ -135,7 +135,6 @@ const Account: React.FC = () => {
     setAuthLoading(true);
 
     const isValid = validateForm();
-    console.log('Validation status:', isValid);
 
     if (!isValid) {
       setAuthLoading(false);
@@ -171,8 +170,12 @@ const Account: React.FC = () => {
         await login(formData.email, formData.password);
         setMessage('Login successful!');
       }
-    } catch (error: any) {
-      setMessage(error.message || 'An unknown error occurred');
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setMessage(error.message || 'An unknown error occurred');
+      } else {
+        setMessage('An unknown error occurred');
+      }
     } finally {
       setAuthLoading(false);
     }
@@ -183,8 +186,12 @@ const Account: React.FC = () => {
     try {
       await resetPassword(formData.email);
       setMessage('Password reset email sent. Please check your inbox.');
-    } catch (error: any) {
-      setMessage(error.message || 'An unknown error occurred');
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setMessage(error.message);
+      } else {
+        setMessage('An unknown error occurred');
+      }
     }
   };
 
@@ -194,8 +201,12 @@ const Account: React.FC = () => {
       await logout();
       localStorage.removeItem('userDetails');
       setMessage('Logged out successfully!');
-    } catch (error: any) {
-      setMessage('Failed to log out.');
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setMessage(error.message);
+      } else {
+        setMessage('Failed to log out.');
+      }
     }
   };
 

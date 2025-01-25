@@ -1,11 +1,3 @@
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  ReactNode,
-  useCallback,
-} from 'react';
 import {
   getAuth,
   onAuthStateChanged,
@@ -16,9 +8,17 @@ import {
   sendPasswordResetEmail,
   User,
 } from 'firebase/auth';
-import { AuthUser } from '../types/authUser';
-import { createDocRef, getData } from '../services/firebase/firestoreService';
 import { getFunctions, httpsCallable } from 'firebase/functions';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+  useCallback,
+} from 'react';
+import { createDocRef, getData } from '../services/firebase/firestoreService';
+import { AuthUser } from '../types/authUser';
 
 interface AdditionalData {
   title: string;
@@ -65,9 +65,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const functions = getFunctions();
 
   const fetchAuthUser = useCallback(
-    async (uid: any) => {
+    async (uid: string) => {
       try {
-        console.log('fetchAuthUser', uid);
         const docRefComplete = await createDocRef('users', uid);
         const docSnap = await getData(docRefComplete);
         let data = docSnap.data();
@@ -95,25 +94,36 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         };
 
         const setAdmin = httpsCallable(functions, 'setAdmin');
-
-        try {
-          const user = auth.currentUser;
-          if (!user) {
-            return;
-          }
-          await setAdmin();
-        } catch (error) {
-          console.error('Error assigning admin role:', error);
-        }
+        await setAdmin();
 
         return authUser; // Return the constructed AuthUser object
       } catch (error) {
         console.error('Error fetchAuthUser:', error);
       }
     },
-    [auth.currentUser],
+    [functions],
   );
 
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      setUser(user);
+      setLoading(false);
+
+      if (user) {
+        setIsAuthenticated(true);
+        const fetchedUser = await fetchAuthUser(user?.uid);
+
+        if (fetchedUser) {
+          setAuthUser(fetchedUser);
+        }
+      } else {
+        setIsAuthenticated(false);
+      }
+    });
+    return unsubscribe;
+  }, [auth, fetchAuthUser]);
+
+  /*
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
@@ -131,13 +141,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     });
     return unsubscribe;
   }, [auth, fetchAuthUser]);
+  */
 
   const login = async (email: string, password: string) => {
     setLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
-    } catch (error: any) {
-      throw new Error(error.message || 'Failed to login');
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      } else {
+        throw new Error('Failed to login');
+      }
     } finally {
       setLoading(false);
     }
@@ -149,9 +164,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       await signOut(auth);
       setAuthUser(null);
       localStorage.removeItem('userDetails');
-    } catch (error: any) {
+    } catch (error: unknown) {
       setAuthUser(null);
-      throw new Error(error.message || 'Failed to logout');
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      } else {
+        throw new Error('Failed to logout');
+      }
     } finally {
       setLoading(false);
     }
@@ -186,8 +205,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       }
 
       await sendEmailVerification(user);
-    } catch (error: any) {
-      throw new Error(error.message || 'Failed to register');
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      } else {
+        throw new Error('Failed to register');
+      }
     } finally {
       setLoading(false);
     }
@@ -197,8 +220,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     setLoading(true);
     try {
       await sendPasswordResetEmail(auth, email);
-    } catch (error: any) {
-      throw new Error(error.message || 'Failed to reset password');
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      } else {
+        throw new Error('Failed to reset password');
+      }
     } finally {
       setLoading(false);
     }

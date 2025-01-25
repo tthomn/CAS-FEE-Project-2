@@ -79,10 +79,10 @@ export async function getDocRefsBy1Condition(
 export async function getDocRefsBy2Condition(
   collectionName: string,
   field1: string,
-  operator1: any,
-  value1: any,
+  operator1: WhereFilterOp,
+  value1: string,
   field2: string,
-  operator2: any,
+  operator2: WhereFilterOp,
   value2: string,
 ): Promise<DocumentReference<DocumentData>[]> {
   try {

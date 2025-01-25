@@ -1,5 +1,5 @@
-import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
+import React from 'react';
 import { ProductProvider, useProduct } from '../context/ProductContext';
 import { getCollectionData } from '../services/firebase/firestoreService';
 import { Product } from '../types/product';
@@ -150,6 +150,10 @@ describe('ProductContext and useProduct Hook', () => {
     await waitFor(() => {
       const productElements = screen.getAllByTestId('product-name');
       expect(productElements).toHaveLength(1);
+    });
+
+    await waitFor(() => {
+      const productElements = screen.getAllByTestId('product-name');
       expect(productElements[0]).toHaveTextContent('Product A');
     });
 

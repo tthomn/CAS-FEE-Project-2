@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { useCart } from '../../context/CartContext';
-import Rating from '../shared/Rating';
 import {
   getData,
   createDocRef,
 } from '../../services/firebase/firestoreService';
-import { toast } from 'react-toastify';
+import Rating from '../shared/Rating';
 
 interface Product {
   id: string;
@@ -91,10 +91,6 @@ const ProductDetail: React.FC = () => {
       <p className="text-center text-gray-600">Loading product details...</p>
     );
   }
-
-  const averageRating = product.ratings
-    ? product.ratings.totalRating / product.ratings.ratingCount
-    : 0;
 
   return (
     <div className="max-w-5xl mx-auto p-6">

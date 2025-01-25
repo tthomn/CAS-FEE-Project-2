@@ -1,3 +1,4 @@
+import { where } from 'firebase/firestore';
 import React, {
   createContext,
   useContext,
@@ -5,7 +6,6 @@ import React, {
   ReactNode,
   useCallback,
 } from 'react';
-import { where } from 'firebase/firestore';
 import { getCollectionData } from '../services/firebase/firestoreService';
 import { Product } from '../types/product';
 
@@ -39,9 +39,11 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({
       );
 
       setProducts(fetchedProducts);
-    } catch (error: any) {
-      console.error('Error fetching products:', error);
-      setProductsError('Failed to load products. Please try again.');
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error('Error fetching products: ', error.message);
+        setProductsError('Failed to load products. Please try again.');
+      }
     } finally {
       setProductsLoading(false);
     }

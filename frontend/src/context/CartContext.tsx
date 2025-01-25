@@ -1,3 +1,5 @@
+import { getAuth } from 'firebase/auth';
+import { DocumentData, Timestamp } from 'firebase/firestore';
 import React, {
   createContext,
   useContext,
@@ -6,10 +8,7 @@ import React, {
   ReactNode,
   useCallback,
 } from 'react';
-import { CartItem } from '../types/cartItem';
 import { v4 as uuidv4 } from 'uuid';
-import { DocumentData } from 'firebase/firestore';
-import { Timestamp } from 'firebase/firestore';
 import {
   getDocDataBy1Condition,
   addDocToCollection,
@@ -20,8 +19,8 @@ import {
   setDocByRef,
   createDocRef,
 } from '../services/firebase/firestoreService';
+import { CartItem } from '../types/cartItem';
 import { useAuth } from './AuthContext';
-import { getAuth } from 'firebase/auth';
 
 interface CartContextType {
   cartItems: CartItem[];
@@ -127,7 +126,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
             'cart',
             'guestId',
             '==',
-            guestId,
+            guestId!,
             'productId',
             '==',
             item.productId,
@@ -150,7 +149,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
               'cart',
               'userId',
               '==',
-              userId,
+              userId!,
               'productId',
               '==',
               existingItem.id,
@@ -165,7 +164,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
               'cart',
               'guestId',
               '==',
-              guestId,
+              guestId!,
               'productId',
               '==',
               item.productId,
@@ -176,7 +175,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
               'cart',
               'guestId',
               '==',
-              guestId,
+              guestId!,
               'productId',
               '==',
               item.productId,
