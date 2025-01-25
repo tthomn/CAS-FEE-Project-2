@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import Modal from "../shared/Modal";
@@ -27,6 +27,22 @@ const CheckoutPage: React.FC = () => {
     const [backupData, setBackupData] = useState({ name: "", surname: "", deliveryAddress: "" });
     const navigate = useNavigate();
 
+
+
+    const fetchUserDetails = useCallback( async (userId: string) => {
+        try {            
+            setEmail(authUser?.userName || "Keine E-Mail verfügbar");
+            const fullAddress = `${authUser?.street || ""} ${authUser?.houseNumber || ""}, ${authUser?.zip || ""} ${authUser?.city || ""}`;
+            setDeliveryAddress(fullAddress);
+            setBillingAddress(fullAddress);
+            setName(authUser?.name || "");
+            setSurname(authUser?.surname || "");
+            localStorage.setItem("userDetails", JSON.stringify({ name: authUser?.name, surname: authUser?.surname, deliveryAddress: fullAddress }));
+        } catch (error) {
+            console.error("Error fetching user details:", error);
+        }
+    }, [authUser]);
+
     // Load saved data on mount
     useEffect(() => {      
         const savedDetails = localStorage.getItem("userDetails");
@@ -39,21 +55,9 @@ const CheckoutPage: React.FC = () => {
           
             fetchUserDetails(authUser.id);
         }
-    }, [authUser]);
+    }, [authUser, fetchUserDetails]);
 
-    const fetchUserDetails = async (userId: string) => {
-        try {            
-            setEmail(authUser?.userName || "Keine E-Mail verfügbar");
-            const fullAddress = `${authUser?.street || ""} ${authUser?.houseNumber || ""}, ${authUser?.zip || ""} ${authUser?.city || ""}`;
-            setDeliveryAddress(fullAddress);
-            setBillingAddress(fullAddress);
-            setName(authUser?.name || "");
-            setSurname(authUser?.surname || "");
-            localStorage.setItem("userDetails", JSON.stringify({ name: authUser?.name, surname: authUser?.surname, deliveryAddress: fullAddress }));
-        } catch (error) {
-            console.error("Error fetching user details:", error);
-        }
-    };
+
 
     const validateForm = () => {
         const newErrors: { [key: string]: string } = {};

@@ -1,5 +1,5 @@
 
-import React, {createContext, useContext, useState,ReactNode, useCallback, useRef} from "react";
+import React, {createContext, useContext, useState,ReactNode, useCallback,} from "react";
   import { where } from "firebase/firestore";
   import { getCollectionData } from "../services/firebase/firestoreService";
   import { Product } from "../types/product"; 

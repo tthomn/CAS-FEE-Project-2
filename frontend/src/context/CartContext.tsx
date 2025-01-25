@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { CartItem } from '../types/cartItem';
 import { v4 as uuidv4 } from 'uuid';
 import { DocumentData, } from 'firebase/firestore';
@@ -31,18 +31,11 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
 
-        useEffect(() => {            
-             fetchCartItems();
-            if (isAuthenticated === false)
-                { syncLocalToFirestore(getGuestId()); }    
-        }, [isAuthenticated]);      
-
         
         
  
-        const fetchCartItems = async () => {
+        const fetchCartItems = useCallback(async () => {
             try {
-                
                 let firestoreItems: CartItem[] = [];
                 const guestId = getGuestId();
         
@@ -65,7 +58,16 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             } catch (error) {
                 console.error("Error fetching cart items:", error);
             }
-        }
+        }, [authUser?.id]);
+        
+
+        useEffect(() => {            
+            fetchCartItems();
+           if (isAuthenticated === false)
+               { syncLocalToFirestore(getGuestId()); }    
+       }, [fetchCartItems, isAuthenticated]);
+
+
         
       const cartCleaner = async () => 
       {
@@ -75,7 +77,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
         const guestId = localStorage.getItem("guestId");
         const localCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
-       // let userId = authUser?.id;
         const auth = getAuth();
         let userId = auth?.currentUser?.uid;
         
@@ -166,10 +167,8 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             );   
             for (const item of newItems)  {         
 
-                //const docRef = doc(collection(db, "cart"), item.cartItemId);
                 const docRef = await createDocRef("cart", item.cartItemId);
                 await  setDocByRef(docRef, { ...item, guestId });
-               // await setDoc(docRef, { ...item, guestId }); 
 
             }    
             if (newItems.length > 0) {

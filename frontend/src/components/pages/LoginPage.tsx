@@ -1,15 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import {useAuth} from "../../context/AuthContext";
-
-import {
-    getAuth,
-    signInWithEmailAndPassword,
-    onAuthStateChanged,
-    signOut,
-    sendPasswordResetEmail,
-} from "firebase/auth";
 
 
 //ONLY CALLED WHEN LOGIN IN FROM CART!
@@ -26,19 +18,6 @@ const LoginPage: React.FC = () => {
     const { login, resetPassword, logout } = useAuth();   
 
 
-    //const auth = getAuth();
-/*
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            if (user) {
-                setUser({ email: user.email || "Anonymous" });
-            } else {
-                setUser(null);
-            }
-        });
-        return unsubscribe;
-    }, [auth]);*/
-
     //Here we're coming from the cart
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -46,10 +25,7 @@ const LoginPage: React.FC = () => {
         setErrorMessage("");
 
         try {
-            await login(email, password);
-           // await signInWithEmailAndPassword(auth, email, password);
-           // setLoading(false);         
-
+            await login(email, password);  
             await cartCleaner();   
   
             const fromCart = new URLSearchParams(location.search).get("fromCart");
@@ -81,7 +57,6 @@ const LoginPage: React.FC = () => {
         }
         try {
 
-           // await sendPasswordResetEmail(auth, email);
             await resetPassword(email);
 
             setResetEmailSent(true);
@@ -97,7 +72,6 @@ const LoginPage: React.FC = () => {
     const handleLogout = async () => {
         try {
             await logout();
-           // await signOut(auth);
             setUser(null);
         } catch (error) {
             console.error("Error logging out:", error);

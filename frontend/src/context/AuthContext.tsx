@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import React, { createContext, useContext, useEffect, useState, ReactNode, useCallback } from "react";
 import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut,createUserWithEmailAndPassword,sendEmailVerification,sendPasswordResetEmail,User,} from "firebase/auth";
 import {AuthUser} from "../types/authUser";
 import {createDocRef,getData} from "../services/firebase/firestoreService";
@@ -44,7 +44,57 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const [authUser, setAuthUser] = useState<AuthUser | null>(null); 
     const [loading, setLoading] = useState(true); 
     const auth = getAuth();
-     
+    const functions = getFunctions();
+
+    
+    const fetchAuthUser = useCallback(async (uid: any) => {        
+        try
+        {            
+            const docRefComplete = await createDocRef("users", uid);
+             const docSnap = await getData(docRefComplete);
+             let data =  docSnap.data();
+      
+         if (!data || data.length === 0) {
+            return null; }
+           
+            const userDoc = data;            
+            const authUser: AuthUser = {
+            id: uid ,  
+            userName: userDoc?.email,
+            userId: userDoc.id,              
+            authType: userDoc.authType,
+            city: userDoc?.city,
+            country: userDoc?.country || "",
+            dob: userDoc?.dob || "",
+            houseNumber: userDoc?.houseNumber,
+            name: userDoc?.name,
+            surname: userDoc?.surname,
+            zip: userDoc?.zip || "",
+            street: userDoc?.street,
+            gender: userDoc?.gender || "",
+            addedAt: userDoc?.addedAt || undefined , // Date of user creation              
+            };
+            
+            const setAdmin = httpsCallable(functions, "setAdmin");
+          
+              try {
+                  const user = auth.currentUser;    
+                  if (!user) {         
+                      return;
+                  }              
+                 await setAdmin();
+             
+              } catch (error) {
+                  console.error("Error assigning admin role:", error);
+              }
+
+         return authUser; // Return the constructed AuthUser object            
+        }
+        catch (error) {
+          console.error("Error fetchAuthUser:", error);
+        }           
+    }, [auth.currentUser]);     
+
 
     useEffect(() =>{
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -64,62 +114,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
               }
         });
         return unsubscribe;
-    }, []);
-
+    }, [auth, fetchAuthUser]);
     
-    const assignAdminRole = async () => {
-      const functions = getFunctions();        
-      const setAdmin = httpsCallable(functions, "setAdmin");
-    
-        try {
-            const user = auth.currentUser;    
-            if (!user) {         
-                return;
-            }              
-           await setAdmin();
-       
-        } catch (error) {
-            console.error("Error assigning admin role:", error);
-        }
-    };
 
-        const fetchAuthUser = async (uid: any) => {        
-            try
-            {            
-                 //const docRefComplete = doc(collection(db, "users"), uid);     
-                const docRefComplete = await createDocRef("users", uid);
-                // const docSnap = await getDoc(docRefComplete);
-                 const docSnap = await getData(docRefComplete);
-                 let data =  docSnap.data();
-          
-             if (!data || data.length === 0) {
-                return null; }
-               
-                const userDoc = data;            
-                const authUser: AuthUser = {
-                id: uid ,  
-                userName: userDoc?.email,
-                userId: userDoc.id,              
-                authType: userDoc.authType,
-                city: userDoc?.city,
-                country: userDoc?.country || "",
-                dob: userDoc?.dob || "",
-                houseNumber: userDoc?.houseNumber,
-                name: userDoc?.name,
-                surname: userDoc?.surname,
-                zip: userDoc?.zip || "",
-                street: userDoc?.street,
-                gender: userDoc?.gender || "",
-                addedAt: userDoc?.addedAt || undefined , // Date of user creation              
-                };
-                assignAdminRole();
-
-             return authUser; // Return the constructed AuthUser object            
-            }
-            catch (error) {
-              console.error("Error fetchAuthUser:", error);
-            }           
-        }     
 
 
     const login = async (email: string, password: string) => {
@@ -155,7 +152,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
-                const functions = getFunctions();
                 const setAdditionalUserData = httpsCallable(functions, "setAdditionalUserData");
                 await setAdditionalUserData({
                 uid: user.uid,
