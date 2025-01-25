@@ -33,7 +33,6 @@ const CartPage: React.FC = () => {
             );
           }
 
-          await decrementStock(item.productId, item.quantity);
         } else {
           throw new Error(`Product ${item.productName} does not exist.`);
         }

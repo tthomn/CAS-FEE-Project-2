@@ -1,11 +1,17 @@
 import emailjs from '@emailjs/browser';
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 import { addDocToCollection } from '../../services/firebase/firestoreService';
 import { CartItem } from '../../types/cartItem';
 import Modal from '../shared/Modal';
+import {
+  createDocRef,
+  decrementStock,
+  getData,
+} from '../../services/firebase/firestoreService';
 
 const CheckoutPage: React.FC = () => {
   const { cartItems, clearCart } = useCart();
@@ -133,15 +139,57 @@ const CheckoutPage: React.FC = () => {
         userId: authUser?.id || 'guest',
       };
 
+      const stockValidationAndUpdatePromises = cartItems.map(async (item) => {
+        const productDocRef = await createDocRef('products', item.productId);
+        const productDoc = await getData(productDocRef);
+
+        if (productDoc.exists()) {
+          const productData = productDoc.data();
+          const updatedStock = productData.stock - item.quantity;
+
+          if (updatedStock < 0) {
+            throw new Error(
+              `${item.productName} has insufficient stock. Available: ${productData.stock}, Requested: ${item.quantity}`,
+            );
+          }
+          await decrementStock(item.productId, item.quantity);
+        } else {
+          throw new Error(`Product ${item.productName} does not exist.`);
+        }
+      });
+
+      await Promise.all(stockValidationAndUpdatePromises);
+
       const docRef = await addDocToCollection('orders', order);
+
       await sendInvoiceEmail(order, docRef);
 
       await clearCart();
       localStorage.removeItem('userDetails');
 
       setIsModalOpen(true);
-    } catch (error) {
-      console.error('Error placing order:', error);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message, {
+          position: 'top-right',
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          theme: 'colored',
+        });
+      } else {
+        toast.error('Stock validation or update failed. Please try again.', {
+          position: 'top-right',
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          theme: 'colored',
+        });
+      }
     } finally {
       setIsLoading(false);
     }

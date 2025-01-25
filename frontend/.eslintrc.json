@@ -12,8 +12,8 @@
       { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }
     ],
     "@typescript-eslint/no-explicit-any": "warn", // Avoid "any" usage
-     "tailwindcss/no-custom-classname": "warn", // Warns if non-Tailwind class names are used
-      "tailwindcss/classnames-order": "warn", // Enforces logical class order
+    "tailwindcss/no-custom-classname": "warn", // Warns if non-Tailwind class names are used
+    "tailwindcss/classnames-order": "warn", // Enforces logical class order
     "import/order": [
       "warn",
       {
@@ -33,9 +33,9 @@
     "react": {
       "version": "detect" // Automatically detects the React version
     },
-      "tailwindcss": {
-         "callees": ["classnames", "clsx"], // Optional: specify custom className utilities
-         "config": "tailwind.config.js" // Path to your Tailwind configuration
-       }
+    "tailwindcss": {
+      "callees": ["classnames", "clsx"], // Optional: specify custom className utilities
+      "config": "tailwind.config.js" // Path to your Tailwind configuration
+    }
   }
 }
