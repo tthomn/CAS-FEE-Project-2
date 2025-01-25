@@ -654,6 +654,11 @@ const Account: React.FC = () => {
                             }))
                           }
                         />
+                        {errors.country && (
+                          <p className="text-red-500 text-sm">
+                            {errors.country}
+                          </p>
+                        )}
                       </div>
                     </>
                   )}
