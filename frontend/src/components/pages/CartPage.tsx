@@ -6,7 +6,6 @@ import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 import {
   createDocRef,
-  decrementStock,
   getData,
 } from '../../services/firebase/firestoreService';
 

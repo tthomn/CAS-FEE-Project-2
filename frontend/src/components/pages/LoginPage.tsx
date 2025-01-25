@@ -1,3 +1,4 @@
+import { FirebaseError } from 'firebase/app';
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -28,15 +29,20 @@ const LoginPage: React.FC = () => {
       } else {
         navigate('/');
       }
-    } catch (error: any) {
-      setLoading(false);
-      if (error.code === 'auth/user-not-found') {
-        setErrorMessage('No account found with this email.');
-      } else if (error.code === 'auth/wrong-password') {
-        setErrorMessage('Incorrect password.');
+    } catch (error: unknown) {
+      if (error instanceof FirebaseError) {
+        if (error.code === 'auth/user-not-found') {
+          setErrorMessage('No account found with this email.');
+        } else if (error.code === 'auth/wrong-password') {
+          setErrorMessage('Incorrect password.');
+        } else {
+          setErrorMessage('An error occurred. Please try again.');
+        }
       } else {
-        setErrorMessage('An error occurred. Please try again.');
+        setErrorMessage('An unexpected error occurred.');
       }
+    } finally {
+      setLoading(false); // Ensures loading is turned off regardless of success or failure
     }
   };
 
@@ -52,11 +58,15 @@ const LoginPage: React.FC = () => {
       await resetPassword(email);
 
       setResetEmailSent(true);
-    } catch (error: any) {
-      if (error.code === 'auth/user-not-found') {
-        setErrorMessage('No account found with this email.');
+    } catch (error: unknown) {
+      if (error instanceof FirebaseError) {
+        if (error.code === 'auth/user-not-found') {
+          setErrorMessage('No account found with this email.');
+        } else {
+          setErrorMessage('Failed to send reset email. Please try again.');
+        }
       } else {
-        setErrorMessage('Failed to send reset email. Please try again.');
+        setErrorMessage('An unexpected error occurred.');
       }
     }
   };

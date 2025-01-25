@@ -120,7 +120,7 @@ const AdminPanel: React.FC<{}> = () => {
                 // Clear the error if the input is no longer empty
                 if (e.target.value.trim()) {
                   setValidationErrors((prev) => {
-                    const { name, ...rest } = prev;
+                    const { name: _, ...rest } = prev;
                     return rest;
                   });
                 }
@@ -156,7 +156,7 @@ const AdminPanel: React.FC<{}> = () => {
 
                   if (!isNaN(numericValue) && numericValue > 0) {
                     setValidationErrors((prev) => {
-                      const { price, ...rest } = prev;
+                      const { price: _, ...rest } = prev;
                       return rest;
                     });
                   }
@@ -253,7 +253,7 @@ const AdminPanel: React.FC<{}> = () => {
                       });
 
                       setValidationErrors((prev) => {
-                        const { categoryId, ...rest } = prev;
+                        const { categoryId: _categoryId, ...rest } = prev; // Use an underscore prefix
                         return rest;
                       });
 
@@ -290,7 +290,7 @@ const AdminPanel: React.FC<{}> = () => {
                     // Clear the error if a valid category is selected
                     if (selectedValue) {
                       setValidationErrors((prev) => {
-                        const { categoryId, ...rest } = prev; // Remove the 'categoryId' error
+                        const { categoryId: _, ...rest } = prev;
                         return rest;
                       });
                     }

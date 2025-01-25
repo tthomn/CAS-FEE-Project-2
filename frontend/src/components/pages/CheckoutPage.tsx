@@ -5,13 +5,13 @@ import { toast } from 'react-toastify';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 import { addDocToCollection } from '../../services/firebase/firestoreService';
-import { CartItem } from '../../types/cartItem';
-import Modal from '../shared/Modal';
 import {
   createDocRef,
   decrementStock,
   getData,
 } from '../../services/firebase/firestoreService';
+import { CartItem } from '../../types/cartItem';
+import Modal from '../shared/Modal';
 
 const CheckoutPage: React.FC = () => {
   const { cartItems, clearCart } = useCart();
