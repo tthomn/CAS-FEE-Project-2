@@ -385,8 +385,7 @@ const Account: React.FC = () => {
                       placeholder="Email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded text-base focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                      style={{ height: '44px' }}
+                      className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
                     />
                     {errors.email && (
                       <p className="text-red-500 text-sm">{errors.email}</p>
@@ -401,7 +400,7 @@ const Account: React.FC = () => {
                         placeholder="Password"
                         value={formData.password}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-2 border border-gray-300 rounded text-base focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                        className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
                       />
                       {errors.password && (
                         <p className="text-red-500 text-sm">
@@ -467,6 +466,11 @@ const Account: React.FC = () => {
                           }
                           className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500 pr-10"
                         />
+                        {errors.confirmPassword && (
+                          <p className="text-red-500 text-sm">
+                            {errors.confirmPassword}
+                          </p>
+                        )}
                         <span
                           onClick={() =>
                             setShowConfirmPassword(!showConfirmPassword)
