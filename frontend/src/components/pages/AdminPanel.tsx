@@ -83,32 +83,32 @@ const AdminPanel: React.FC<{}> = () => {
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="relative group">
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="group relative">
         <button
           onClick={() => navigate('/account')}
-          className="text-3xl bg-transparent text-gray-700 hover:text-blue-600 z-50"
+          className="z-50 bg-transparent text-3xl text-gray-700 hover:text-blue-600"
           aria-label="Back to Account"
         >
           &larr;
         </button>
-        <span className="absolute opacity-0 group-hover:opacity-100 bg-gray-800 text-white text-sm rounded-lg py-1 px-3 shadow-lg transition-opacity duration-300 -top-8 left-0 z-50">
+        <span className="absolute -top-8 left-0 z-50 rounded-lg bg-gray-800 px-3 py-1 text-sm text-white opacity-0 shadow-lg transition-opacity duration-300 group-hover:opacity-100">
           Back to Account
         </span>
       </div>
-      <h1 className="text-3xl font-extrabold mb-6 text-center text-blue-700">
+      <h1 className="mb-6 text-center text-3xl font-extrabold text-blue-700">
         Admin Panel
       </h1>
 
       {/* Add Product Section */}
-      <div className="mb-10 bg-white shadow-md rounded-lg p-6">
-        <h2 className="text-2xl font-semibold mb-4 border-b pb-2">
+      <div className="mb-10 rounded-lg bg-white p-6 shadow-md">
+        <h2 className="mb-4 border-b pb-2 text-2xl font-semibold">
           Add Product
         </h2>
-        {errorMessage && <p className="text-red-500 mb-4">{errorMessage}</p>}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {errorMessage && <p className="mb-4 text-red-500">{errorMessage}</p>}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           <div className="flex flex-col">
-            <label className="block font-semibold mb-1 text-gray-600">
+            <label className="mb-1 block font-semibold text-gray-600">
               Product Name
             </label>
             <input
@@ -125,16 +125,16 @@ const AdminPanel: React.FC<{}> = () => {
                   });
                 }
               }}
-              className="border rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
+              className="w-full rounded-lg border p-3 focus:outline-none focus:ring-2 focus:ring-blue-300"
             />
             {validationErrors.name && (
-              <p className="text-red-500 text-sm mt-1">
+              <p className="mt-1 text-sm text-red-500">
                 {validationErrors.name}
               </p>
             )}
           </div>
           <div>
-            <label className="block font-semibold mb-1 text-gray-600">
+            <label className="mb-1 block font-semibold text-gray-600">
               Price (CHF)
             </label>
             <input
@@ -173,16 +173,16 @@ const AdminPanel: React.FC<{}> = () => {
                   price: parseFloat(formattedValue),
                 });
               }}
-              className="border rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
+              className="w-full rounded-lg border p-3 focus:outline-none focus:ring-2 focus:ring-blue-300"
             />
             {validationErrors.price && (
-              <p className="text-red-500 text-sm mt-1">
+              <p className="mt-1 text-sm text-red-500">
                 {validationErrors.price}
               </p>
             )}
           </div>
           <div className="sm:col-span-1">
-            <label className="block font-semibold mb-1 text-gray-600">
+            <label className="mb-1 block font-semibold text-gray-600">
               Stock
             </label>
             <input
@@ -195,21 +195,21 @@ const AdminPanel: React.FC<{}> = () => {
                   stock: parseInt(e.target.value) || 0,
                 })
               }
-              className="border rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
+              className="w-full rounded-lg border p-3 focus:outline-none focus:ring-2 focus:ring-blue-300"
             />
           </div>
           <div>
-            <label className="block font-semibold mb-1 text-gray-600">
+            <label className="mb-1 block font-semibold text-gray-600">
               Category
             </label>
             {isAddingNewCategory ? (
-              <div className="flex gap-2 items-center">
+              <div className="flex items-center gap-2">
                 <input
                   type="text"
                   placeholder="Enter new category name"
                   value={newCategoryName}
                   onChange={(e) => setNewCategoryName(e.target.value)}
-                  className="border rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
+                  className="w-full rounded-lg border p-3 focus:outline-none focus:ring-2 focus:ring-blue-300"
                 />
                 <button
                   onClick={async () => {
@@ -261,7 +261,7 @@ const AdminPanel: React.FC<{}> = () => {
                       setIsAddingNewCategory(false);
                     }
                   }}
-                  className="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-lg transition"
+                  className="rounded-lg bg-green-500 px-3 py-2 text-white transition hover:bg-green-600"
                 >
                   Add
                 </button>
@@ -270,7 +270,7 @@ const AdminPanel: React.FC<{}> = () => {
                     setNewCategoryName('');
                     setIsAddingNewCategory(false);
                   }}
-                  className="text-gray-600 hover:text-red-600 text-sm"
+                  className="text-sm text-gray-600 hover:text-red-600"
                 >
                   Cancel
                 </button>
@@ -296,7 +296,7 @@ const AdminPanel: React.FC<{}> = () => {
                     }
                   }
                 }}
-                className="border rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
+                className="w-full rounded-lg border p-3 focus:outline-none focus:ring-2 focus:ring-blue-300"
               >
                 <option value="">Select a category</option>
                 {categories.map((category) => (
@@ -310,14 +310,14 @@ const AdminPanel: React.FC<{}> = () => {
               </select>
             )}
             {validationErrors.categoryId && (
-              <p className="text-red-500 text-sm mt-1">
+              <p className="mt-1 text-sm text-red-500">
                 {validationErrors.categoryId}
               </p>
             )}
           </div>
 
           <div className="sm:col-span-1">
-            <label className="block font-semibold mb-1 text-gray-600">
+            <label className="mb-1 block font-semibold text-gray-600">
               Upload Image
             </label>
             <input
@@ -328,14 +328,14 @@ const AdminPanel: React.FC<{}> = () => {
                   handleImageUpload(e.target.files[0]);
                 }
               }}
-              className="border rounded-lg p-3 w-full"
+              className="w-full rounded-lg border p-3"
             />
             {uploadingImage && (
-              <p className="text-blue-500 mt-2">Uploading image...</p>
+              <p className="mt-2 text-blue-500">Uploading image...</p>
             )}
           </div>
           <div className="col-span-full">
-            <label className="block font-semibold mb-1 text-gray-600">
+            <label className="mb-1 block font-semibold text-gray-600">
               Description
             </label>
             <textarea
@@ -344,11 +344,11 @@ const AdminPanel: React.FC<{}> = () => {
               onChange={(e) =>
                 setNewProduct({ ...newProduct, description: e.target.value })
               }
-              className="border rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
+              className="w-full rounded-lg border p-3 focus:outline-none focus:ring-2 focus:ring-blue-300"
             />
           </div>
           <div className="col-span-full">
-            <label className="block font-semibold mb-1 text-gray-600">
+            <label className="mb-1 block font-semibold text-gray-600">
               Keywords (comma-separated)
             </label>
             <input
@@ -361,15 +361,15 @@ const AdminPanel: React.FC<{}> = () => {
                   keywords: e.target.value.split(',').map((kw) => kw.trim()),
                 })
               }
-              className="border rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
+              className="w-full rounded-lg border p-3 focus:outline-none focus:ring-2 focus:ring-blue-300"
             />
           </div>
         </div>
         <button
           onClick={handleAddProduct}
           disabled={isAdding}
-          className={`bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg px-6 py-2 mt-6 transition duration-300 ${
-            isAdding ? 'opacity-50 cursor-not-allowed' : ''
+          className={`mt-6 rounded-lg bg-blue-600 px-6 py-2 font-bold text-white transition duration-300 hover:bg-blue-700 ${
+            isAdding ? 'cursor-not-allowed opacity-50' : ''
           }`}
         >
           {isAdding ? 'Adding Product...' : 'Add Product'}
@@ -377,10 +377,10 @@ const AdminPanel: React.FC<{}> = () => {
       </div>
 
       {/* Product List */}
-      <div className="bg-white shadow-md rounded-lg p-6">
-        <h2 className="text-2xl font-semibold mb-4 border-b pb-2">Products</h2>
+      <div className="rounded-lg bg-white p-6 shadow-md">
+        <h2 className="mb-4 border-b pb-2 text-2xl font-semibold">Products</h2>
 
-        <div className="hidden md:grid grid-cols-7 bg-blue-200 text-blue-800 font-bold p-3 rounded-t-lg">
+        <div className="hidden grid-cols-7 rounded-t-lg bg-blue-200 p-3 font-bold text-blue-800 md:grid">
           <span>Product Name</span>
           <span>Price (CHF)</span>
           <span>Stock</span>
@@ -394,7 +394,7 @@ const AdminPanel: React.FC<{}> = () => {
           {products.map((product) => (
             <div
               key={product.id}
-              className="grid grid-cols-1 md:grid-cols-7 gap-4 p-4 items-center hover:bg-gray-100 transition rounded-md"
+              className="grid grid-cols-1 items-center gap-4 rounded-md p-4 transition hover:bg-gray-100 md:grid-cols-7"
             >
               {editingProductId === product.id ? (
                 <>
@@ -410,7 +410,7 @@ const AdminPanel: React.FC<{}> = () => {
                         ),
                       )
                     }
-                    className="border p-2 rounded-md"
+                    className="rounded-md border p-2"
                   />
                   <input
                     type="number"
@@ -424,7 +424,7 @@ const AdminPanel: React.FC<{}> = () => {
                         ),
                       )
                     }
-                    className="border p-2 rounded-md"
+                    className="rounded-md border p-2"
                   />
                   <input
                     type="number"
@@ -438,7 +438,7 @@ const AdminPanel: React.FC<{}> = () => {
                         ),
                       )
                     }
-                    className="border p-2 rounded-md"
+                    className="rounded-md border p-2"
                   />
                   <select
                     value={product.categoryId}
@@ -451,7 +451,7 @@ const AdminPanel: React.FC<{}> = () => {
                         ),
                       )
                     }
-                    className="border p-2 rounded-md"
+                    className="rounded-md border p-2"
                   >
                     <option value="">Select a category</option>
                     {categories.map((category) => (
@@ -472,7 +472,7 @@ const AdminPanel: React.FC<{}> = () => {
                         ),
                       )
                     }
-                    className="border p-2 rounded-md h-20"
+                    className="h-20 rounded-md border p-2"
                   />
                   <input
                     type="text"
@@ -492,11 +492,11 @@ const AdminPanel: React.FC<{}> = () => {
                         ),
                       )
                     }
-                    className="border p-2 rounded-md"
+                    className="rounded-md border p-2"
                   />
-                  <div className="flex gap-2 justify-end">
+                  <div className="flex justify-end gap-2">
                     <button
-                      className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md flex items-center text-sm"
+                      className="flex items-center rounded-md bg-green-500 px-3 py-1 text-sm text-white hover:bg-green-600"
                       onClick={() => {
                         updateProduct(product.id, {
                           ...product,
@@ -523,7 +523,7 @@ const AdminPanel: React.FC<{}> = () => {
                   </span>
 
                   {/* Description section with line-clamp */}
-                  <span className="text-sm italic text-gray-700 overflow-hidden line-clamp-3 max-h-16">
+                  <span className="line-clamp-3 max-h-16 overflow-hidden text-sm italic text-gray-700">
                     {product.description || 'No description'}
                   </span>
 
@@ -531,15 +531,15 @@ const AdminPanel: React.FC<{}> = () => {
                     {product.keywords?.join(', ') || 'No keywords'}
                   </span>
 
-                  <div className="flex gap-2 justify-end">
+                  <div className="flex justify-end gap-2">
                     <button
-                      className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md flex items-center text-sm"
+                      className="flex items-center rounded-md bg-blue-500 px-3 py-1 text-sm text-white hover:bg-blue-600"
                       onClick={() => setEditingProductId(product.id)}
                     >
                       <FaEdit className="mr-1" /> Edit
                     </button>
                     <button
-                      className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md flex items-center text-sm"
+                      className="flex items-center rounded-md bg-red-500 px-3 py-1 text-sm text-white hover:bg-red-600"
                       onClick={() =>
                         deleteProduct(product.id, product.imageUrl)
                       }

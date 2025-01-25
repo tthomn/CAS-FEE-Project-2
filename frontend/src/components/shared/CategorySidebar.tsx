@@ -22,14 +22,14 @@ const CategorySidebar: React.FC<CategorySidebarProps> = ({
 }) => {
   return (
     <div className="p-2 sm:p-4">
-      <h3 className="mb-2 sm:mb-4 text-base sm:text-lg font-bold">
+      <h3 className="mb-2 text-base font-bold sm:mb-4 sm:text-lg">
         Categories
       </h3>
       <ul className="list-none p-0">
         <li className="mb-2">
           <Link
             to="/shop"
-            className={`font-semibold text-base sm:text-lg cursor-pointer ${
+            className={`cursor-pointer text-base font-semibold sm:text-lg ${
               activeCategory === null ? 'text-red-700' : 'text-red-500'
             }`}
             onClick={() => onSelectCategory(null, 'Shop')}
@@ -41,7 +41,7 @@ const CategorySidebar: React.FC<CategorySidebarProps> = ({
           <li key={category.id} className="mb-2">
             <Link
               to={`/shop?category=${category.id}`}
-              className={`font-bold text-lg cursor-pointer ${
+              className={`cursor-pointer text-lg font-bold ${
                 activeCategory === category.id ? 'text-red-700' : 'text-red-500'
               }`}
               onClick={() => onSelectCategory(category.id, category.name)}

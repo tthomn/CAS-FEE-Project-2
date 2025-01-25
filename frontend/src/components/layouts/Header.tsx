@@ -31,7 +31,7 @@ const Header: React.FC = () => {
 
   return (
     <div className="relative bg-[#fff8e1]">
-      <header className="relative z-10 flex justify-between items-center py-4 px-5 bg-[#fff8e1] mt-4">
+      <header className="relative z-10 mt-4 flex items-center justify-between bg-[#fff8e1] px-5 py-4">
         <div className="flex items-center gap-4">
           {/* Hamburger Menu for Mobile */}
           <button
@@ -44,7 +44,7 @@ const Header: React.FC = () => {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="absolute top-full left-0 w-full bg-white shadow-md rounded p-4 sm:hidden">
+          <div className="absolute left-0 top-full w-full rounded bg-white p-4 shadow-md sm:hidden">
             <nav className="flex flex-col gap-4">
               {[
                 { to: '/', label: 'Home' },
@@ -66,7 +66,7 @@ const Header: React.FC = () => {
         )}
 
         {/* Center Navigation Tabs for Desktop */}
-        <nav className="hidden sm:flex gap-8 items-center">
+        <nav className="hidden items-center gap-8 sm:flex">
           {[
             { to: '/', label: 'Home' },
             { to: '/shop', label: 'Shop' },
@@ -78,8 +78,8 @@ const Header: React.FC = () => {
               to={to}
               className={({ isActive }) =>
                 `relative text-lg font-medium ${
-                  isActive ? 'text-orange-600 font-bold' : 'text-gray-800'
-                } hover:text-orange-600 hover:after:w-full after:content-[''] after:absolute after:left-0 after:bottom-[0px] after:h-[1px] after:bg-orange-600 after:w-0 after:transition-all after:duration-300`
+                  isActive ? 'font-bold text-orange-600' : 'text-gray-800'
+                } after:absolute after:bottom-[0px] after:left-0 after:h-[1px] after:w-0 after:bg-orange-600 after:transition-all after:duration-300 after:content-[''] hover:text-orange-600 hover:after:w-full`
               }
             >
               {label}
@@ -88,7 +88,7 @@ const Header: React.FC = () => {
 
           {/* Cart Icon for Desktop */}
           <div
-            className="relative hidden sm:flex items-center"
+            className="relative hidden items-center sm:flex"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           >
@@ -97,12 +97,12 @@ const Header: React.FC = () => {
               className="relative text-2xl text-gray-800 hover:text-orange-600"
             >
               <i className="fas fa-shopping-basket"></i>
-              <span className="absolute top-0 right-0 bg-red-600 text-white rounded-full px-1 text-xs font-bold transform translate-x-2 -translate-y-2">
+              <span className="absolute right-0 top-0 -translate-y-2 translate-x-2 transform rounded-full bg-red-600 px-1 text-xs font-bold text-white">
                 {totalItems > 0 ? totalItems : 0}
               </span>
             </NavLink>
             {isHovered && totalItems === 0 && (
-              <div className="absolute top-full left-1/2 transform -translate-x-1/2 bg-white border border-gray-300 shadow-md rounded py-1 px-3 text-xs text-gray-800 z-50 whitespace-nowrap">
+              <div className="absolute left-1/2 top-full z-50 -translate-x-1/2 transform whitespace-nowrap rounded border border-gray-300 bg-white px-3 py-1 text-xs text-gray-800 shadow-md">
                 No products in the cart
               </div>
             )}
@@ -112,19 +112,19 @@ const Header: React.FC = () => {
         {/* Cart Icon for Mobile (Aligned Right) */}
         <NavLink
           to="/cart"
-          className="sm:hidden relative text-2xl text-gray-800 hover:text-orange-600 absolute right-5"
+          className="absolute relative right-5 text-2xl text-gray-800 hover:text-orange-600 sm:hidden"
         >
           <i className="fas fa-shopping-basket"></i>
-          <span className="absolute top-0 right-0 bg-red-600 text-white rounded-full px-1 text-xs font-bold transform translate-x-2 -translate-y-2">
+          <span className="absolute right-0 top-0 -translate-y-2 translate-x-2 transform rounded-full bg-red-600 px-1 text-xs font-bold text-white">
             {totalItems > 0 ? totalItems : 0}
           </span>
         </NavLink>
 
         {/* Right Section for Desktop (Search and Contact) */}
-        <div className="hidden sm:flex items-center gap-4">
+        <div className="hidden items-center gap-4 sm:flex">
           <NavLink
             to="/contact"
-            className="px-4 py-2 bg-[#E47D31] text-white rounded hover:bg-orange-700 transition-colors text-sm"
+            className="rounded bg-[#E47D31] px-4 py-2 text-sm text-white transition-colors hover:bg-orange-700"
           >
             Contact Us
           </NavLink>
@@ -136,8 +136,8 @@ const Header: React.FC = () => {
               <i className="fas fa-search"></i>
             </button>
             {isSearchOpen && (
-              <div className="absolute right-0 top-full mt-2 bg-white border border-gray-300 shadow-md rounded p-4 z-50 w-64">
-                <div className="flex items-center justify-between mb-2">
+              <div className="absolute right-0 top-full z-50 mt-2 w-64 rounded border border-gray-300 bg-white p-4 shadow-md">
+                <div className="mb-2 flex items-center justify-between">
                   <h4 className="text-sm font-bold text-gray-800">Search</h4>
                   <button
                     onClick={() => setIsSearchOpen(false)}
@@ -149,14 +149,14 @@ const Header: React.FC = () => {
                 <form onSubmit={handleSearchSubmit}>
                   <input
                     type="text"
-                    className="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:border-orange-600"
+                    className="w-full rounded border border-gray-300 px-2 py-1 text-sm focus:border-orange-600 focus:outline-none"
                     placeholder="Search..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
                   <button
                     type="submit"
-                    className="mt-2 w-full bg-orange-600 text-white py-1 rounded hover:bg-orange-700 text-sm"
+                    className="mt-2 w-full rounded bg-orange-600 py-1 text-sm text-white hover:bg-orange-700"
                   >
                     Search
                   </button>
@@ -167,7 +167,7 @@ const Header: React.FC = () => {
           {user && (
             <button
               onClick={handleLogout}
-              className="bg-red-500 text-white px-3 py-1 text-base rounded hover:bg-red-700"
+              className="rounded bg-red-500 px-3 py-1 text-base text-white hover:bg-red-700"
             >
               Log out
             </button>

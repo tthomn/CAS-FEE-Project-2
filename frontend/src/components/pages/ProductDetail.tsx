@@ -93,13 +93,13 @@ const ProductDetail: React.FC = () => {
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <div className="mx-auto max-w-5xl p-6">
       {/* Popup */}
       {popupVisible && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg transform transition-transform scale-95 duration-300 ease-out w-72">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="w-72 scale-95 transform rounded-lg bg-white p-6 shadow-lg transition-transform duration-300 ease-out">
             <div className="flex flex-col items-center">
-              <div className="bg-green-500 text-white w-12 h-12 flex items-center justify-center rounded-full mb-4">
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-500 text-white">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-6 w-6"
@@ -118,7 +118,7 @@ const ProductDetail: React.FC = () => {
               <p className="text-lg font-semibold text-gray-800">
                 Item Added to Cart
               </p>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="mt-1 text-sm text-gray-600">
                 You can view it in your cart.
               </p>
             </div>
@@ -128,32 +128,32 @@ const ProductDetail: React.FC = () => {
 
       <button
         onClick={() => navigate('/shop')}
-        className="fixed top-24 md:top-32 left-4 md:left-8 text-3xl bg-transparent text-gray-700 hover:text-blue-600 z-50 group"
+        className="group fixed left-4 top-24 z-50 bg-transparent text-3xl text-gray-700 hover:text-blue-600 md:left-8 md:top-32"
         aria-label="Back to Shopping"
       >
         &larr;
-        <span className="absolute top-10 left-2 opacity-0 group-hover:opacity-100 bg-gray-800 text-white text-sm rounded-lg py-1 px-3 shadow-lg transition-opacity duration-300">
+        <span className="absolute left-2 top-10 rounded-lg bg-gray-800 px-3 py-1 text-sm text-white opacity-0 shadow-lg transition-opacity duration-300 group-hover:opacity-100">
           Back to Shopping
         </span>
       </button>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+      <div className="mt-8 grid grid-cols-1 gap-8 md:grid-cols-2">
         {/* Product Image */}
         <div className="flex justify-center">
           <img
             src={product.imageUrl}
             alt={product.name}
-            className="w-full max-w-sm h-auto object-cover rounded-lg shadow-lg"
+            className="h-auto w-full max-w-sm rounded-lg object-cover shadow-lg"
           />
         </div>
 
         {/* Product Info */}
         <div className="text-left">
           {/* Product Name */}
-          <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
+          <h1 className="mb-2 text-3xl font-bold">{product.name}</h1>
 
           {/* Price */}
-          <p className="text-2xl font-bold text-red-600 mb-6">
+          <p className="mb-6 text-2xl font-bold text-red-600">
             CHF {Number(product.price).toFixed(2)}
           </p>
 
@@ -169,13 +169,13 @@ const ProductDetail: React.FC = () => {
           )}
 
           {/* Description */}
-          <p className="text-lg text-gray-700 mb-8">{product.description}</p>
+          <p className="mb-8 text-lg text-gray-700">{product.description}</p>
 
           {/* Stock Check */}
           {product.stock > 0 ? (
             <>
               {/* Quantity Selector */}
-              <div className="flex items-center gap-4 mb-6">
+              <div className="mb-6 flex items-center gap-4">
                 <label htmlFor="quantity" className="text-lg font-semibold">
                   Quantity:
                 </label>
@@ -187,20 +187,20 @@ const ProductDetail: React.FC = () => {
                     setQuantity(Math.max(1, Number(e.target.value)))
                   }
                   min="1"
-                  className="w-16 px-2 py-1 border border-gray-300 rounded text-center text-lg"
+                  className="w-16 rounded border border-gray-300 px-2 py-1 text-center text-lg"
                 />
               </div>
 
               {/* Add to Cart Button */}
               <button
                 onClick={handleAddToCart}
-                className="bg-blue-600 text-white px-8 py-3 text-lg font-semibold rounded hover:bg-blue-700 transition duration-200 shadow-md"
+                className="rounded bg-blue-600 px-8 py-3 text-lg font-semibold text-white shadow-md transition duration-200 hover:bg-blue-700"
               >
                 Add to Cart
               </button>
             </>
           ) : (
-            <p className="text-red-500 font-semibold text-lg">Out of Stock</p>
+            <p className="text-lg font-semibold text-red-500">Out of Stock</p>
           )}
         </div>
       </div>

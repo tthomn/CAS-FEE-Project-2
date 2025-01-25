@@ -211,14 +211,14 @@ const CheckoutPage: React.FC = () => {
   };
 
   return (
-    <div className="px-4 py-6 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold text-gray-800 text-center mb-6">
+    <div className="mx-auto max-w-4xl px-4 py-6">
+      <h1 className="mb-6 text-center text-2xl font-bold text-gray-800">
         Shipping and invoice
       </h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div>
-          <h2 className="text-lg font-bold mb-4">Personal Data</h2>
-          <div className="block mb-4">
+          <h2 className="mb-4 text-lg font-bold">Personal Data</h2>
+          <div className="mb-4 block">
             <strong>First name:</strong>
             {!isEditing ? (
               <p>{name || 'Not specified'}</p>
@@ -227,15 +227,15 @@ const CheckoutPage: React.FC = () => {
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full border p-2 mt-2 rounded"
+                className="mt-2 w-full rounded border p-2"
                 placeholder="Vorname eingeben"
               />
             )}
             {errors.name && (
-              <p className="text-red-500 text-sm">{errors.name}</p>
+              <p className="text-sm text-red-500">{errors.name}</p>
             )}
           </div>
-          <div className="block mb-4">
+          <div className="mb-4 block">
             <strong>Last name:</strong>
             {!isEditing ? (
               <p>{surname || 'Not specified'}</p>
@@ -244,19 +244,19 @@ const CheckoutPage: React.FC = () => {
                 type="text"
                 value={surname}
                 onChange={(e) => setSurname(e.target.value)}
-                className="w-full border p-2 mt-2 rounded"
+                className="mt-2 w-full rounded border p-2"
                 placeholder="Nachname eingeben"
               />
             )}
             {errors.surname && (
-              <p className="text-red-500 text-sm">{errors.surname}</p>
+              <p className="text-sm text-red-500">{errors.surname}</p>
             )}
           </div>
           {/*<div className="block mb-4">*/}
           {/*    <strong>E-Mail-Adresse:</strong>*/}
           {/*    <p>{email || "Keine E-Mail verfügbar"}</p>*/}
           {/*</div>*/}
-          <div className="block mb-4">
+          <div className="mb-4 block">
             <strong>Delivery address:</strong>
             {!isEditing ? (
               <p>{deliveryAddress || 'Keine Angabe'}</p>
@@ -265,22 +265,22 @@ const CheckoutPage: React.FC = () => {
                 type="text"
                 value={deliveryAddress}
                 onChange={(e) => setDeliveryAddress(e.target.value)}
-                className="w-full border p-2 mt-2 rounded"
+                className="mt-2 w-full rounded border p-2"
                 placeholder="Lieferadresse eingeben"
               />
             )}
             {errors.deliveryAddress && (
-              <p className="text-red-500 text-sm">{errors.deliveryAddress}</p>
+              <p className="text-sm text-red-500">{errors.deliveryAddress}</p>
             )}
           </div>
-          <div className="flex gap-4 mt-4">
+          <div className="mt-4 flex gap-4">
             {!isEditing ? (
               <button
                 onClick={() => {
                   setBackupData({ name, surname, deliveryAddress });
                   setIsEditing(true);
                 }}
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
               >
                 Edit data
               </button>
@@ -288,13 +288,13 @@ const CheckoutPage: React.FC = () => {
               <>
                 <button
                   onClick={handleSaveDetails}
-                  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                  className="rounded bg-green-500 px-4 py-2 text-white hover:bg-green-600"
                 >
                   Save
                 </button>
                 <button
                   onClick={handleCancelEdit}
-                  className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+                  className="rounded bg-gray-500 px-4 py-2 text-white hover:bg-gray-600"
                 >
                   Cancel
                 </button>
@@ -303,10 +303,10 @@ const CheckoutPage: React.FC = () => {
           </div>
         </div>
         <div>
-          <h2 className="text-lg font-bold mb-4">Summary</h2>
+          <h2 className="mb-4 text-lg font-bold">Summary</h2>
           <ul className="mb-4">
             {cartItems.map((item) => (
-              <li key={item.id} className="flex justify-between mb-4">
+              <li key={item.id} className="mb-4 flex justify-between">
                 <span>
                   {item.productName}{' '}
                   <span className="text-black">({item.quantity} Stück)</span>
@@ -331,16 +331,16 @@ const CheckoutPage: React.FC = () => {
           </div>
         </div>
       </div>
-      <div className="flex justify-between mt-6">
+      <div className="mt-6 flex justify-between">
         <Link
           to="/cart"
-          className="px-6 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition"
+          className="rounded bg-gray-500 px-6 py-2 text-white transition hover:bg-gray-600"
         >
           Back to the shopping cart
         </Link>
         <button
-          className={`px-6 py-2 bg-red-500 text-white rounded ${
-            isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-red-600'
+          className={`rounded bg-red-500 px-6 py-2 text-white ${
+            isLoading ? 'cursor-not-allowed opacity-50' : 'hover:bg-red-600'
           }`}
           onClick={handlePlaceOrder}
           disabled={isLoading}

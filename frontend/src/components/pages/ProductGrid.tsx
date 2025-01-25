@@ -16,8 +16,8 @@ const ProductGrid: React.FC<ProductGridProps> = ({ categoryId }) => {
 
   if (productsLoading) {
     return (
-      <div className="flex justify-center items-center">
-        <div className="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full"></div>
+      <div className="flex items-center justify-center">
+        <div className="spinner-border inline-block h-8 w-8 animate-spin rounded-full border-4"></div>
         <span className="ml-2">Loading products...</span>
       </div>
     );
@@ -29,7 +29,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({ categoryId }) => {
         <p className="text-red-500">{productsError}</p>
         <button
           onClick={() => fetchProducts(categoryId)}
-          className="bg-blue-500 text-white px-4 py-2 rounded"
+          className="rounded bg-blue-500 px-4 py-2 text-white"
         >
           Retry
         </button>
@@ -42,14 +42,14 @@ const ProductGrid: React.FC<ProductGridProps> = ({ categoryId }) => {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 p-2 sm:p-4">
+    <div className="grid grid-cols-1 gap-4 p-2 sm:grid-cols-2 sm:gap-6 sm:p-4 md:grid-cols-3 lg:grid-cols-4 lg:gap-8">
       {products.map((product) => (
         <Link
           to={`/shop/${product.id}`}
           key={product.id}
-          className="no-underline text-inherit"
+          className="text-inherit no-underline"
         >
-          <div className="border border-gray-300 rounded-lg shadow hover:shadow-lg transition-shadow p-6 flex flex-col items-center text-center">
+          <div className="flex flex-col items-center rounded-lg border border-gray-300 p-6 text-center shadow transition-shadow hover:shadow-lg">
             <picture>
               <source
                 srcSet={`${product.imageUrl}?alt=media&format=webp`}
@@ -58,13 +58,13 @@ const ProductGrid: React.FC<ProductGridProps> = ({ categoryId }) => {
               <img
                 src={`${product.imageUrl}?alt=media&width=300&height=300`}
                 alt={product.name}
-                className="w-full h-auto max-h-[150px] object-cover mb-4"
+                className="mb-4 h-auto max-h-[150px] w-full object-cover"
                 loading="lazy"
                 decoding="async"
                 //loading="eager"
               />
             </picture>
-            <h4 className="text-lg font-semibold mb-2">{product.name}</h4>
+            <h4 className="mb-2 text-lg font-semibold">{product.name}</h4>
             <p className="text-base font-medium text-gray-800">
               CHF {product.price.toFixed(2)}
             </p>

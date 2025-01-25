@@ -28,16 +28,16 @@ const OrdersList: React.FC<OrdersListProps> = ({ orders, loading, error }) => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 px-4 lg:px-0">
+    <div className="mx-auto max-w-4xl space-y-8 px-4 lg:px-0">
       {orders.map((order) => (
         <div
           key={order.id}
-          className="bg-white border border-gray-200 rounded-lg shadow-lg hover:shadow-xl transition-shadow p-6 overflow-hidden"
+          className="overflow-hidden rounded-lg border border-gray-200 bg-white p-6 shadow-lg transition-shadow hover:shadow-xl"
         >
           {/* Order Container */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
             <div className="w-full md:w-1/2">
-              <p className="font-medium text-base tracking-wide text-gray-900 break-words">
+              <p className="break-words text-base font-medium tracking-wide text-gray-900">
                 Order ID: <span className="block md:inline">{order.id}</span>
               </p>
               <p className="text-sm text-gray-600">
@@ -56,7 +56,7 @@ const OrdersList: React.FC<OrdersListProps> = ({ orders, loading, error }) => {
               </p>
             </div>
 
-            <div className="w-full md:w-1/4 flex flex-col items-start md:items-center">
+            <div className="flex w-full flex-col items-start md:w-1/4 md:items-center">
               <p className="text-sm">Total Items: {order.cartItems.length}</p>
               <p className="text-sm font-bold text-gray-800">
                 {new Intl.NumberFormat('en-US', {
@@ -66,10 +66,10 @@ const OrdersList: React.FC<OrdersListProps> = ({ orders, loading, error }) => {
               </p>
             </div>
 
-            <div className="w-full md:w-1/4 text-right">
+            <div className="w-full text-right md:w-1/4">
               <button
                 onClick={() => toggleOrderDetails(order.id)}
-                className="text-gray-600 hover:text-blue-600 font-medium transition-colors duration-200"
+                className="font-medium text-gray-600 transition-colors duration-200 hover:text-blue-600"
               >
                 {expandedOrderId === order.id
                   ? 'Hide Details ▲'
@@ -80,14 +80,14 @@ const OrdersList: React.FC<OrdersListProps> = ({ orders, loading, error }) => {
 
           {/* Order Details */}
           {expandedOrderId === order.id && (
-            <div className="bg-gray-50 p-6 mt-4 rounded-md">
+            <div className="mt-4 rounded-md bg-gray-50 p-6">
               <p className="text-md font-medium">Items in Order:</p>
-              <ul className="list-none mt-3 space-y-2">
+              <ul className="mt-3 list-none space-y-2">
                 {order.cartItems.map((item) => (
-                  <li key={item.cartItemId} className="text-sm break-words">
+                  <li key={item.cartItemId} className="break-words text-sm">
                     <Link
                       to={`/shop/${item.productId}`}
-                      className="text-orange-600 font-medium hover:text-orange-700"
+                      className="font-medium text-orange-600 hover:text-orange-700"
                     >
                       <strong>{item.productName}</strong>
                     </Link>{' '}
@@ -100,18 +100,18 @@ const OrdersList: React.FC<OrdersListProps> = ({ orders, loading, error }) => {
                 ))}
               </ul>
               <div className="mt-4 border-t border-gray-200 pt-4">
-                <div className="flex justify-between items-center">
-                  <span className="font-semibold text-lg text-gray-800">
+                <div className="flex items-center justify-between">
+                  <span className="text-lg font-semibold text-gray-800">
                     Total Price
                   </span>
-                  <span className="text-green-600 text-lg font-bold">
+                  <span className="text-lg font-bold text-green-600">
                     {new Intl.NumberFormat('en-US', {
                       style: 'currency',
                       currency: 'USD',
                     }).format(order.totalPrice)}
                   </span>
                 </div>
-                <p className="text-sm text-gray-500 mt-1 text-right">
+                <p className="mt-1 text-right text-sm text-gray-500">
                   (Including Delivery)
                 </p>
               </div>

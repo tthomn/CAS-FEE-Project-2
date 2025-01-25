@@ -71,11 +71,11 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="p-6 bg-white shadow-md rounded-lg">
+    <div className="flex min-h-screen items-center justify-center bg-gray-100">
+      <div className="rounded-lg bg-white p-6 shadow-md">
         {!user ? (
           <>
-            <h1 className="text-2xl font-bold mb-4">Login</h1>
+            <h1 className="mb-4 text-2xl font-bold">Login</h1>
             <form onSubmit={handleLogin}>
               <input
                 type="email"
@@ -83,7 +83,7 @@ const LoginPage: React.FC = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Email"
                 required
-                className="mb-4 p-2 border rounded w-full"
+                className="mb-4 w-full rounded border p-2"
               />
               <input
                 type="password"
@@ -91,12 +91,12 @@ const LoginPage: React.FC = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Password"
                 required
-                className="mb-4 p-2 border rounded w-full"
+                className="mb-4 w-full rounded border p-2"
               />
               <button
                 type="submit"
                 disabled={loading}
-                className={`w-full p-2 rounded ${
+                className={`w-full rounded p-2 ${
                   loading ? 'bg-gray-400' : 'bg-green-500 text-white'
                 }`}
               >
@@ -105,23 +105,23 @@ const LoginPage: React.FC = () => {
             </form>
             <button
               onClick={handleForgotPassword}
-              className="mt-4 text-blue-600 hover:underline text-sm"
+              className="mt-4 text-sm text-blue-600 hover:underline"
             >
               Forgot Password?
             </button>
             {resetEmailSent && (
-              <p className="text-green-600 mt-4">Password reset email sent!</p>
+              <p className="mt-4 text-green-600">Password reset email sent!</p>
             )}
             {errorMessage && (
-              <p className="text-red-500 mt-4">{errorMessage}</p>
+              <p className="mt-4 text-red-500">{errorMessage}</p>
             )}
           </>
         ) : (
           <div className="text-center">
-            <h1 className="text-2xl font-bold mb-4">Welcome, {user.email}</h1>
+            <h1 className="mb-4 text-2xl font-bold">Welcome, {user.email}</h1>
             <button
               onClick={handleLogout}
-              className="px-4 py-2 text-white bg-red-500 rounded hover:bg-red-600 transition-colors"
+              className="rounded bg-red-500 px-4 py-2 text-white transition-colors hover:bg-red-600"
             >
               Logout
             </button>

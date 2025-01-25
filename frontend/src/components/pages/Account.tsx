@@ -215,48 +215,48 @@ const Account: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#fff8e1]">
+    <div className="flex min-h-screen flex-col bg-[#fff8e1]">
       {/* Banner Section */}
       <div className="relative">
         <img
           src="/images/banner_account.png"
           alt="Account Banner"
-          className="w-full h-40 sm:h-64 object-cover"
+          className="h-40 w-full object-cover sm:h-64"
           loading="eager"
         />
-        <h1 className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-2xl sm:text-4xl font-bold">
+        <h1 className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-2xl font-bold text-white sm:text-4xl">
           My Account
         </h1>
       </div>
 
       <button
-        className="sm:hidden p-2 bg-yellow-500 text-white rounded"
+        className="rounded bg-yellow-500 p-2 text-white sm:hidden"
         onClick={() => setShowSidebar(!showSidebar)}
       >
         {showSidebar ? 'Close Menu' : 'Menu'}
       </button>
 
       <main className="flex-grow">
-        <div className="flex flex-col sm:flex-row max-w-full sm:max-w-6xl mx-auto">
+        <div className="mx-auto flex max-w-full flex-col sm:max-w-6xl sm:flex-row">
           {/* Sidebar */}
           {user && (
             <div
               className={`${
                 showSidebar ? 'block' : 'hidden'
-              } sm:block w-full sm:w-1/4 p-4 border-r border-gray-300`}
+              } w-full border-r border-gray-300 p-4 sm:block sm:w-1/4`}
             >
-              <h2 className="text-center sm:text-left text-xl font-semibold mb-6 text-gray-800">
+              <h2 className="mb-6 text-center text-xl font-semibold text-gray-800 sm:text-left">
                 Account
               </h2>
               <ul className="space-y-4 text-center sm:text-left">
                 <li
-                  className={`cursor-pointer ${!showOrders ? 'text-blue-600 font-semibold' : 'text-gray-600 hover:text-blue-500'}`}
+                  className={`cursor-pointer ${!showOrders ? 'font-semibold text-blue-600' : 'text-gray-600 hover:text-blue-500'}`}
                   onClick={() => setShowOrders(false)}
                 >
                   Profile
                 </li>
                 <li
-                  className={`cursor-pointer ${showOrders ? 'text-blue-600 font-semibold' : 'text-gray-600 hover:text-blue-500'}`}
+                  className={`cursor-pointer ${showOrders ? 'font-semibold text-blue-600' : 'text-gray-600 hover:text-blue-500'}`}
                   onClick={() => setShowOrders(true)}
                 >
                   Orders
@@ -271,7 +271,7 @@ const Account: React.FC = () => {
                 )}
 
                 <li
-                  className="text-gray-600 cursor-pointer hover:text-blue-500"
+                  className="cursor-pointer text-gray-600 hover:text-blue-500"
                   onClick={handleLogout}
                 >
                   Log Out
@@ -287,7 +287,7 @@ const Account: React.FC = () => {
             >
               {isForgotPassword ? (
                 <>
-                  <h2 className="text-xl font-bold mb-4">Restore Password</h2>
+                  <h2 className="mb-4 text-xl font-bold">Restore Password</h2>
                   <div className="mb-4">
                     <input
                       type="email"
@@ -295,21 +295,21 @@ const Account: React.FC = () => {
                       placeholder="Email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
+                      className="mb-4 w-full rounded border p-2 focus:outline-none focus:ring focus:ring-yellow-500"
                     />
                     {errors.email && (
-                      <p className="text-red-500 text-sm">{errors.email}</p>
+                      <p className="text-sm text-red-500">{errors.email}</p>
                     )}
                   </div>
 
                   {errors.email && (
-                    <p className="text-red-500 text-sm">{errors.email}</p>
+                    <p className="text-sm text-red-500">{errors.email}</p>
                   )}
 
                   <button
                     onClick={handlePasswordReset}
-                    className={`w-full p-2 sm:p-3 mb-4 rounded bg-blue-500 text-white hover:bg-blue-600 ${
-                      authLoading ? 'opacity-50 cursor-not-allowed' : ''
+                    className={`mb-4 w-full rounded bg-blue-500 p-2 text-white hover:bg-blue-600 sm:p-3 ${
+                      authLoading ? 'cursor-not-allowed opacity-50' : ''
                     }`}
                     disabled={authLoading || !formData.email.trim()}
                   >
@@ -320,19 +320,19 @@ const Account: React.FC = () => {
                       setIsForgotPassword(false);
                       setMessage('');
                     }}
-                    className="w-full p-2 sm:p-3 mb-4 rounded bg-gray-500 text-white hover:bg-gray-600"
+                    className="mb-4 w-full rounded bg-gray-500 p-2 text-white hover:bg-gray-600 sm:p-3"
                   >
                     Back to Login
                   </button>
-                  {message && <p className="text-green-500 mt-4">{message}</p>}
+                  {message && <p className="mt-4 text-green-500">{message}</p>}
                 </>
               ) : user ? (
-                <div className="w-full px-12 py-4 -mt-8">
+                <div className="-mt-8 w-full px-12 py-4">
                   <></>
 
                   {showOrders ? (
                     <div>
-                      <h2 className="text-2xl font-bold mb-4 mt-0">
+                      <h2 className="mb-4 mt-0 text-2xl font-bold">
                         My Orders
                       </h2>
                       <OrdersList
@@ -349,11 +349,11 @@ const Account: React.FC = () => {
                     </div>
                   ) : (
                     <div>
-                      <h2 className="text-2xl font-bold mb-8">
+                      <h2 className="mb-8 text-2xl font-bold">
                         My Information
                       </h2>
-                      <div className="rounded-lg shadow-md bg-white w-full sm:w-[90%] lg:w-[85%] mx-auto overflow-x-auto p-4 sm:p-6">
-                        <div className="break-words w-full">
+                      <div className="mx-auto w-full overflow-x-auto rounded-lg bg-white p-4 shadow-md sm:w-[90%] sm:p-6 lg:w-[85%]">
+                        <div className="w-full break-words">
                           <UserInfo
                             authUser={authUser}
                             userEmail={
@@ -375,7 +375,7 @@ const Account: React.FC = () => {
                 </div>
               ) : (
                 <>
-                  <h1 className="text-2xl font-bold mb-4">
+                  <h1 className="mb-4 text-2xl font-bold">
                     {isRegistering ? 'Register' : 'Login'}
                   </h1>
                   <div className="relative mb-4">
@@ -385,10 +385,10 @@ const Account: React.FC = () => {
                       placeholder="Email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
+                      className="w-full rounded border p-2 focus:outline-none focus:ring focus:ring-yellow-500"
                     />
                     {errors.email && (
-                      <p className="text-red-500 text-sm">{errors.email}</p>
+                      <p className="text-sm text-red-500">{errors.email}</p>
                     )}
                   </div>
 
@@ -400,10 +400,10 @@ const Account: React.FC = () => {
                         placeholder="Password"
                         value={formData.password}
                         onChange={handleInputChange}
-                        className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
+                        className="w-full rounded border p-2 focus:outline-none focus:ring focus:ring-yellow-500"
                       />
                       {errors.password && (
-                        <p className="text-red-500 text-sm">
+                        <p className="text-sm text-red-500">
                           {errors.password}
                         </p>
                       )}
@@ -411,7 +411,7 @@ const Account: React.FC = () => {
 
                     <span
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute inset-y-0 right-3 flex items-center justify-center cursor-pointer text-gray-500"
+                      className="absolute inset-y-0 right-3 flex cursor-pointer items-center justify-center text-gray-500"
                     >
                       {showPassword ? (
                         <svg
@@ -464,10 +464,10 @@ const Account: React.FC = () => {
                               confirmPassword: e.target.value,
                             }))
                           }
-                          className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500 pr-10"
+                          className="w-full rounded border p-2 pr-10 focus:outline-none focus:ring focus:ring-yellow-500"
                         />
                         {errors.confirmPassword && (
-                          <p className="text-red-500 text-sm">
+                          <p className="text-sm text-red-500">
                             {errors.confirmPassword}
                           </p>
                         )}
@@ -475,7 +475,7 @@ const Account: React.FC = () => {
                           onClick={() =>
                             setShowConfirmPassword(!showConfirmPassword)
                           }
-                          className="absolute inset-y-0 right-3 flex items-center cursor-pointer text-gray-500"
+                          className="absolute inset-y-0 right-3 flex cursor-pointer items-center text-gray-500"
                         >
                           {showConfirmPassword ? (
                             <svg
@@ -523,10 +523,10 @@ const Account: React.FC = () => {
                             placeholder="Name"
                             value={formData.name}
                             onChange={handleInputChange}
-                            className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
+                            className="w-full rounded border p-2 focus:outline-none focus:ring focus:ring-yellow-500"
                           />
                           {errors.name && (
-                            <p className="text-red-500 text-sm">
+                            <p className="text-sm text-red-500">
                               {errors.name}
                             </p>
                           )}
@@ -540,10 +540,10 @@ const Account: React.FC = () => {
                             placeholder="Surname"
                             value={formData.surname}
                             onChange={handleInputChange}
-                            className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
+                            className="w-full rounded border p-2 focus:outline-none focus:ring focus:ring-yellow-500"
                           />
                           {errors.surname && (
-                            <p className="text-red-500 text-sm">
+                            <p className="text-sm text-red-500">
                               {errors.surname}
                             </p>
                           )}
@@ -554,7 +554,7 @@ const Account: React.FC = () => {
                   {isRegistering && (
                     <>
                       <div className="mb-4 text-left">
-                        <label className="block mb-2 font-bold">Anrede</label>
+                        <label className="mb-2 block font-bold">Anrede</label>
                         <div className="flex items-center gap-4">
                           <label className="flex items-center">
                             <input
@@ -588,10 +588,10 @@ const Account: React.FC = () => {
                             placeholder="Street"
                             value={formData.street}
                             onChange={handleInputChange}
-                            className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
+                            className="w-full rounded border p-2 focus:outline-none focus:ring focus:ring-yellow-500"
                           />
                           {errors.street && (
-                            <p className="text-red-500 text-sm">
+                            <p className="text-sm text-red-500">
                               {errors.street}
                             </p>
                           )}
@@ -605,10 +605,10 @@ const Account: React.FC = () => {
                             placeholder="House Number"
                             value={formData.houseNumber}
                             onChange={handleInputChange}
-                            className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
+                            className="w-full rounded border p-2 focus:outline-none focus:ring focus:ring-yellow-500"
                           />
                           {errors.houseNumber && (
-                            <p className="text-red-500 text-sm">
+                            <p className="text-sm text-red-500">
                               {errors.houseNumber}
                             </p>
                           )}
@@ -621,10 +621,10 @@ const Account: React.FC = () => {
                           placeholder="Postal Code (ZIP)"
                           value={formData.zip}
                           onChange={handleInputChange}
-                          className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
+                          className="w-full rounded border p-2 focus:outline-none focus:ring focus:ring-yellow-500"
                         />
                         {errors.zip && (
-                          <p className="text-red-500 text-sm">{errors.zip}</p>
+                          <p className="text-sm text-red-500">{errors.zip}</p>
                         )}
                       </div>
                       <div className="mb-4">
@@ -634,10 +634,10 @@ const Account: React.FC = () => {
                           placeholder="City"
                           value={formData.city}
                           onChange={handleInputChange}
-                          className="w-full p-2 mb-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500"
+                          className="mb-2 w-full rounded border p-2 focus:outline-none focus:ring focus:ring-yellow-500"
                         />
                         {errors.city && (
-                          <p className="text-red-500 text-sm">{errors.city}</p>
+                          <p className="text-sm text-red-500">{errors.city}</p>
                         )}
                       </div>
                       <div className="mb-4">
@@ -659,7 +659,7 @@ const Account: React.FC = () => {
                           }
                         />
                         {errors.country && (
-                          <p className="text-red-500 text-sm">
+                          <p className="text-sm text-red-500">
                             {errors.country}
                           </p>
                         )}
@@ -668,7 +668,7 @@ const Account: React.FC = () => {
                   )}
                   <button
                     onClick={handleSubmit}
-                    className={`w-full p-2 sm:p-3 mb-4 rounded ${
+                    className={`mb-4 w-full rounded p-2 sm:p-3 ${
                       isRegistering ? 'bg-blue-500' : 'bg-green-500'
                     } text-white hover:bg-opacity-90`}
                     disabled={authLoading}
@@ -685,7 +685,7 @@ const Account: React.FC = () => {
                     <div className="mt-4">
                       <button
                         onClick={() => setIsForgotPassword(true)}
-                        className="text-blue-600 hover:underline text-sm bg-transparent border-none cursor-pointer"
+                        className="cursor-pointer border-none bg-transparent text-sm text-blue-600 hover:underline"
                       >
                         Forgot Password?
                       </button>
@@ -712,12 +712,12 @@ const Account: React.FC = () => {
                           authType: 'user',
                         });
                       }}
-                      className="text-blue-600 hover:underline text-sm bg-transparent border-none cursor-pointer"
+                      className="cursor-pointer border-none bg-transparent text-sm text-blue-600 hover:underline"
                     >
                       {isRegistering ? '← Back to Login' : 'Switch to Register'}
                     </button>
                   </div>
-                  {message && <p className="text-red-500 mt-4">{message}</p>}
+                  {message && <p className="mt-4 text-red-500">{message}</p>}
                 </>
               )}
             </div>

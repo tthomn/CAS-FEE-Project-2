@@ -9,7 +9,7 @@ const CountryDropdown: React.FC<{
   const options = CountryList().getData();
 
   return (
-    <div className="w-full mb-6">
+    <div className="mb-6 w-full">
       <Select
         id="country"
         options={options}
@@ -57,7 +57,7 @@ const CountryDropdown: React.FC<{
               <img
                 src={`https://flagcdn.com/w40/${option.value.toLowerCase()}.png`}
                 alt=""
-                className="w-5 h-4"
+                className="h-4 w-5"
               />
               {option.label}
             </div>

@@ -26,19 +26,19 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, message }) => {
 
   return (
     <div
-      className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-50"
       aria-labelledby="modal-title"
       aria-modal="true"
       role="dialog"
     >
-      <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
-        <h2 id="modal-title" className="text-xl font-bold text-gray-800 mb-4">
+      <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
+        <h2 id="modal-title" className="mb-4 text-xl font-bold text-gray-800">
           Order confirmed
         </h2>
-        <p className="text-gray-600 mb-6">{message}</p>
+        <p className="mb-6 text-gray-600">{message}</p>
         <button
           onClick={onClose}
-          className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+          className="rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
         >
           Close
         </button>

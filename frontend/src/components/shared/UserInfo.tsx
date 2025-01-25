@@ -16,34 +16,34 @@ const UserInfo: React.FC<UserInfoProps> = ({
 }) => {
   if (loading) {
     return (
-      <p className="text-gray-500 text-center">Loading user information...</p>
+      <p className="text-center text-gray-500">Loading user information...</p>
     );
   }
 
   if (!authUser) {
     return (
-      <p className="text-gray-500 text-center">
+      <p className="text-center text-gray-500">
         No additional user information available.
       </p>
     );
   }
 
   return (
-    <div className="w-[98%] sm:w-[95%] lg:w-full p-4 bg-white shadow-md rounded-lg mx-auto">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="mx-auto w-[98%] rounded-lg bg-white p-4 shadow-md sm:w-[95%] lg:w-full">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div>
-          <div className="flex items-start gap-3 mb-4">
-            <FiMail className="text-3xl text-blue-500 mt-1" />
+          <div className="mb-4 flex items-start gap-3">
+            <FiMail className="mt-1 text-3xl text-blue-500" />
             <div className="w-full">
               <p className="text-xs font-medium text-gray-500">Email</p>
-              <p className="text-sm text-gray-900 break-words overflow-hidden">
+              <p className="overflow-hidden break-words text-sm text-gray-900">
                 {userEmail || 'Not provided'}
               </p>
             </div>
           </div>
 
-          <div className="flex items-start gap-3 mb-4">
-            <FiUser className="text-3xl text-green-500 mt-1" />
+          <div className="mb-4 flex items-start gap-3">
+            <FiUser className="mt-1 text-3xl text-green-500" />
             <div className="w-full">
               <p className="text-xs font-medium text-gray-500">Full Name</p>
               <p className="text-sm text-gray-900">
@@ -52,8 +52,8 @@ const UserInfo: React.FC<UserInfoProps> = ({
             </div>
           </div>
 
-          <div className="flex items-start gap-3 mb-4">
-            <FiCalendar className="text-3xl text-yellow-500 mt-1" />
+          <div className="mb-4 flex items-start gap-3">
+            <FiCalendar className="mt-1 text-3xl text-yellow-500" />
             <div className="w-full">
               <p className="text-xs font-medium text-gray-500">Date of Birth</p>
               <p className="text-sm text-gray-900">
@@ -65,7 +65,7 @@ const UserInfo: React.FC<UserInfoProps> = ({
 
         <div>
           <div className="flex items-start gap-3">
-            <FiMapPin className="text-3xl text-purple-500 mt-1" />
+            <FiMapPin className="mt-1 text-3xl text-purple-500" />
             <div className="w-full">
               <p className="text-xs font-medium text-gray-500">Address</p>
               <p className="text-sm text-gray-900">

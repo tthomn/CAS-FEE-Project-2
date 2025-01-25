@@ -110,13 +110,13 @@ const Rating: React.FC<RatingProps> = ({
       <div className="flex items-center">
         {[...Array(totalStars)].map((_, index) => (
           <div key={index} className="relative">
-            <i className="fas fa-star text-gray-400 text-xl"></i>
+            <i className="fas fa-star text-xl text-gray-400"></i>
             {index < filledStars && (
-              <i className="fas fa-star text-yellow-500 text-xl absolute inset-0"></i>
+              <i className="fas fa-star absolute inset-0 text-xl text-yellow-500"></i>
             )}
             {index === filledStars && partialStarWidth > 0 && (
               <i
-                className="fas fa-star text-yellow-500 text-xl absolute inset-0"
+                className="fas fa-star absolute inset-0 text-xl text-yellow-500"
                 style={{
                   clipPath: `inset(0 ${100 - partialStarWidth}% 0 0)`,
                 }}
@@ -140,29 +140,29 @@ const Rating: React.FC<RatingProps> = ({
         <>
           <button
             onClick={handleOpenPopup}
-            className="text-sm text-blue-500 hover:underline mt-2"
+            className="mt-2 text-sm text-blue-500 hover:underline"
           >
             Rate this product
           </button>
           {alreadyRatedMessageVisible && (
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="mt-1 text-sm text-gray-500">
               <i className="fas fa-info-circle text-gray-400"></i> You already
               rated this product.
             </p>
           )}
         </>
       ) : (
-        <p className="text-sm text-gray-500 mt-2">
+        <p className="mt-2 text-sm text-gray-500">
           <i className="fas fa-info-circle text-gray-400"></i> Please log in to
           rate this product.
         </p>
       )}
 
       {showPopup && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-80 text-center">
-            <h3 className="text-lg font-bold mb-4">Rate this product</h3>
-            <div className="flex justify-center mb-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="w-80 rounded-lg bg-white p-6 text-center shadow-lg">
+            <h3 className="mb-4 text-lg font-bold">Rate this product</h3>
+            <div className="mb-4 flex justify-center">
               {[1, 2, 3, 4, 5].map((star) => (
                 <button
                   key={star}
@@ -177,7 +177,7 @@ const Rating: React.FC<RatingProps> = ({
             </div>
             <button
               onClick={handleRateProduct}
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
             >
               Rate
             </button>

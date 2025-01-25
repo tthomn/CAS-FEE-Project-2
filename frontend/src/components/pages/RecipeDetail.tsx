@@ -49,44 +49,44 @@ const RecipeDetail: React.FC = () => {
 
   if (!recipe) {
     return (
-      <div className="text-center text-red-600 font-bold mt-6">
+      <div className="mt-6 text-center font-bold text-red-600">
         Recipe not found
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#f8e5a1] pt-6 relative">
-      <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md overflow-hidden mt-12 relative">
+    <div className="relative min-h-screen bg-[#f8e5a1] pt-6">
+      <div className="relative mx-auto mt-12 max-w-4xl overflow-hidden rounded-lg bg-white shadow-md">
         <Link
           to="/recipe"
-          className="absolute top-3 left-3 text-3xl bg-transparent text-gray-700 hover:text-orange-600 z-50 group"
+          className="group absolute left-3 top-3 z-50 bg-transparent text-3xl text-gray-700 hover:text-orange-600"
           aria-label="Back to Recipes"
         >
           &larr;
-          <span className="absolute top-10 left-2 opacity-0 group-hover:opacity-100 bg-gray-800 text-white text-sm rounded-lg py-1 px-3 shadow-lg transition-opacity duration-300">
+          <span className="absolute left-2 top-10 rounded-lg bg-gray-800 px-3 py-1 text-sm text-white opacity-0 shadow-lg transition-opacity duration-300 group-hover:opacity-100">
             Back to Recipes
           </span>
         </Link>
 
-        <div className="w-full h-[120px] overflow-hidden">
+        <div className="h-[120px] w-full overflow-hidden">
           <img
             src="/images/banner.jpg"
             alt="Rezepte Banner"
-            className="w-full h-full object-cover"
+            className="h-full w-full object-cover"
             loading="eager"
           />
         </div>
 
         <div className="p-6 md:p-10">
-          <div className="flex flex-col md:flex-row gap-6 items-start">
+          <div className="flex flex-col items-start gap-6 md:flex-row">
             <img
               src={recipe.image}
               alt={recipe.title}
-              className="w-full md:w-[300px] rounded-md object-cover"
+              className="w-full rounded-md object-cover md:w-[300px]"
             />
             <div className="flex-1 text-gray-800">
-              <h3 className="text-2xl font-bold mb-4">{recipe.title}</h3>
+              <h3 className="mb-4 text-2xl font-bold">{recipe.title}</h3>
               <p className="text-lg leading-relaxed">{recipe.description}</p>
             </div>
           </div>

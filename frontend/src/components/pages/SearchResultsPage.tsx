@@ -73,18 +73,18 @@ const SearchResultsPage: React.FC = () => {
     linkPrefix: string,
   ) => (
     <div className="mb-6">
-      <h2 className="text-xl font-bold mb-2">{title}</h2>
-      <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <h2 className="mb-2 text-xl font-bold">{title}</h2>
+      <ul className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {items.map((item) => (
           <li
             key={item.id}
-            className="flex items-center gap-4 border p-4 rounded shadow-md"
+            className="flex items-center gap-4 rounded border p-4 shadow-md"
           >
             {item.imageUrl && (
               <img
                 src={item.imageUrl}
                 alt={item.name || 'Product Image'}
-                className="w-16 h-16 object-cover rounded"
+                className="h-16 w-16 rounded object-cover"
               />
             )}
             <div>
@@ -94,7 +94,7 @@ const SearchResultsPage: React.FC = () => {
               >
                 {item.name || 'No Name'}
               </Link>
-              <p className="text-gray-600 text-sm">
+              <p className="text-sm text-gray-600">
                 {item.description || 'No Description'}
               </p>
             </div>
@@ -106,7 +106,7 @@ const SearchResultsPage: React.FC = () => {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Search Results</h1>
+      <h1 className="mb-4 text-2xl font-bold">Search Results</h1>
 
       {loading && <p>Loading...</p>}
 

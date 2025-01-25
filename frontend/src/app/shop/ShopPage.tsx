@@ -27,7 +27,7 @@ const ShopPage: React.FC = () => {
         <p>{categoriesError}</p>
         <button
           onClick={fetchCategories}
-          className="bg-blue-500 text-white px-4 py-2 rounded"
+          className="rounded bg-blue-500 px-4 py-2 text-white"
         >
           Retry
         </button>
@@ -36,16 +36,16 @@ const ShopPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#fff8e1]">
+    <div className="flex min-h-screen flex-col bg-[#fff8e1]">
       <div
-        className="relative w-full h-[300px] bg-cover bg-center"
+        className="relative h-[300px] w-full bg-cover bg-center"
         style={{
           backgroundImage: `url('/images/banner_bee.png')`,
         }}
       >
         <div className="absolute inset-0 bg-black/40"></div>
-        <div className="absolute inset-0 flex flex-col justify-center items-center text-center">
-          <h1 className="text-white text-3xl md:text-4xl font-bold uppercase tracking-wider">
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+          <h1 className="text-3xl font-bold uppercase tracking-wider text-white md:text-4xl">
             {selectedCategoryName}
           </h1>
         </div>

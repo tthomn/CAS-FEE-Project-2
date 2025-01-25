@@ -32,7 +32,6 @@ const CartPage: React.FC = () => {
               `${item.productName} has insufficient stock. Available: ${productData.stock}, Requested: ${item.quantity}`,
             );
           }
-
         } else {
           throw new Error(`Product ${item.productName} does not exist.`);
         }
@@ -82,20 +81,20 @@ const CartPage: React.FC = () => {
   }
 
   return (
-    <div className="px-4 py-6 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold text-gray-800 text-center mb-6">
+    <div className="mx-auto max-w-4xl px-4 py-6">
+      <h1 className="mb-6 text-center text-2xl font-bold text-gray-800">
         Your Shopping Cart
       </h1>
       <ul className="list-none space-y-4">
         {cartItems.map((item) => (
           <li
             key={item.cartItemId}
-            className="flex items-center p-4 border-b border-gray-200"
+            className="flex items-center border-b border-gray-200 p-4"
           >
             <img
               src={item.imageUrl}
               alt={item.productName}
-              className="w-16 h-16 object-cover rounded mr-4"
+              className="mr-4 h-16 w-16 rounded object-cover"
             />
             <div className="flex-1">
               <h4 className="text-lg font-semibold text-gray-800">
@@ -108,9 +107,9 @@ const CartPage: React.FC = () => {
                 <span className="text-sm font-medium text-gray-800">
                   Quantity:
                 </span>
-                <div className="flex items-center gap-2 mt-1">
+                <div className="mt-1 flex items-center gap-2">
                   <button
-                    className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
+                    className="rounded bg-gray-200 px-2 py-1 hover:bg-gray-300"
                     onClick={() =>
                       updateQuantity(item.cartItemId, item.quantity - 1)
                     }
@@ -119,7 +118,7 @@ const CartPage: React.FC = () => {
                   </button>
                   <p className="text-sm">{item.quantity}</p>
                   <button
-                    className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
+                    className="rounded bg-gray-200 px-2 py-1 hover:bg-gray-300"
                     onClick={() =>
                       updateQuantity(item.cartItemId, item.quantity + 1)
                     }
@@ -130,7 +129,7 @@ const CartPage: React.FC = () => {
               </div>
             </div>
             <button
-              className="px-3 py-1 text-sm text-white bg-red-500 rounded hover:bg-red-600 transition-colors"
+              className="rounded bg-red-500 px-3 py-1 text-sm text-white transition-colors hover:bg-red-600"
               onClick={() => removeFromCart(item.cartItemId)}
             >
               Remove
@@ -138,12 +137,12 @@ const CartPage: React.FC = () => {
           </li>
         ))}
       </ul>
-      <div className="text-right mt-6">
-        <h3 className="text-xl font-semibold text-gray-800 mb-4">
+      <div className="mt-6 text-right">
+        <h3 className="mb-4 text-xl font-semibold text-gray-800">
           Total: CHF {totalPrice.toFixed(2)}
         </h3>
         <button
-          className="px-6 py-2 text-white bg-green-500 rounded hover:bg-green-600 transition-colors"
+          className="rounded bg-green-500 px-6 py-2 text-white transition-colors hover:bg-green-600"
           onClick={handleProceedToCheckout}
         >
           Proceed to Checkout
@@ -152,20 +151,20 @@ const CartPage: React.FC = () => {
 
       {/* Popup for not logged-in users */}
       {showPopup && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-96 text-center">
-            <h2 className="text-lg font-semibold mb-4">Please Log In</h2>
-            <p className="text-sm text-gray-600 mb-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="w-96 rounded-lg bg-white p-6 text-center shadow-lg">
+            <h2 className="mb-4 text-lg font-semibold">Please Log In</h2>
+            <p className="mb-4 text-sm text-gray-600">
               You need to log in to proceed with the checkout.
             </p>
             <button
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors mr-2"
+              className="mr-2 rounded bg-blue-500 px-4 py-2 text-white transition-colors hover:bg-blue-600"
               onClick={() => navigate('/login?fromCart=true')}
             >
               Go to Login
             </button>
             <button
-              className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition-colors"
+              className="rounded bg-gray-300 px-4 py-2 text-gray-800 transition-colors hover:bg-gray-400"
               onClick={closePopup}
             >
               Cancel
