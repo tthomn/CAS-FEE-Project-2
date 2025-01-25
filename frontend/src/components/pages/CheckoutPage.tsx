@@ -87,6 +87,7 @@ const CheckoutPage: React.FC = () => {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const sendInvoiceEmail = async (order: any, orderId: string) => {
     const emailParams = {
       to_name: email,
