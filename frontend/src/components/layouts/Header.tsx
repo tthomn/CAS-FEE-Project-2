@@ -20,6 +20,15 @@ const Header: React.FC = () => {
             setSearchQuery("");
         }
     };
+    const handleLogout = async () => {
+        try {
+            await logout(); 
+            navigate("/"); 
+        } catch (error) {
+            console.error("Error logging out:", error);
+        }
+    };
+
 
     return (
         <div className="relative bg-[#fff8e1]">
@@ -159,7 +168,7 @@ const Header: React.FC = () => {
                     </div>
                     {user && (
                         <button
-                            onClick={logout}
+                            onClick={handleLogout}
                             className="bg-red-500 text-white px-3 py-1 text-base rounded hover:bg-red-700"
                         >
                             Log out
