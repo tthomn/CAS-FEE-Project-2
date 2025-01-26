@@ -1,3 +1,11 @@
 src/tests/CartContext.test.tsx
 functions/src/index.ts
 functions/.eslintrc.js
+src/assets
+public/
+*.png
+*.jpg
+*.svg
+*.gif
+*.css
+*.scss

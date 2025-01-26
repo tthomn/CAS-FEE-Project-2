@@ -1,4 +1,3 @@
-// CAS-FEE-Project-2/frontend/src/types/order.ts
 import { CartItem } from './cartItem';
 
 export interface Order {

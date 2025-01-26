@@ -38,7 +38,6 @@ export const cartCollectionCleaner = functions.scheduler.onSchedule(
 );
 
 export const setAdditionalUserData = functions.https.onCall(async (context) => {
-  // Ensure the request is authenticated
   if (!context.auth) {
     throw new functions.https.HttpsError(
       "unauthenticated",

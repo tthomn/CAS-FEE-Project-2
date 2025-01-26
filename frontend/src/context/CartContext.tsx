@@ -244,7 +244,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-  //Used in ProductDetail.tsx
   const addToCart = async (item: CartItem) => {
     const newItem = { ...item, cartItemId: uuidv4(), addedAt: Timestamp.now() };
     try {

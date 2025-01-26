@@ -14,7 +14,6 @@ const LoginPage: React.FC = () => {
   const location = useLocation();
   const { login, resetPassword, logout } = useAuth();
 
-  //Here we're coming from the cart
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);

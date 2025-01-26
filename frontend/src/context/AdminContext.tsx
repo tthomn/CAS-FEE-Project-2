@@ -121,7 +121,6 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({
 
   const updateProduct = async (id: string, updatedData: Partial<Product>) => {
     try {
-      // const docRefComplete = doc(collection(db, "products"), id);
       const docRefComplete = await createDocRef('products', id);
       await updateDocByRef(docRefComplete, updatedData);
       await fetchProducts(null);

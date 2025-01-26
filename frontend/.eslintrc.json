@@ -1,4 +1,15 @@
 {
+  "ignorePatterns": [
+    "public/*",
+    "node_modules/*",
+    "dist/*",
+    "*.png",
+    "*.jpg",
+    "*.svg",
+    "*.gif",
+    "*.css",
+    "*.scss"
+  ],
   "extends": ["react-app", "react-app/jest", "plugin:prettier/recommended"],
   "plugins": ["tailwindcss"],
   "rules": {
@@ -15,9 +26,24 @@
     "tailwindcss/no-custom-classname": [
       "warn",
       {
-        "whitelist": ["fas", "fa-home", "fa-user", "fa-star", "fa-info-circle",
-          "text-md","react-select-container", "spinner-border","fa-envelope","fa-phone","fa-map-marker-alt",
-        "shop-page", "checkout-form","fa-bars","fa-shopping-basket","fa-search"]
+        "whitelist": [
+          "fas",
+          "fa-home",
+          "fa-user",
+          "fa-star",
+          "fa-info-circle",
+          "text-md",
+          "react-select-container",
+          "spinner-border",
+          "fa-envelope",
+          "fa-phone",
+          "fa-map-marker-alt",
+          "shop-page",
+          "checkout-form",
+          "fa-bars",
+          "fa-shopping-basket",
+          "fa-search"
+        ]
       }
     ],
     "tailwindcss/classnames-order": "warn", // Enforces logical class order

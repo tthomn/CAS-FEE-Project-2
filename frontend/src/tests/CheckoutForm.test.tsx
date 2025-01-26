@@ -2,6 +2,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import CheckoutForm from '../components/checkout/CheckoutForm';
+import '@testing-library/jest-dom';
 
 describe('CheckoutForm', () => {
   const mockOnCheckout = jest.fn();

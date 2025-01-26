@@ -24,7 +24,6 @@ import {
 import { db, storage } from './firebaseConfig';
 
 //Query for Doc fields (Cart Items) with 1 condition
-//Gets the Contens (the fields)
 export async function getDocDataBy1Condition<T>(
   collectionName: string,
   field: string,
@@ -112,7 +111,6 @@ export async function getCollectionData<T>(
     const colRef = collection(db, collectionName);
     const q = query(colRef, ...constraints);
     const querySnapshot = await getDocs(q);
-    // Map Firestore docs to objects with `id` + data
     return querySnapshot.docs.map((doc) => ({
       id: doc.id,
       ...(doc.data() as T),

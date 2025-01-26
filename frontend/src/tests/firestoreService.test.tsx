@@ -27,6 +27,7 @@ import {
   deleteDocByRef,
   uploadImageToStorage,
 } from '../services/firebase/firestoreService';
+import '@testing-library/jest-dom';
 
 // * 1) Mock "firebase/firestore" so we can intercept Firestore calls.
 

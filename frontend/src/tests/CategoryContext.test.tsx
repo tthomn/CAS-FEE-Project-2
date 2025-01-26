@@ -3,6 +3,7 @@ import React from 'react';
 import { CategoriesProvider, useCategories } from '../context/CategoryContext';
 import { getCollectionData } from '../services/firebase/firestoreService';
 import { Category } from '../types/category';
+import '@testing-library/jest-dom';
 
 jest.mock('../services/firebase/firestoreService');
 
@@ -40,8 +41,6 @@ describe('CategoryContext', () => {
     screen.getByText('Fetch Categories').click();
     await waitFor(() => {
       expect(screen.getByText('Category 1')).toBeInTheDocument();
-    });
-    await waitFor(() => {
       expect(screen.getByText('Category 2')).toBeInTheDocument();
     });
   });

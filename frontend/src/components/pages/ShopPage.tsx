@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import Footer from '../../components/layouts/Footer';
-import ProductGrid from '../../components/pages/ProductGrid';
-import CategorySidebar from '../../components/shared/CategorySidebar';
+import Footer from '../layouts/Footer';
+import ProductGrid from './ProductGrid';
+import CategorySidebar from '../shared/CategorySidebar';
 import { useCategories } from '../../context/CategoryContext';
 
 const ShopPage: React.FC = () => {

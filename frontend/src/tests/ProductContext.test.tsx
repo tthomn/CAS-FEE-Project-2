@@ -3,6 +3,7 @@ import React from 'react';
 import { ProductProvider, useProduct } from '../context/ProductContext';
 import { getCollectionData } from '../services/firebase/firestoreService';
 import { Product } from '../types/product';
+import '@testing-library/jest-dom';
 
 jest.mock('../services/firebase/firestoreService', () => ({
   getCollectionData: jest.fn(),

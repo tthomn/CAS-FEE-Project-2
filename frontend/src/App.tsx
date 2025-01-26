@@ -1,7 +1,7 @@
 import './index.css';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
-import ShopPage from './app/shop/ShopPage';
+import ShopPage from './components/pages/ShopPage';
 import Header from './components/layouts/Header';
 import Account from './components/pages/Account';
 import AdminPanel from './components/pages/AdminPanel';

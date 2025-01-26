@@ -100,7 +100,6 @@ function TestCartConsumer() {
 
 describe('CartContext', () => {
   test('initially renders empty for a guest user', async () => {
-    // 1) The first call to `fetchCartItems` in useEffect => we return empty
     (getDocDataBy1Condition as jest.Mock).mockResolvedValueOnce([]);
 
     await act(async () => {
@@ -111,15 +110,17 @@ describe('CartContext', () => {
       );
     });
 
-    // Expect cart to be empty
-    expect(screen.getByTestId('cart-length')).toHaveTextContent('0');
+    // Check if the element exists
+    const cartLengthElement = screen.getByTestId('cart-length');
+
+    // Assert manually
+    expect(cartLengthElement.textContent).toBe('0');
   });
 
   test('adds an item for a guest user', async () => {
     // 1) On mount => returns empty cart from Firestore
     (getDocDataBy1Condition as jest.Mock)
       .mockResolvedValueOnce([]) // first call: no items
-      // subsequent calls if fetchCartItems is triggered again
       .mockResolvedValue([]);
 
     await act(async () => {
@@ -137,7 +138,8 @@ describe('CartContext', () => {
     expect(addDocToCollection).toHaveBeenCalledTimes(1);
 
     // The local state should show 1 item
-    expect(screen.getByTestId('cart-length')).toHaveTextContent('1');
+    const cartLengthElement = screen.getByTestId('cart-length');
+    expect(cartLengthElement.textContent).toBe('1');
   });
 
   test('removes an item from the cart', async () => {
@@ -166,7 +168,8 @@ describe('CartContext', () => {
     });
 
     // Confirm the cart started with 1 item
-    expect(screen.getByTestId('cart-length')).toHaveTextContent('1');
+    const cartLengthElement = screen.getByTestId('cart-length');
+    expect(cartLengthElement.textContent).toBe('1');
 
     // Remove the item
     await act(async () => {
@@ -175,7 +178,9 @@ describe('CartContext', () => {
 
     // Deletion call
     expect(deleteDocByRef).toHaveBeenCalledTimes(1);
-    expect(screen.getByTestId('cart-length')).toHaveTextContent('0');
+
+    // Confirm the cart is now empty
+    expect(cartLengthElement.textContent).toBe('0');
   });
 
   test('clears the cart', async () => {
@@ -205,7 +210,8 @@ describe('CartContext', () => {
     });
 
     // Initially 1 item in the cart
-    expect(screen.getByTestId('cart-length')).toHaveTextContent('1');
+    const cartLengthElement = screen.getByTestId('cart-length');
+    expect(cartLengthElement.textContent).toBe('1');
 
     // Clear cart
     await act(async () => {
@@ -216,7 +222,7 @@ describe('CartContext', () => {
     expect(deleteDocByRef).toHaveBeenCalledTimes(2);
 
     // Now 0 items
-    expect(screen.getByTestId('cart-length')).toHaveTextContent('0');
+    expect(cartLengthElement.textContent).toBe('0');
   });
 
   test('updates the quantity of an item', async () => {
@@ -245,9 +251,12 @@ describe('CartContext', () => {
       );
     });
 
-    // Initially totalItems should be 1
-    expect(screen.getByTestId('total-items')).toHaveTextContent('1');
-    expect(screen.getByTestId('total-price')).toHaveTextContent('100');
+    // Initially totalItems should be 1 and totalPrice should be 100
+    const totalItemsElement = screen.getByTestId('total-items');
+    const totalPriceElement = screen.getByTestId('total-price');
+
+    expect(totalItemsElement.textContent).toBe('1');
+    expect(totalPriceElement.textContent).toBe('100');
 
     // Click update
     await act(async () => {
@@ -258,8 +267,8 @@ describe('CartContext', () => {
     expect(updateDocByRef).toHaveBeenCalledTimes(1);
 
     // Now totalItems=5 => totalPrice=5*100=500
-    expect(screen.getByTestId('total-items')).toHaveTextContent('5');
-    expect(screen.getByTestId('total-price')).toHaveTextContent('500');
+    expect(totalItemsElement.textContent).toBe('5');
+    expect(totalPriceElement.textContent).toBe('500');
   });
 
   test('handles authenticated user scenario', async () => {
@@ -295,10 +304,17 @@ describe('CartContext', () => {
       );
     });
 
-    expect(screen.getByTestId('cart-length')).toHaveTextContent('2');
-    expect(screen.getByTestId('total-items')).toHaveTextContent('3');
-    expect(screen.getByTestId('total-price')).toHaveTextContent('450');
+    // Get the elements for assertions
+    const cartLengthElement = screen.getByTestId('cart-length');
+    const totalItemsElement = screen.getByTestId('total-items');
+    const totalPriceElement = screen.getByTestId('total-price');
+
+    // Assert the values
+    expect(cartLengthElement.textContent).toBe('2'); // 2 items in the cart
+    expect(totalItemsElement.textContent).toBe('3'); // 2 + 1 = 3 total items
+    expect(totalPriceElement.textContent).toBe('450'); // 200*2 + 50 = 450 total price
   });
+
   test('adds a new item to the cart for a guest user', async () => {
     // Mock Firestore responses
     (getDocDataBy1Condition as jest.Mock).mockResolvedValueOnce([]); // Always return an array
@@ -314,7 +330,8 @@ describe('CartContext', () => {
     });
 
     // Verify initial state
-    expect(screen.getByTestId('cart-length')).toHaveTextContent('0');
+    const cartLengthElement = screen.getByTestId('cart-length');
+    expect(cartLengthElement.textContent).toBe('0');
 
     // Add an item to the cart
     await act(async () => {
@@ -335,7 +352,7 @@ describe('CartContext', () => {
       );
 
       // Verify UI state
-      expect(screen.getByTestId('cart-length')).toHaveTextContent('1');
+      expect(cartLengthElement.textContent).toBe('1');
     });
 
     // Verify localStorage sync

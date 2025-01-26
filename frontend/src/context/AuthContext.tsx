@@ -94,7 +94,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         };
 
         const setAdmin = httpsCallable(functions, 'setAdmin');
-        await setAdmin();
+        setAdmin();
 
         return authUser; // Return the constructed AuthUser object
       } catch (error) {
@@ -122,26 +122,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     });
     return unsubscribe;
   }, [auth, fetchAuthUser]);
-
-  /*
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setUser(user);
-      setLoading(false);
-
-      if (user) {
-        const fetchedUser = await fetchAuthUser(user?.uid);
-        if (fetchedUser) {
-          setAuthUser(fetchedUser);
-          setIsAuthenticated(true);
-        }
-      } else {
-        setIsAuthenticated(false);
-      }
-    });
-    return unsubscribe;
-  }, [auth, fetchAuthUser]);
-  */
 
   const login = async (email: string, password: string) => {
     setLoading(true);
@@ -176,7 +156,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-  //Adds additionalData to the user in the firebase db
   const register = async (
     email: string,
     password: string,
