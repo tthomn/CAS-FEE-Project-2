@@ -385,7 +385,7 @@ const AdminPanel: React.FC<{}> = () => {
           <span className="-ml-1">Price (CHF)</span>
           <span className="ml-1">Stock</span>
           <span className="-ml-1">Category</span>
-          <span>Description</span>
+          <span className="ml-28">Description</span>
           <span>Keywords</span>
           <span className="text-right">Actions</span>
         </div>
