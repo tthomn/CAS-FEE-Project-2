@@ -1,6 +1,6 @@
 # Bee Products Web Shop
 
-
+[**Live App on Firebase**](https://beeproductswebshop.web.app/)
 ***Honey Hive Treasures*** is an online storefront designed to sell a variety of bee-related products such as honey, soaps, candles, and more.
 
 ## Table of Contents
@@ -21,16 +21,16 @@
     - Forgot password option
   
 - **Shop Management**
-    - Admin role
-    - Adding new product
-    - Modifying existing product
-    - Delete product
-    - Manage product categories (e.g., Wildflower Honey, Beeswax Candles)
-    - Inventory tracking
+    - Admin User:
+        - Adding new product
+        - Modifying existing product
+        - Delete product
+        - Manage product categories (e.g., Wildflower Honey, Beeswax Candles)
+        - Inventory tracking
 
 - **Shopping Cart & Checkout**
     - Add products to cart
-    - Stock Management
+    - Validation if propduct is in stock
     - Secure checkout process
     - Order history for customers
 
@@ -51,7 +51,7 @@ Follow these instructions to set up and run the project locally.
    ```bash
    git clone https://github.com/tthomn/CAS-FEE-Project-2.git
 
-### Navigate to the directory freontend directory
+### Navigate to the directory frontend directory
 
 `cd yourPath/frontend`
 
@@ -63,7 +63,7 @@ Follow these instructions to set up and run the project locally.
 
 `npm start`
 
-### Test
+### Unit-Tests
 
 `npm run test`
 
@@ -75,11 +75,11 @@ You can access the live version of **Honey Hive Treasures** here:
 
 Alternatively, if you’re running the app locally, open your browser and navigate to:
 
-`http://localhost:5000`
+`http://localhost:3000`
 
 ### Firebase Functions
 
-At: cd yourPath/frontend/functions This project includes the following Firebase Functions:
+At: `cd yourPath/frontend/functions` this project includes the following Firebase Functions:
 
 ### 1. `cartCollectionCleaner`
 
@@ -87,7 +87,7 @@ At: cd yourPath/frontend/functions This project includes the following Firebase 
 - **Description**: Automatically deletes cart items in the `cart` collection that:
   - Are older than 14 days.
   - Have a `guestId`.
-- **Schedule**: Runs every 14 days (336 hours) based on the `addedAt` timestamp.
+- **Schedule**: Runs every 14 days (336 hours)
 - **Use Case**: Ensures the database is kept clean by removing abandoned guest user cart items.
 
 ---
@@ -96,9 +96,8 @@ At: cd yourPath/frontend/functions This project includes the following Firebase 
 
 - **Type**: Callable Function
 - **Description**: Writes the users data to the `users` collection on registration. Fields include:
-  - `name`, `surname`, `title`, `dob`, `street`, `houseNumber`, `zip`, `city`, `country`, and `email`.
-- **Security**: Ensures users can only modify their own data by validating their `uid`.
-- **Use Case**: Enables users to securely manage and update their profile information.
+  - `name`, `surname`, `authType`,`title`, `dob`, `street`, `houseNumber`, `zip`, `city`, `country`, and `email`.
+- **Use Case**: Savely adds new user to the collection 
 
 ---
 
