@@ -41,6 +41,8 @@ describe('CategoryContext', () => {
     screen.getByText('Fetch Categories').click();
     await waitFor(() => {
       expect(screen.getByText('Category 1')).toBeInTheDocument();
+    });
+    await waitFor(() => {
       expect(screen.getByText('Category 2')).toBeInTheDocument();
     });
   });

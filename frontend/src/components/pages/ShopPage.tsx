@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import Footer from '../layouts/Footer';
-import ProductGrid from './ProductGrid';
-import CategorySidebar from '../shared/CategorySidebar';
 import { useCategories } from '../../context/CategoryContext';
+import Footer from '../layouts/Footer';
+import CategorySidebar from '../shared/CategorySidebar';
+import ProductGrid from './ProductGrid';
 
 const ShopPage: React.FC = () => {
   const { categories, fetchCategories, categoriesLoading, categoriesError } =

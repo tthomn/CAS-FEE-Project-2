@@ -1,7 +1,6 @@
 import './index.css';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
-import ShopPage from './components/pages/ShopPage';
 import Header from './components/layouts/Header';
 import Account from './components/pages/Account';
 import AdminPanel from './components/pages/AdminPanel';
@@ -15,6 +14,7 @@ import ProductDetail from './components/pages/ProductDetail';
 import Recipe from './components/pages/Recipe';
 import RecipeDetail from './components/pages/RecipeDetail';
 import SearchResultsPage from './components/pages/SearchResultsPage';
+import ShopPage from './components/pages/ShopPage';
 import ProtectedRoute from './components/routes/ProtectedRoute';
 import { AdminProvider } from './context/AdminContext';
 import { AuthProvider } from './context/AuthContext';

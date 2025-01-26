@@ -35,7 +35,6 @@ const SearchResultsPage: React.FC = () => {
       try {
         // Normalize query to lowercase
         const normalizedQuery = queryParam.trim().toLowerCase();
-        console.log('Normalized query:', normalizedQuery);
 
         // Firestore query for exact matches
         const productsQuery = query(
@@ -51,8 +50,6 @@ const SearchResultsPage: React.FC = () => {
           id: doc.id,
           ...doc.data(),
         }));
-
-        console.log('Fetched products:', products);
 
         setResults({ products });
       } catch (err) {
