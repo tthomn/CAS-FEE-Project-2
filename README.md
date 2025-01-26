@@ -53,9 +53,9 @@ Follow these instructions to set up and run the project locally.
    ```bash
    git clone https://github.com/tthomn/CAS-FEE-Project-2.git
 
-### Navigate to the directory
+### Navigate to the directory freontend directory
 
-`cd bee-products-webshop/frontend`
+`cd yourPath/frontend`
 
 ### Install Dependencies
 
