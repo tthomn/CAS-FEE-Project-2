@@ -9,6 +9,7 @@
 - [Getting Started](#getting-started)
     - [Installation](#installation)
 - [Access the Application](#access-the-application)
+- [Firebase Functions](#firebase-functions)
 
 ---
 
@@ -71,6 +72,48 @@ Follow these instructions to set up and run the project locally.
 
 ### Access the Application
 
-Open your browser and navigate to `http://localhost:5003` to view Honey Hive Treasures.
+You can access the live version of **Honey Hive Treasures** here:
+
+[**Live App on Firebase**](https://beeproductswebshop.web.app/)
+
+Alternatively, if you’re running the app locally, open your browser and navigate to:
+
+`http://localhost:5003`
+
+### Firebase Functions
+
+This project includes the following Firebase Functions:
+
+### 1. `cartCollectionCleaner`
+
+- **Type**: Scheduled Function
+- **Description**: Automatically deletes cart items in the `cart` collection that:
+  - Are older than 14 days.
+  - Have a `guestId`.
+- **Schedule**: Runs every 14 days (336 hours) based on the `addedAt` timestamp.
+- **Use Case**: Ensures the database is kept clean by removing abandoned guest user cart items.
+
+---
+
+### 2. `setAdditionalUserData`
+
+- **Type**: Callable Function
+- **Description**: Allows authenticated users to update their personal data in the `users` collection. Fields include:
+  - `name`, `surname`, `title`, `dob`, `street`, `houseNumber`, `zip`, `city`, `country`, and `email`.
+- **Security**: Ensures users can only modify their own data by validating their `uid`.
+- **Use Case**: Enables users to securely manage and update their profile information.
+
+---
+
+### 3. `setAdmin`
+
+- **Type**: Callable Function
+- **Description**: Grants administrative privileges to a user if their `authType` in the `users` collection is `admin`.
+- **Security**:
+  - Validates the user's `authType` before assigning admin rights.
+  - Ensures only eligible users receive admin privileges.
+- **Use Case**: Allows administrators to manage restricted areas of the application.
+
+---
 
 
