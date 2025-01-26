@@ -21,8 +21,8 @@
   
 - **Shop Management**
     - Admin role
-    - Adding product
-    - Modifying product
+    - Adding new product
+    - Modifying existing product
     - Delete product
     - Create new categorie for products
   
