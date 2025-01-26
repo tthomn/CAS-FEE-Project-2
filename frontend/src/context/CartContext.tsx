@@ -81,18 +81,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
     }
   }, [authUser?.id]);
 
-  useEffect(() => {
-    fetchCartItems();
-    if (isAuthenticated === true) {
-      cartCleaner();
-    }
-
-    if (isAuthenticated === false) {
-      syncLocalToFirestore(getGuestId());
-    }
-  }, [fetchCartItems, isAuthenticated]);
-
-  const cartCleaner = async () => {
+  const cartCleaner = useCallback(async () => {
     if (isCleaning) return; // Prevent multiple concurrent calls
     setIsCleaning(true);
     try {
@@ -201,7 +190,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
     } finally {
       setIsCleaning(false);
     }
-  };
+  }, [isCleaning]);
 
   const getGuestId = (): string => {
     let guestId = localStorage.getItem('guestId');
@@ -211,6 +200,17 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
     }
     return guestId;
   };
+
+  useEffect(() => {
+    fetchCartItems();
+    if (isAuthenticated === true) {
+      cartCleaner();
+    }
+
+    if (isAuthenticated === false) {
+      syncLocalToFirestore(getGuestId());
+    }
+  }, [fetchCartItems, isAuthenticated, cartCleaner]);
 
   /**
    * Comes in handy when: Cart DB is cleaned up: and All unsuded items added by Guest Users are removed from the Firestore DB
