@@ -380,11 +380,11 @@ const AdminPanel: React.FC<{}> = () => {
       <div className="rounded-lg bg-white p-6 shadow-md">
         <h2 className="mb-4 border-b pb-2 text-2xl font-semibold">Products</h2>
 
-        <div className="hidden grid-cols-7 rounded-t-lg bg-blue-200 p-3 font-bold text-blue-800 md:grid">
+        <div className="hidden grid-cols-[1.5fr_1fr_1fr_0.75fr_3fr_1fr_1fr] rounded-t-lg bg-blue-200 p-3 font-bold text-blue-800 md:grid">
           <span>Product Name</span>
-          <span>Price (CHF)</span>
-          <span>Stock</span>
-          <span>Category</span>
+          <span className="-ml-1">Price (CHF)</span>
+          <span className="ml-1">Stock</span>
+          <span className="-ml-1">Category</span>
           <span>Description</span>
           <span>Keywords</span>
           <span className="text-right">Actions</span>
@@ -394,7 +394,7 @@ const AdminPanel: React.FC<{}> = () => {
           {products.map((product) => (
             <div
               key={product.id}
-              className="grid grid-cols-1 items-center gap-4 rounded-md p-4 transition hover:bg-gray-100 md:grid-cols-7"
+              className="grid grid-cols-1 items-center gap-4 rounded-md p-4 transition hover:bg-gray-100 md:grid-cols-[1.5fr_1fr_1fr_0.75fr_3fr_1fr_1fr]"
             >
               {editingProductId === product.id ? (
                 <>
@@ -410,7 +410,7 @@ const AdminPanel: React.FC<{}> = () => {
                         ),
                       )
                     }
-                    className="rounded-md border p-2"
+                    className="w-full rounded-md border p-2"
                   />
                   <input
                     type="number"
@@ -424,7 +424,7 @@ const AdminPanel: React.FC<{}> = () => {
                         ),
                       )
                     }
-                    className="rounded-md border p-2"
+                    className="w-full rounded-md border p-2"
                   />
                   <input
                     type="number"
@@ -438,7 +438,7 @@ const AdminPanel: React.FC<{}> = () => {
                         ),
                       )
                     }
-                    className="rounded-md border p-2"
+                    className="w-full rounded-md border p-2"
                   />
                   <select
                     value={product.categoryId}
@@ -451,7 +451,7 @@ const AdminPanel: React.FC<{}> = () => {
                         ),
                       )
                     }
-                    className="rounded-md border p-2"
+                    className="w-full rounded-md border p-2"
                   >
                     <option value="">Select a category</option>
                     {categories.map((category) => (
@@ -472,7 +472,7 @@ const AdminPanel: React.FC<{}> = () => {
                         ),
                       )
                     }
-                    className="h-20 rounded-md border p-2"
+                    className="h-20 w-full rounded-md border p-2"
                   />
                   <input
                     type="text"
@@ -492,7 +492,7 @@ const AdminPanel: React.FC<{}> = () => {
                         ),
                       )
                     }
-                    className="rounded-md border p-2"
+                    className="w-[110%] rounded-md border p-2"
                   />
                   <div className="flex justify-end gap-2">
                     <button
@@ -516,7 +516,16 @@ const AdminPanel: React.FC<{}> = () => {
                 <>
                   <span className="font-semibold">{product.name}</span>
                   <span>{product.price.toFixed(2)} CHF</span>
-                  <span>{product.stock}</span>
+                  <span
+                    className={`ml-2 ${
+                      product.stock === 0
+                        ? 'font-bold text-red-500'
+                        : 'text-gray-700'
+                    }`}
+                  >
+                    {product.stock}
+                  </span>
+
                   <span className="text-sm">
                     {categories.find((cat) => cat.id === product.categoryId)
                       ?.name || 'Unknown'}
