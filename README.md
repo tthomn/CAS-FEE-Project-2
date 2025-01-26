@@ -79,7 +79,7 @@ Alternatively, if you’re running the app locally, open your browser and naviga
 
 ### Firebase Functions
 
-This project includes the following Firebase Functions:
+At: cd yourPath/frontend/functions This project includes the following Firebase Functions:
 
 ### 1. `cartCollectionCleaner`
 
