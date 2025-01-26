@@ -386,6 +386,7 @@ const Account: React.FC = () => {
                       value={formData.email}
                       onChange={handleInputChange}
                       className="w-full rounded border p-2 focus:outline-none focus:ring focus:ring-yellow-500"
+                      autoComplete="email"
                     />
                     {errors.email && (
                       <p className="text-sm text-red-500">{errors.email}</p>
@@ -393,13 +394,17 @@ const Account: React.FC = () => {
                   </div>
 
                   <div className="relative mb-4">
-                    <div className="mb-4">
+                    <form
+                      onSubmit={(e) => e.preventDefault()}
+                      className="relative mb-4 w-full"
+                    >
                       <input
                         type={showPassword ? 'text' : 'password'}
                         name="password"
                         placeholder="Password"
                         value={formData.password}
                         onChange={handleInputChange}
+                        autoComplete="password"
                         className="w-full rounded border p-2 focus:outline-none focus:ring focus:ring-yellow-500"
                       />
                       {errors.password && (
@@ -407,7 +412,7 @@ const Account: React.FC = () => {
                           {errors.password}
                         </p>
                       )}
-                    </div>
+                    </form>
 
                     <span
                       onClick={() => setShowPassword(!showPassword)}
@@ -453,7 +458,10 @@ const Account: React.FC = () => {
                   </div>
                   {isRegistering && (
                     <>
-                      <div className="relative mb-4">
+                      <form
+                        onSubmit={(e) => e.preventDefault()}
+                        className="relative mb-4"
+                      >
                         <input
                           type={showConfirmPassword ? 'text' : 'password'}
                           placeholder="Confirm Password"
@@ -464,6 +472,7 @@ const Account: React.FC = () => {
                               confirmPassword: e.target.value,
                             }))
                           }
+                          autoComplete="password"
                           className="w-full rounded border p-2 pr-10 focus:outline-none focus:ring focus:ring-yellow-500"
                         />
                         {errors.confirmPassword && (
@@ -509,12 +518,13 @@ const Account: React.FC = () => {
                               <path
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
-                                d="M3.98 8.29A10.024 10.024 0 0112 5c4.478 0 8.269 2.943 9.543 7-.34 1.361-1.02 2.624-1.92 3.682m-2.11 2.373A9.963 9.963 0 0112 19c-4.478 0-8.269-2.943-9.543-7a10.054 10.054 0 012.02-3.71m1.42-1.42l13.75 13.75"
+                                d="M3.98 8.29A10.024 10.024 0 0112 5c4.478 0 8.269 2.943 9.543 7-.34 1.361-1.02 2.624-1.92 3.682m-2.11 2.373A9.963 9.963 0 0112 19c-4.478 0-8.268-2.943-9.543-7a10.054 10.054 0 012.02-3.71m1.42-1.42l13.75 13.75"
                               />
                             </svg>
                           )}
                         </span>
-                      </div>
+                      </form>
+
                       <div className="mb-4">
                         <div className="mb-4">
                           <input
@@ -554,7 +564,7 @@ const Account: React.FC = () => {
                   {isRegistering && (
                     <>
                       <div className="mb-4 text-left">
-                        <label className="mb-2 block font-bold">Anrede</label>
+                        <label className="mb-2 block font-bold">Title</label>
                         <div className="flex items-center gap-4">
                           <label className="flex items-center">
                             <input

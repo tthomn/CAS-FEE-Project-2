@@ -91,6 +91,7 @@ const LoginPage: React.FC = () => {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
                 placeholder="Email"
                 required
                 className="mb-4 w-full rounded border p-2"
@@ -99,6 +100,7 @@ const LoginPage: React.FC = () => {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                autoComplete="password"
                 placeholder="Password"
                 required
                 className="mb-4 w-full rounded border p-2"
