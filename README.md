@@ -25,12 +25,8 @@
     - Adding new product
     - Modifying existing product
     - Delete product
-    - Create new categorie for products
-  
-- **Product Management**
-    - Add, edit, and delete products
     - Manage product categories (e.g., Wildflower Honey, Beeswax Candles)
-    - Inventory tracking with stock levels
+    - Inventory tracking
 
 - **Shopping Cart & Checkout**
     - Add products to cart
