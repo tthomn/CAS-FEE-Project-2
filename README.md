@@ -34,6 +34,7 @@
 
 - **Shopping Cart & Checkout**
     - Add products to cart
+    - Stock Management
     - Secure checkout process
     - Order history for customers
 
@@ -78,7 +79,7 @@ You can access the live version of **Honey Hive Treasures** here:
 
 Alternatively, if you’re running the app locally, open your browser and navigate to:
 
-`http://localhost:5003`
+`http://localhost:5000`
 
 ### Firebase Functions
 
