@@ -99,7 +99,7 @@ This project includes the following Firebase Functions:
 ### 2. `setAdditionalUserData`
 
 - **Type**: Callable Function
-- **Description**: Allows authenticated users to update their personal data in the `users` collection. Fields include:
+- **Description**: Writes the users data to the `users` collection on registration. Fields include:
   - `name`, `surname`, `title`, `dob`, `street`, `houseNumber`, `zip`, `city`, `country`, and `email`.
 - **Security**: Ensures users can only modify their own data by validating their `uid`.
 - **Use Case**: Enables users to securely manage and update their profile information.
