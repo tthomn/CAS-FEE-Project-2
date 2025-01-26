@@ -140,6 +140,3 @@ This document outlines potential usability tests designed to evaluate the core f
   - Validation errors are displayed, and the product is not added/updated until all errors are resolved.
 
 ---
-
-## 3. Note
-These usability tests are provided as a framework for potential future evaluations. They are included as an additional component to demonstrate the thought process behind ensuring a user-friendly design for both users and administrators.
