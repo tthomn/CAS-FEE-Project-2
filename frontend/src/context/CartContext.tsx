@@ -38,6 +38,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export const CartProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
+  const [isCleaning, setIsCleaning] = useState(false);
   const { isAuthenticated, authUser } = useAuth();
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   let totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
@@ -92,6 +93,8 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
   }, [fetchCartItems, isAuthenticated]);
 
   const cartCleaner = async () => {
+    if (isCleaning) return; // Prevent multiple concurrent calls
+    setIsCleaning(true);
     try {
       let firestoreItems: CartItem[] = [];
 
@@ -195,6 +198,8 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
       setCartItems(firestoreItems);
     } catch (error) {
       console.error('Error cleaning cart:', error);
+    } finally {
+      setIsCleaning(false);
     }
   };
 
