@@ -33,6 +33,7 @@
     - Validation if propduct is in stock
     - Secure checkout process
     - Order history for customers
+    - Search for Products
 
 - **Responsive Design**
     - Optimized for mobile and desktop devices using Tailwind CSS
